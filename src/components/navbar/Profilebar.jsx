@@ -12,7 +12,7 @@ import {
 
 const AccountProfileBar = ({ username, avatarSrc }) => {
   return (
-    <div className="flex items-center justify-end space-x-4 bg-gray-800 p-4 w-full">      
+    <div className="flex items-center justify-end space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
