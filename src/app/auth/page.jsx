@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,14 @@ import { Label } from "@/components/ui/label";
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  useEffect(() => {
+    setMsg({
+      sucess: false,
+      message: "Testing"
+    })
+  }, [setMsg])
 
   const toggleForm = () => setIsLogin(!isLogin);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -75,6 +83,11 @@ const AuthPage = () => {
               </button>
             </div>
           </div>
+          {msg !== null && (
+            <Label className={`${ msg.sucess === true ? "text-green-800" : "text-red-800" } text-center`} >
+              {msg.message}
+            </Label>
+          )}
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
