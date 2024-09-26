@@ -54,14 +54,14 @@ export async function POST(request) {
         cookieStore.set("user", account_data.user_id);
 
         return NextResponse.json({
-            sucess: true,
+            success: true,
             message: "Success"
         }, { status: 200})
     } catch (err) {
         return NextResponse.json({
-            sucess: false,
+            success: false,
             message: err,
-        }, { status: 200 })
+        }, { status: 400 })
     }
 
 }

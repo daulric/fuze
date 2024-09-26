@@ -1,22 +1,40 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+
+import {encrypt} from "@/tools/encryption";
+import axios from "axios";
+import { useRouter } from 'next/navigation';
+
+async function handleSignupForm({email, password, username}, setMsg) {
+  const user_info = {
+    loginType: "signup",
+    email: email,
+    password: encrypt(password, "passcode"),
+    username: username,
+  }
+
+  const { data } = await axios.post("/api/auth", user_info);
+
+  if (data) {
+    console.log(data);
+    setMsg(data);
+    console.log("message set!")
+    return data.success;
+  }
+}
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [msg, setMsg] = useState(null);
 
-  useEffect(() => {
-    setMsg({
-      sucess: false,
-      message: "Testing"
-    })
-  }, [setMsg])
+  const [user_info, setUserInfo] = useState({});
+  const router = useRouter();
 
   const toggleForm = () => setIsLogin(!isLogin);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -27,7 +45,7 @@ const AuthPage = () => {
         <h2 className="text-3xl font-bold text-center text-white mb-8">
           {isLogin ? 'Login' : 'Sign Up'}
         </h2>
-        <form className="space-y-6">
+        <div className="space-y-6">
           {!isLogin && (
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium text-gray-300">
@@ -40,6 +58,7 @@ const AuthPage = () => {
                   id="name"
                   placeholder="example123"
                   className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                  onChange={(e) => { setUserInfo((state) => { state.username = e.target.value; return state }) }}
                 />
               </div>
             </div>
@@ -55,6 +74,7 @@ const AuthPage = () => {
                 id="email"
                 placeholder="you@example.com"
                 className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                onChange={(e) => { setUserInfo((state) => { state.email = e.target.value; return state }) }}
               />
             </div>
           </div>
@@ -69,6 +89,7 @@ const AuthPage = () => {
                 id="password"
                 placeholder="••••••••"
                 className="pl-10 pr-10 bg-gray-700 text-gray-300 border-gray-600"
+                onChange={(e) => { setUserInfo((state) => { state.password = e.target.value; return state }) }}
               />
               <button
                 type="button"
@@ -84,17 +105,31 @@ const AuthPage = () => {
             </div>
           </div>
           {msg !== null && (
-            <Label className={`${ msg.sucess === true ? "text-green-800" : "text-red-800" } text-center`} >
-              {msg.message}
-            </Label>
+            // Center This
+            <div className="text-center">
+              <Label className={`${msg.success ? "text-green-500" : "text-red-500"}`}>
+                {msg.message}
+              </Label>
+            </div>
           )}
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => {
+              console.log("running")
+              if (!isLogin) {
+                handleSignupForm( user_info, setMsg ).then((success) => {
+                  if (success === true) {
+                    setTimeout(() => {}, 3000);
+                    router.push("/")
+                  }
+                });
+              }
+            }}
           >
             {isLogin ? 'Sign In' : 'Sign Up'}
           </Button>
-        </form>
+        </div>
         <div className="mt-6">
           <Button
             variant="ghost"
