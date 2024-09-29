@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import LogoutSession from "@/components/essentials/LogoutSession";
 
 import SupabaseClient from "@/supabase/client";
 import { cookieStore } from "@/tools/cookieStore";
@@ -17,8 +16,20 @@ import {
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
 
+async function Logout() {
 
-const AccountProfileBar = ({ username, avatarSrc }) => {
+  const user_token = cookieStore.get("user");
+  const user_data = localStorage.getItem("user");
+
+  if (user_token !== null || user_data !== null ) {
+    cookieStore.remove("user");
+    localStorage.removeItem("user");
+  }
+
+  window.location.reload();
+}
+
+const AccountProfileBar = ({ avatarSrc }) => {
 
   const [user, setUser] = useState(null);
   const router = useRouter();
@@ -28,8 +39,6 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
       // This function will be used in a useEffec function;
       const user_token = cookieStore.get("user");
       const user_data = localStorage.getItem("user");
-
-      console.log(typeof user_data);
       
       if (user_token === null || user_token === "") {
         localStorage.removeItem("user");
@@ -55,7 +64,6 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
         }
 
       }
-    
     }
 
     fetch_profile();
@@ -67,8 +75,8 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar>
-              <AvatarImage src={avatarSrc} alt={username} />
-              <AvatarFallback className='text-gray-800'>{username.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarImage src={avatarSrc} alt={user?.username} />
+              <AvatarFallback className='text-gray-800'>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -83,7 +91,7 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
           </DropdownMenuItem>
           
           {user !== null && (
-            <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700">
+            <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700" onClick={() => Logout(router)}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>

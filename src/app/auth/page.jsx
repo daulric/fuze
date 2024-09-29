@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 
 import {encrypt} from "@/tools/encryption";
 import axios from "axios";
-import { useRouter } from 'next/navigation';
 
 async function handleSignupForm({email, password, username}, setMsg) {
   const user_info = {
@@ -49,7 +48,6 @@ const AuthPage = () => {
   const [msg, setMsg] = useState(null);
 
   const [user_info, setUserInfo] = useState({});
-  const router = useRouter();
 
   const toggleForm = () => setIsLogin(!isLogin);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
@@ -138,8 +136,8 @@ const AuthPage = () => {
                 handleLoginForm(user_info, setMsg).then((success) => {
                   if (success === true) {
                     setTimeout(() => {
-                      router.push("/")
-                    }, 3000);
+                      window.location.href = "/"
+                    }, 1000);
                     
                   }
                 });
@@ -147,9 +145,8 @@ const AuthPage = () => {
                 handleSignupForm( user_info, setMsg ).then((success) => {
                   if (success === true) {
                     setTimeout(() => {
-                      router.push("/")
-                    }, 3000);
-                    
+                      window.location.href = "/"
+                    }, 1000);
                   }
                 });
               }
