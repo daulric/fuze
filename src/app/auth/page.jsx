@@ -137,15 +137,19 @@ const AuthPage = () => {
               if (isLogin === true) {
                 handleLoginForm(user_info, setMsg).then((success) => {
                   if (success === true) {
-                    setTimeout(() => {}, 3000);
-                    router.push("/")
+                    setTimeout(() => {
+                      router.push("/")
+                    }, 3000);
+                    
                   }
                 });
               } else if (isLogin === false) {
                 handleSignupForm( user_info, setMsg ).then((success) => {
                   if (success === true) {
-                    setTimeout(() => {}, 3000);
-                    router.push("/")
+                    setTimeout(() => {
+                      router.push("/")
+                    }, 3000);
+                    
                   }
                 });
               }

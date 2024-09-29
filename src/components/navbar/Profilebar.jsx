@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import LogoutSession from "@/components/essentials/LogoutSession";
 
 import SupabaseClient from "@/supabase/client";
 import { cookieStore } from "@/tools/cookieStore";
@@ -13,8 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator
+  DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
 
 
@@ -29,9 +29,8 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
       const user_token = cookieStore.get("user");
       const user_data = localStorage.getItem("user");
 
-      console.log(user_data);
+      console.log(typeof user_data);
       
-    
       if (user_token === null || user_token === "") {
         localStorage.removeItem("user");
         return router.push("/auth");
@@ -48,8 +47,6 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
         if (checkError) {
           return router.push("/auth");
         }
-
-        console.log(account_data);
 
         if (account_data !== null) {
           const string_data = JSON.stringify(account_data);
@@ -84,11 +81,13 @@ const AccountProfileBar = ({ username, avatarSrc }) => {
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700">
+          
+          {user !== null && (
+            <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
