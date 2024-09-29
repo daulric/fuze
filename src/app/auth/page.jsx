@@ -21,11 +21,26 @@ async function handleSignupForm({email, password, username}, setMsg) {
   const { data } = await axios.post("/api/auth", user_info);
 
   if (data) {
-    console.log(data);
     setMsg(data);
     console.log("message set!")
     return data.success;
   }
+}
+
+async function handleLoginForm({email, password}, setMsg) {
+  const user_info = {
+    loginType: "login",
+    email: email,
+    password: password,
+  }
+
+  const { data } = await axios.put("/api/auth", user_info);
+
+  if (data) {
+    setMsg(data);
+    return data.success;
+  }
+
 }
 
 const AuthPage = () => {
@@ -117,7 +132,16 @@ const AuthPage = () => {
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             onClick={() => {
               console.log("running")
-              if (!isLogin) {
+              console.log("is login page", isLogin)
+
+              if (isLogin === true) {
+                handleLoginForm(user_info, setMsg).then((success) => {
+                  if (success === true) {
+                    setTimeout(() => {}, 3000);
+                    router.push("/")
+                  }
+                });
+              } else if (isLogin === false) {
                 handleSignupForm( user_info, setMsg ).then((success) => {
                   if (success === true) {
                     setTimeout(() => {}, 3000);

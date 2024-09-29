@@ -45,28 +45,40 @@ const Sidebar = ({ defaultCollapsed = false }) => {
 
   return (
     <>
-      <Button 
-        variant="ghost" 
-        className={`fixed top-20 left-4 z-50 p-2 ${isMobile ? '' : 'md:hidden'}`}
-        onClick={toggleSidebar}
-      >
-        {(isMobile && !isHidden) || (!isMobile && !collapsed) ? (
-          <X className="h-6 w-6" />
-        ) : (
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <Button 
+          variant="ghost" 
+          className="fixed top-20 left-4 z-50 p-2 md:hidden"
+          onClick={toggleSidebar}
+        >
           <Menu className="h-6 w-6" />
-        )}
-      </Button>
+        </Button>
+      )}
+      
       <div 
         className={`bg-gray-900 text-white h-[calc(100vh-4rem)] fixed top-16 left-0 transition-all duration-300 
           ${isMobile ? (isHidden ? '-translate-x-full' : 'translate-x-0 w-64') : (collapsed ? 'w-16' : 'w-64')} 
           ${isMobile ? 'z-40 shadow-lg' : 'relative'}`}
       >
-        {!isMobile && (
-          <Button variant="ghost" className="w-full p-2" onClick={toggleSidebar}>
-            <Menu className="h-6 w-6" />
+        <div className="relative">
+          <Button 
+            variant="ghost" 
+            className={`absolute top-4 p-2 transition-all duration-300
+              ${(isMobile && !isHidden) || (!isMobile && !collapsed)
+                ? 'right-2 translate-x-1 translate-y-1 shadow-md' 
+                : 'left-2 -translate-x-0.5 -translate-y-0.5 shadow-inner'}
+              ${isMobile ? 'md:hidden' : ''}`}
+            onClick={toggleSidebar}
+          >
+            {(isMobile && !isHidden) || (!isMobile && !collapsed) ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </Button>
-        )}
-        <ScrollArea className="h-[calc(100vh-4rem-40px)]">
+        </div>
+        <ScrollArea className="h-[calc(100vh-4rem-40px)] mt-14">
           <div className={`p-2 space-y-2 ${collapsed && !isMobile ? 'items-center' : ''}`}>
             <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
             <SidebarItem icon={PlaySquare} label="Videos" collapsed={collapsed && !isMobile} href='/video' />
