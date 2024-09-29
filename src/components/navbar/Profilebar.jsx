@@ -1,7 +1,14 @@
-import React from 'react';
+"use client"
+
+import { useEffect, useState } from 'react';
 import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+
+import SupabaseClient from "@/supabase/client";
+import { cookieStore } from "@/tools/cookieStore";
+import { useRouter } from "next/navigation"
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -10,7 +17,53 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 
+
 const AccountProfileBar = ({ username, avatarSrc }) => {
+
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetch_profile = async () => {
+      // This function will be used in a useEffec function;
+      const user_token = cookieStore.get("user");
+      const user_data = localStorage.getItem("user");
+
+      console.log(user_data);
+      
+    
+      if (user_token === null || user_token === "") {
+        localStorage.removeItem("user");
+        return router.push("/auth");
+      }
+
+      if (user_data) {
+        const converted_data = JSON.parse(user_data);
+        setUser(converted_data);
+      } else {
+        const supa_client = SupabaseClient();
+        const accounts_db = supa_client.from("Account");
+        const {data: account_data, error: checkError} =  await accounts_db.select().eq("account_id", user_token).single();
+
+        if (checkError) {
+          return router.push("/auth");
+        }
+
+        console.log(account_data);
+
+        if (account_data !== null) {
+          const string_data = JSON.stringify(account_data);
+          localStorage.setItem("user", string_data);
+          setUser(account_data);
+        }
+
+      }
+    
+    }
+
+    fetch_profile();
+  }, [setUser, router])
+
   return (
     <div className="flex items-center justify-end space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       <DropdownMenu>
