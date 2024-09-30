@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "shadcn": "npx shadcn@latest"
+    "shadcn": "npx shadcn@latest",
+    "deploy": "npm run build && npm run start"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.0",
