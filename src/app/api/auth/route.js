@@ -24,20 +24,21 @@ export async function POST(request) {
         if (loginType !== "signup") { throw "Invalid Login Type!"; }
         const { data: exsisting_accounts, error: checkError } = await accounts_db.select().or(`username.eq.${username},email.eq.${email}`);
 
-        if (checkError) { throw checkError }
+        if (checkError) { throw "Server Error" }
 
         if (exsisting_accounts && exsisting_accounts.length > 0) {
-            const isDuplicateUsername = existing_accounts.some(account => account.username === username);
-            const isDuplicateEmail = existing_accounts.some(account => account.email === email);
+            console.log("idk probally here!")
+            const isDuplicateUsername = exsisting_accounts.some(account => account.username === username);
+            const isDuplicateEmail = exsisting_accounts.some(account => account.email === email);
 
-            let message = "";
+            let message;
 
             if (isDuplicateUsername && isDuplicateEmail) {
-                message = "Username and Email already exsists!";
+                message = "Username and Email already exsists";
             } else if (isDuplicateUsername) {
-                message = "Username already exists!";
+                message = "Username already exists";
             } else if (isDuplicateEmail) {
-                message = "Email already exists!";
+                message = "Email already exists";
             }
 
             throw message;
@@ -49,7 +50,7 @@ export async function POST(request) {
             password:  password
         }).select().single();
 
-        if (insertError) { throw "Server Error!"; }
+        if (insertError) { throw "Server Error"; }
         cookieStore.set("user", account_data.account_id);
 
         return NextResponse.json({
@@ -61,7 +62,7 @@ export async function POST(request) {
         return NextResponse.json({
             success: false,
             message: err,
-        }, { status: 400 })
+        }, { status: 200 })
     }
 
 }
@@ -128,13 +129,13 @@ export async function DELETE() {
         return NextResponse.json({
             success: true,
             message: "Logged Out"
-        })
+        }, { status: 200 })
 
     } catch (e) {
         return NextResponse.json({
             success: false,
-            message: e
-        })
+            message: e,
+        }, { status: 200 })
     }
 
 }

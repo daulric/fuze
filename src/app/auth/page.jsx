@@ -21,7 +21,7 @@ async function handleSignupForm({email, password, username}, setMsg) {
 
   if (data) {
     setMsg(data);
-    console.log("message set!")
+    console.log(data);
     return data.success;
   }
 }
@@ -47,10 +47,38 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [msg, setMsg] = useState(null);
 
+  const [isLogining, setIsLogining] = useState(false);
+
   const [user_info, setUserInfo] = useState({});
 
   const toggleForm = () => setIsLogin(!isLogin);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  function handleSubmit() {
+    setIsLogining(true);
+    if (isLogin === true) {
+      handleLoginForm(user_info, setMsg).then((success) => {
+        if (success === true) {
+          setTimeout(() => {
+            window.location.href = "/"
+          }, 1000);
+          
+        } else if (success === false) {
+          setIsLogining(false);
+        }
+      });
+    } else if (isLogin === false) {
+      handleSignupForm( user_info, setMsg ).then((success) => {
+        if (success === true) {
+          setTimeout(() => {
+            window.location.href = "/"
+          }, 1000);
+        } else if (success === false) {
+          setIsLogining(false);
+        }
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -121,36 +149,15 @@ const AuthPage = () => {
             // Center This
             <div className="text-center">
               <Label className={`${msg.success ? "text-green-500" : "text-red-500"}`}>
-                {msg.message}
+                {typeof(msg.message) === "string" ? msg.message : "Server Error"}
               </Label>
             </div>
           )}
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => {
-              console.log("running")
-              console.log("is login page", isLogin)
-
-              if (isLogin === true) {
-                handleLoginForm(user_info, setMsg).then((success) => {
-                  if (success === true) {
-                    setTimeout(() => {
-                      window.location.href = "/"
-                    }, 1000);
-                    
-                  }
-                });
-              } else if (isLogin === false) {
-                handleSignupForm( user_info, setMsg ).then((success) => {
-                  if (success === true) {
-                    setTimeout(() => {
-                      window.location.href = "/"
-                    }, 1000);
-                  }
-                });
-              }
-            }}
+            onClick={ handleSubmit }
+            disabled={isLogining}
           >
             {isLogin ? 'Sign In' : 'Sign Up'}
           </Button>
