@@ -9,6 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 
+import axios from "axios";
+import { cookieStore } from "@/tools/cookieStore"
+
 const VideoUploadPage = () => {
   const [file, setFile] = useState(null);
   const [videoDetails, setVideoDetails] = useState({
@@ -35,7 +38,36 @@ const VideoUploadPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted', { file, videoDetails });
+    console.log("uploading data idk");
+
+    const account_id = cookieStore.get("user");
+
+    if (!account_id) {
+      console.log("Error Getting Account ID")
+      return;
+    }
+
+    handleDetailsChange("account_id", account_id);
+
+    console.log(file, videoDetails);
+
+    const form_data = new FormData();
+    form_data.append("video_file", file);
+    form_data.append("data", JSON.stringify(videoDetails));
+    console.log("Form Data", form_data);
+
+    const { data } = axios.postForm("/api/video/upload", form_data, {
+      headers: {
+        "Content-Type": "multipart/form-data",  // Specify the content type
+      },
+    });
+
+    console.log(data)
+
+    if (data.success === true) {
+      console.log("Video Uploaded Successfully!", data.video_id)
+    }
+
     // Here you would typically handle the form submission
   };
 
@@ -46,7 +78,7 @@ const VideoUploadPage = () => {
           <CardTitle className="text-2xl font-bold">Upload Video</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="dropzone-file" className="block">Video File</Label>
               <div className="flex items-center justify-center w-full">
@@ -117,10 +149,16 @@ const VideoUploadPage = () => {
               </div>
             </div>
             
-            <Button type="submit" disabled={isUploading} className="w-full hover:bg-gray-700" onClick={() => setIsUploading(true)} >
+            <Button type="submit" 
+            disabled={isUploading} 
+            className="w-full hover:bg-gray-700" 
+            onClick={(e) => {
+              setIsUploading(true);
+              handleSubmit(e);
+            }} >
               Upload Video
             </Button>
-          </form>
+          </div>
         </CardContent>
       </Card>
     </div>
