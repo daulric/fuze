@@ -13,6 +13,9 @@ export async function POST(request) {
         const video_file = video_upload_data.get("video_file");
         const video_data = JSON.parse(video_upload_data.get("data"));
 
+        if ( !video_data.account_id ) { throw "Account Needed!"; }
+        if ( !video_data.title, !video_data.description ) { throw "Missing Fields Required"; }
+
         const video_db = supa_client.from("Video");
         const video_storage = supa_client.storage.from("Videos");
 
@@ -24,12 +27,12 @@ export async function POST(request) {
 
         if (data_error) { throw "Server Error" }
 
-        if (final_video_data && final_video_data.video_id) {
+        if (final_video_data.video_id) {
             const last_index =  video_file.name.lastIndexOf(".");
-            const file_extension = last_index !== -1 ? fileName.slice(last_index + 1) : '';
+            const file_extension = last_index !== -1 ? video_file.name.slice(last_index + 1) : '';
 
             const { error: videoUploadError } = await video_storage.upload(
-                `${video_data.account_id}/${final_video_data.video_id}.${file_extension}`, 
+                `${final_video_data.video_id}.${file_extension}`, 
                 video_file
             );
 

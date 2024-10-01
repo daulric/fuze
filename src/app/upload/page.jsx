@@ -15,8 +15,8 @@ import { cookieStore } from "@/tools/cookieStore"
 const VideoUploadPage = () => {
   const [file, setFile] = useState(null);
   const [videoDetails, setVideoDetails] = useState({
-    title: '',
-    description: '',
+    title: null,
+    description: null,
     is_private: false,
     age_18: false
   });
@@ -36,39 +36,34 @@ const VideoUploadPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("uploading data idk");
+    const form_data = new FormData();
 
     const account_id = cookieStore.get("user");
 
     if (!account_id) {
-      console.log("Error Getting Account ID")
       return;
     }
 
-    handleDetailsChange("account_id", account_id);
-
-    console.log(file, videoDetails);
-
-    const form_data = new FormData();
-    form_data.append("video_file", file);
-    form_data.append("data", JSON.stringify(videoDetails));
-    console.log("Form Data", form_data);
-
-    const { data } = axios.postForm("/api/video/upload", form_data, {
+    const updatedVideoDetails = {
+      ...videoDetails,
+      account_id: account_id
+    }
+  
+    form_data.set("video_file", file);
+    form_data.set("data", JSON.stringify(updatedVideoDetails));
+  
+    const { data } = await axios.post("/api/video/upload", form_data, {
       headers: {
         "Content-Type": "multipart/form-data",  // Specify the content type
       },
     });
 
-    console.log(data)
-
     if (data.success === true) {
       console.log("Video Uploaded Successfully!", data.video_id)
     }
 
-    // Here you would typically handle the form submission
   };
 
   return (
