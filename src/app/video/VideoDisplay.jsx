@@ -5,6 +5,8 @@ import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+import VideoPlayer from "./VideoPlayer";
+
 const YouTubeStylePlayer = () => {
   const [likeCount, setLikeCount] = useState(100);
   const [dislikeCount, setDislikeCount] = useState(20);
@@ -41,8 +43,8 @@ const YouTubeStylePlayer = () => {
     <Card className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-lg border-gray-700 rounded-sm">
       <CardContent className="p-0">
         <div className="relative pt-[56.25%] bg-gray-700">
-          <div className="absolute inset-0 flex items-center justify-center rounded-sm">
-            <p className="text-gray-400">Video Player Placeholder</p>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <VideoPlayer videoSrc={"/test.mp4"} />
           </div>
         </div>
         
