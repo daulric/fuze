@@ -1,17 +1,45 @@
 "use client"
 
-import React, { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { ThumbsUp, ThumbsDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 import VideoPlayer from "./VideoPlayer";
+import axios from "axios";
+import { useSearchParams } from "next/navigation"
 
 const YouTubeStylePlayer = () => {
   const [likeCount, setLikeCount] = useState(100);
   const [dislikeCount, setDislikeCount] = useState(20);
   const [userChoice, setUserChoice] = useState(null);
   const [expanded, setExpanded] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  const [ videoSrc, setVideoSrc ] = useState(null);
+  const video_id = searchParams.get("id");
+  
+  useEffect(() => {
+    async function getVideo() {
+      if (!video_id) return;
+      
+      const { data } = await axios.get("/api/video", {
+        params: {
+          id: video_id,
+        }
+      })
+
+      if (!data) return;
+      if (data.success === false) return;
+      if (!data.video_url) return;
+
+      setVideoSrc(data.video_url);
+    }
+
+    getVideo();
+  }, [setVideoSrc, video_id])
+  
 
   const handleLike = () => {
     if (userChoice === null) {
@@ -44,7 +72,11 @@ const YouTubeStylePlayer = () => {
       <CardContent className="p-0">
         <div className="relative pt-[56.25%] bg-gray-700">
           <div className="absolute inset-0 flex items-center justify-center">
-            <VideoPlayer videoSrc={"/test.mp4"} />
+            {videoSrc ? (
+              <Suspense fallback={<p className="text-gray-400">just loading video 😊</p>} >
+                <VideoPlayer videoSrc={videoSrc} />
+              </Suspense>
+            ): <p className="text-gray-400">No Video Display. Just watch me 😊</p>}
           </div>
         </div>
         

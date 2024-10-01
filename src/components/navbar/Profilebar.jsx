@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useMemo } from 'react';
 import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-
 import SupabaseClient from "@/supabase/client";
 import { cookieStore } from "@/tools/cookieStore";
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import {
   DropdownMenu,
@@ -17,11 +16,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 async function Logout() {
-
   const user_token = cookieStore.get("user");
   const user_data = localStorage.getItem("user");
 
-  if (user_token !== null || user_data !== null ) {
+  if (user_token !== null || user_data !== null) {
     cookieStore.remove("user");
     localStorage.removeItem("user");
   }
@@ -30,19 +28,53 @@ async function Logout() {
 }
 
 const AccountProfileBar = ({ avatarSrc }) => {
-
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const currentPathName = usePathname();
+
+  // Wrap this inside a Suspense boundary
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AccountProfileContent 
+        avatarSrc={avatarSrc} 
+        user={user} 
+        setUser={setUser} 
+        currentPathName={currentPathName} 
+        router={router} 
+      />
+    </Suspense>
+  );
+};
+
+const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, router }) => {
+  const searchParams = useSearchParams();
+
+  // Memoize allQueryParams to prevent recalculation on every render
+  const allQueryParams = useMemo(() => {
+    return Object.fromEntries(searchParams.entries());
+  }, [searchParams]);
+
+  // Memoize queryParams to prevent recalculation on every render
+  const queryParams = useMemo(() => {
+    let temp_string = "";
+    for (const [key, value] of Object.entries(allQueryParams)) {
+      if (key !== "p") {
+        temp_string += `&${key}=${value}`;
+      }
+    }
+    return temp_string;
+  }, [allQueryParams]);
 
   useEffect(() => {
     const fetch_profile = async () => {
-      // This function will be used in a useEffec function;
       const user_token = cookieStore.get("user");
       const user_data = localStorage.getItem("user");
-      
-      if (user_token === null || user_token === "") {
+
+      if (!user_token) {
         localStorage.removeItem("user");
-        return router.push("/auth");
+
+        if (currentPathName === "/auth" && allQueryParams) return;
+        return (window.location.href = `/auth?p=${currentPathName}${queryParams}`);
       }
 
       if (user_data) {
@@ -51,23 +83,22 @@ const AccountProfileBar = ({ avatarSrc }) => {
       } else {
         const supa_client = SupabaseClient();
         const accounts_db = supa_client.from("Account");
-        const {data: account_data, error: checkError} =  await accounts_db.select().eq("account_id", user_token).single();
+        const { data: account_data, error: checkError } = await accounts_db.select().eq("account_id", user_token).single();
 
         if (checkError) {
-          return router.push("/auth");
+          return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
         }
 
-        if (account_data !== null) {
+        if (account_data) {
           const string_data = JSON.stringify(account_data);
           localStorage.setItem("user", string_data);
           setUser(account_data);
         }
-
       }
-    }
+    };
 
     fetch_profile();
-  }, [setUser, router])
+  }, [currentPathName, queryParams, allQueryParams, setUser]);
 
   return (
     <div className="flex items-center justify-end space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
@@ -92,9 +123,9 @@ const AccountProfileBar = ({ avatarSrc }) => {
           
           {user !== null && (
             <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700" onClick={() => Logout(router)}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>

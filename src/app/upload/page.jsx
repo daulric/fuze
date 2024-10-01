@@ -61,7 +61,8 @@ const VideoUploadPage = () => {
     });
 
     if (data.success === true) {
-      console.log("Video Uploaded Successfully!", data.video_id)
+      console.log("Video Uploaded Successfully!", data.video_id);
+      window.location.href = `/video?id=${data.video_id}`;
     }
 
   };

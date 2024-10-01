@@ -1,9 +1,10 @@
-import VideoDisplay from "./VideoDisplay"
+import { Suspense } from "react"
+import MainVideoPage from "./Main"
 
-export default function VideoIDDisplay() {
+export default function PAGE() {
     return (
-        <div className="h-screen bg-gray-800 flex flex-col items-center justify-center p-4">
-            <VideoDisplay />
-        </div>
-    );
+        <Suspense>
+            <MainVideoPage />
+        </Suspense>
+    )
 }
