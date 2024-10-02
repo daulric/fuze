@@ -95,14 +95,12 @@ const AuthPage = () => {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Enter') {
-        handleSubmit();  // Trigger the button's event
+        handleSubmit();
       }
     };
 
-    // Add keydown event listener when component mounts
     document.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup the event listener when the component unmounts
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
