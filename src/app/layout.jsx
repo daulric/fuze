@@ -1,11 +1,11 @@
 import "./globals.css";
 
 import ProfileBar from "@/components/navbar/Profilebar";
-import Sidebar from "@/components/navbar/Sidebar"
+import Sidebar from "@/components/navbar/Sidebar";
 
 export const metadata = {
-  title: "Video App",
-  description: "Share any Video",
+  title: "zTube",
+  description: "A Temu Version of Youtube",
 };
 
 const Layout = ({ children }) => {

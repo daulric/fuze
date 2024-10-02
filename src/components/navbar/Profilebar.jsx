@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import SupabaseClient from "@/supabase/client";
 import { cookieStore } from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 import {
   DropdownMenu,
@@ -27,7 +29,7 @@ async function Logout() {
   window.location.reload();
 }
 
-const AccountProfileBar = ({ avatarSrc }) => {
+const AccountProfileBar = ({ avatarSrc, logoSrc="" }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
   const currentPathName = usePathname();
@@ -37,6 +39,7 @@ const AccountProfileBar = ({ avatarSrc }) => {
     <Suspense fallback={<div>Loading...</div>}>
       <AccountProfileContent 
         avatarSrc={avatarSrc} 
+        logoSrc={logoSrc}
         user={user} 
         setUser={setUser} 
         currentPathName={currentPathName} 
@@ -46,7 +49,7 @@ const AccountProfileBar = ({ avatarSrc }) => {
   );
 };
 
-const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, router }) => {
+const AccountProfileContent = ({ avatarSrc, logoSrc, user, setUser, currentPathName, router }) => {
   const searchParams = useSearchParams();
 
   // Memoize allQueryParams to prevent recalculation on every render
@@ -101,7 +104,14 @@ const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, rout
   }, [currentPathName, queryParams, allQueryParams, setUser]);
 
   return (
-    <div className="flex items-center justify-end space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
+    <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
+      {/* Logo and text */}
+      <Link href="/" className="flex items-center space-x-2">
+        <Image src={logoSrc} alt="Logo" className="h-8 w-8" />
+        <span className="text-white text-lg font-semibold">zTube</span>
+      </Link>
+      
+      {/* User dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
