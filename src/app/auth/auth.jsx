@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ const AuthPage = () => {
   const toggleForm = () => setIsLogin(!isLogin);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  function handleSubmit() {
+  const handleSubmit = useCallback(() => {
     setIsLogining(true);
     if (isLogin === true) {
       handleLoginForm(user_info, setMsg).then((success) => {
@@ -90,7 +90,23 @@ const AuthPage = () => {
         }
       });
     }
-  }
+  }, [isLogin, user_info, redirected_path, path_to_redirect]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        handleSubmit();  // Trigger the button's event
+      }
+    };
+
+    // Add keydown event listener when component mounts
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleSubmit]);
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
