@@ -49,7 +49,7 @@ const AccountProfileBar = ({ avatarSrc, logoSrc="" }) => {
   );
 };
 
-const AccountProfileContent = ({ avatarSrc, logoSrc, user, setUser, currentPathName, router }) => {
+const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, router }) => {
   const searchParams = useSearchParams();
 
   // Memoize allQueryParams to prevent recalculation on every render
@@ -107,7 +107,7 @@ const AccountProfileContent = ({ avatarSrc, logoSrc, user, setUser, currentPathN
     <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       {/* Logo and text */}
       <Link href="/" className="flex items-center space-x-2">
-        <Image src={logoSrc} alt="Logo" className="h-8 w-8" />
+        <Image src="/logo.svg" alt="Logo" className="h-5 w-5" width={20} height={20} />
         <span className="text-white text-lg font-semibold">zTube</span>
       </Link>
       

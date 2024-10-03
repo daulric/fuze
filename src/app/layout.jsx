@@ -6,6 +6,9 @@ import Sidebar from "@/components/navbar/Sidebar";
 export const metadata = {
   title: "zTube",
   description: "A Temu Version of Youtube",
+  icons: {
+    icon: "/logo.svg"
+  }
 };
 
 const Layout = ({ children }) => {
