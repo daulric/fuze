@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Upload, FileVideo } from 'lucide-react';
+import { Upload, FileVideo, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,7 @@ import { cookieStore } from "@/tools/cookieStore"
 
 const VideoUploadPage = () => {
   const [file, setFile] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);
   const [videoDetails, setVideoDetails] = useState({
     title: null,
     description: null,
@@ -28,6 +29,12 @@ const VideoUploadPage = () => {
       setFile(e.target.files[0]);
     }
   };
+
+  const handleThumbnailChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setThumbnail(e.target.files[0]);
+    }
+  }
 
   const handleDetailsChange = (field, value) => {
     setVideoDetails(prevDetails => ({
@@ -52,11 +59,12 @@ const VideoUploadPage = () => {
     }
   
     form_data.set("video_file", file);
+    form_data.set("video_thumbnail", thumbnail);
     form_data.set("data", JSON.stringify(updatedVideoDetails));
   
     const { data } = await axios.post("/api/video/upload", form_data, {
       headers: {
-        "Content-Type": "multipart/form-data",  // Specify the content type
+        "Content-Type": "multipart/form-data",
       },
     });
 
@@ -64,7 +72,6 @@ const VideoUploadPage = () => {
       console.log("Video Uploaded Successfully!", data.video_id);
       window.location.href = `/video?id=${data.video_id}`;
     }
-
   };
 
   return (
@@ -97,6 +104,32 @@ const VideoUploadPage = () => {
                 <div className="flex items-center space-x-2 text-sm text-gray-400 mt-2">
                   <FileVideo className="w-4 h-4" />
                   <span>{file.name}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="thumbnail" className="block">Thumbnail</Label>
+              <div className="flex items-center justify-center w-full">
+                <label htmlFor="thumbnail" className="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Image alt="Thumbnail" className="w-10 h-10 mb-3 text-gray-400" />
+                    <p className="mb-2 text-sm text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                    <p className="text-xs text-gray-500">PNG, JPG or GIF (MAX. 2MB)</p>
+                  </div>
+                  <input 
+                    id="thumbnail" 
+                    type="file" 
+                    className="hidden" 
+                    onChange={handleThumbnailChange} 
+                    accept="image/*" 
+                  />
+                </label>
+              </div>
+              {thumbnail && (
+                <div className="flex items-center space-x-2 text-sm text-gray-400 mt-2">
+                  <Image alt="thumbnail" className="w-4 h-4" />
+                  <span>{thumbnail.name}</span>
                 </div>
               )}
             </div>

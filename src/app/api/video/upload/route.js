@@ -11,6 +11,7 @@ export async function POST(request) {
         const supa_client = SupabaseServer();
 
         const video_file = video_upload_data.get("video_file");
+        const video_thumbnail = video_upload_data.get("video_thumbnail");
         const video_data = JSON.parse(video_upload_data.get("data"));
 
         if ( !video_data.account_id ) { throw "Account Needed!"; }
@@ -18,6 +19,7 @@ export async function POST(request) {
 
         const video_db = supa_client.from("Video");
         const video_storage = supa_client.storage.from("Videos");
+        const video_thumbnail_storage = supa_client.storage.from("Video_Images");
 
         const { data: final_video_data, error: data_error } = await video_db.insert({
             title: video_data.title,
@@ -37,6 +39,18 @@ export async function POST(request) {
             );
 
             if (videoUploadError) { throw "Error Uploading Video" };
+
+            if (video_thumbnail) {
+                const last_index =  video_thumbnail.name.lastIndexOf(".");
+                const file_extension = last_index !== -1 ? video_thumbnail.name.slice(last_index + 1) : '';
+
+                const { error: ImageUploadError } = await video_thumbnail_storage.upload(
+                    `${final_video_data.video_id}.${file_extension}`,
+                    video_thumbnail
+                )
+
+                if (ImageUploadError) {throw "Error Uploading Thumbnail"};
+            }
 
             return NextResponse.json({
                 success: true,
