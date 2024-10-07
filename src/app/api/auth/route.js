@@ -11,9 +11,9 @@ export async function GET() {
 export async function POST(request) {
     // Sign up
     try {
-        const { loginType, username, email, password } = await request.json();
+        const { loginType, username, email, password, dob } = await request.json();
 
-        if (!loginType || !username || !email || !password) {
+        if (!loginType || !username || !email || !password || !dob) {
             throw "Missing Fields Required!";
         }
 
@@ -47,7 +47,8 @@ export async function POST(request) {
         const { data: account_data, error: insertError } = await accounts_db.insert({
             username: username,
             email: email,
-            password:  password
+            password:  password,
+            dob: dob,
         }).select().single();
 
         if (insertError) { throw "Server Error"; }

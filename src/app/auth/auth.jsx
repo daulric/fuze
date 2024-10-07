@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from 'react';
-import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, User, Lock, Mail, Calendar } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,12 +11,13 @@ import axios from "axios";
 
 import { useSearchParams } from "next/navigation"
 
-async function handleSignupForm({email, password, username}, setMsg) {
+async function handleSignupForm({email, password, username, dob}, setMsg) {
   const user_info = {
     loginType: "signup",
     email: email,
     password: encrypt(password, "passcode"),
     username: username,
+    dob: dob,
   }
 
   const { data } = await axios.post("/api/auth", user_info);
@@ -67,6 +68,8 @@ const AuthPage = () => {
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleSubmit = useCallback(() => {
+    if (isLogining === true) return;
+
     setIsLogining(true);
     if (isLogin === true) {
       handleLoginForm(user_info, setMsg).then((success) => {
@@ -90,7 +93,7 @@ const AuthPage = () => {
         }
       });
     }
-  }, [isLogin, user_info, redirected_path, path_to_redirect]);
+  }, [isLogin, user_info, redirected_path, path_to_redirect, isLogining]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -130,6 +133,7 @@ const AuthPage = () => {
               </div>
             </div>
           )}
+
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-gray-300">
               Email address
@@ -145,6 +149,32 @@ const AuthPage = () => {
               />
             </div>
           </div>
+
+          {!isLogin && (
+            <div className="space-y-2">
+              <Label htmlFor="dob" className="text-sm font-medium text-gray-300">
+                Date of Birth
+              </Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  type="date"
+                  id="dob"
+                  className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+
+                    setUserInfo((state) => {
+                      state.dob = selectedDate;
+                      return state;
+                    });
+
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="password" className="text-sm font-medium text-gray-300">
               Password
@@ -171,6 +201,7 @@ const AuthPage = () => {
               </button>
             </div>
           </div>
+
           {msg !== null && (
             // Center This
             <div className="text-center">
@@ -179,6 +210,7 @@ const AuthPage = () => {
               </Label>
             </div>
           )}
+
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
@@ -188,6 +220,7 @@ const AuthPage = () => {
             {isLogin ? 'Sign In' : 'Sign Up'}
           </Button>
         </div>
+
         <div className="mt-6">
           <Button
             variant="ghost"
