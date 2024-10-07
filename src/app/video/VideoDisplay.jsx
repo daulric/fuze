@@ -65,8 +65,6 @@ const YouTubeStylePlayer = () => {
 
   const toggleDescription = () => setExpanded(prev => !prev);
 
-  const description = "This is a sample video description. It can contain multiple lines of text explaining the content of the video, providing context, or including additional information such as timestamps, links, or credits.";
-
   return (
     <Card className="w-full max-w-2xl mx-auto bg-gray-800 text-white shadow-lg border-gray-700 rounded-sm">
       <CardContent className="p-0">
