@@ -35,7 +35,10 @@ export async function GET() {
             Public_Data.push(temp_data);
         })
 
-        return NextResponse.json(Public_Data);
+        return NextResponse.json({
+            success: true,
+            data: Public_Data,
+        });
     } catch(e) {
         return NextResponse.json({
             success: false,

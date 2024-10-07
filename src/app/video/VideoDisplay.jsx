@@ -17,28 +17,28 @@ const YouTubeStylePlayer = () => {
 
   const searchParams = useSearchParams();
 
-  const [ videoSrc, setVideoSrc ] = useState(null);
+  const [ videoData, setVideoData ] = useState(null);
   const video_id = searchParams.get("id");
   
   useEffect(() => {
     async function getVideo() {
       if (!video_id) return;
       
-      const { data } = await axios.get("/api/video", {
-        params: {
-          id: video_id,
-        }
-      })
+      const { data } = await axios.get("/api/video/all")
 
       if (!data) return;
       if (data.success === false) return;
-      if (!data.video_url) return;
+      if (!data) return;
 
-      setVideoSrc(data.video_url);
+      const videos_data = data.data;
+      const filtered_data = videos_data.filter(item => item.video_id === video_id);
+
+      if (filtered_data.length === 0) return;
+      setVideoData(filtered_data[0]);
     }
 
     getVideo();
-  }, [setVideoSrc, video_id])
+  }, [setVideoData, video_id])
   
 
   const handleLike = () => {
@@ -72,9 +72,9 @@ const YouTubeStylePlayer = () => {
       <CardContent className="p-0">
         <div className="relative pt-[56.25%] bg-gray-700">
           <div className="absolute inset-0 flex items-center justify-center">
-            {videoSrc ? (
+            {videoData ? (
               <Suspense fallback={<p className="text-gray-400">just loading video 😊</p>} >
-                <VideoPlayer videoSrc={videoSrc} />
+                <VideoPlayer videoSrc={videoData.video} />
               </Suspense>
             ): <p className="text-gray-400">No Video Display. Just watch me 😊</p>}
           </div>
@@ -82,7 +82,7 @@ const YouTubeStylePlayer = () => {
         
         <div className="p-3">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-lg font-semibold truncate">Video Title</h2>
+            <h2 className="text-lg font-semibold truncate">{ videoData ? videoData.title : "Nothing" }</h2>
             <div className="flex space-x-2">
               <Button 
                 variant={userChoice === 'like' ? 'default' : 'ghost'}
@@ -93,7 +93,7 @@ const YouTubeStylePlayer = () => {
                 <ThumbsUp className="w-4 h-4" />
                 <span className="ml-1 text-xs">{likeCount}</span>
               </Button>
-              <Button 
+              <Button
                 variant={userChoice === 'dislike' ? 'default' : 'ghost'}
                 size="sm" 
                 className={`p-1 ${userChoice === 'dislike' ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-gray-700'}`}
@@ -116,7 +116,7 @@ const YouTubeStylePlayer = () => {
           </Button>
           {expanded && (
             <p className="text-gray-300 text-xs mt-2 max-h-20 overflow-y-auto">
-              {description}
+              { videoData ? videoData.description : "Nothing" }
             </p>
           )}
         </div>

@@ -76,9 +76,11 @@ async function GetVideoData() {
 
   const { data } = await axios.get("/api/video/all");
 
-  if (!data) { return []; }
+  if (!data) return [];
+  if (data.success !== true) return [];
+  if (!data.data) return [];
   
-  const newData = data.map(item => {
+  const newData = data.data.map(item => {
     return {
       title: item.title,
       views: format_views(item.views),
@@ -88,6 +90,12 @@ async function GetVideoData() {
       thumbnail: item.thumbnail,
     }
   })
+
+  // Shuffling the Videos!
+  for (let i = newData.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+    [newData[i], newData[randomIndex]] = [newData[randomIndex], newData[i]];
+  }
 
   return newData;
 }
