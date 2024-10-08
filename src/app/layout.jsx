@@ -15,7 +15,7 @@ const Layout = ({ children }) => {
   return (
     <html>
       <body className="relative h-screen overflow-hidden">
-        <ProfileBar username={"ulric"} />
+        <ProfileBar />
 
         <div className="flex h-screen">
           <Sidebar />
