@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
-import { ThumbsUp, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { User } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import VideoPlayer from "./VideoPlayer";
@@ -10,10 +9,7 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
 const YouTubeStylePlayer = () => {
-  const [likeCount, setLikeCount] = useState(0);
-  const [userChoice, setUserChoice] = useState(null);
   const [videoData, setVideoData] = useState(null);
-  const [user, setUser] = useState(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
 
@@ -28,7 +24,6 @@ const YouTubeStylePlayer = () => {
       const videos_data = data.data;
       const filtered_data = videos_data.filter(item => item.video_id === video_id);
       if (filtered_data.length === 0) return;
-      setLikeCount(filtered_data[0].likes);
       setVideoData(filtered_data[0]);
 
       // Updating the View Count
@@ -42,65 +37,9 @@ const YouTubeStylePlayer = () => {
     }
   }, [video_id]);
 
-  const getUser = useCallback(async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      setUser(user);
-    } catch (error) {
-      console.log("Error getting user data:", error);
-    }
-  }, [setUser]);
-
-  const userAlreadyLiked = useCallback( async () => {
-    const { data } = await axios.get("/api/video/likes/userliked", {
-      params: {
-        account_id: user?.account_id,
-        video_id: video_id,
-      }
-    })
-
-    if (data.success === true) {
-      setUserChoice(data.liked);
-    }
-
-  }, [user, video_id]);
-
   useEffect(() => {
-    getUser().then(() => {
-      //userAlreadyLiked();
-    });
     getVideo();
-  }, [getUser, getVideo, userAlreadyLiked]);
-
-  const handleLike = async () => {
-
-    if (userChoice === null || userChoice === false) {
-      await axios.post("api/video/likes", {
-        account_id: user.account_id,
-      }, {
-        params: {
-          liked: true,
-          id: video_id,
-        }
-      })
-
-      setLikeCount(prev => prev + 1);
-      setUserChoice(true);
-    } else if (userChoice === true) {
-
-      await axios.post("api/video/likes", {
-        account_id: user.account_id,
-      }, {
-        params: {
-          disliked: true,
-          id: video_id,
-        }
-      })
-
-      setLikeCount(prev => prev - 1);
-      setUserChoice(false);
-    }
-  };
+  }, [getVideo]);
 
   return (
     <Card className="w-full max-w-3xl mx-auto bg-gray-900 text-white shadow-xl border-gray-800 rounded-lg overflow-hidden">
@@ -130,21 +69,6 @@ const YouTubeStylePlayer = () => {
                 <p className="font-semibold">{videoData?.Account?.username || "Anonymous"}</p>
                 <p className="text-sm text-gray-400">{new Date(videoData?.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) || "unknown"}</p>
               </div>
-            </div>
-            <div className="flex space-x-2">
-              <Button 
-                variant={userChoice === 'like' ? 'default' : 'outline'}
-                size="sm" 
-                className={`p-2 ${
-                  userChoice === true
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 hover:bg-gray-600 text-white'
-                }`}
-                onClick={handleLike}
-              >
-                <ThumbsUp className="w-4 h-4 mr-2" />
-                <span>{likeCount}</span>
-              </Button>
             </div>
           </div>
         </div>
