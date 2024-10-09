@@ -3,10 +3,13 @@ import MainVideoPage from './Main';
 import { headers } from 'next/headers';
 
 export async function generateMetadata({ searchParams }) {
-  const headersList = headers();
-  const host = headersList.get('host');
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  const domain = `${protocol}://${host}`;
+    const headersList = headers();
+    const host = headersList.get('host');
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    const domain = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : `${protocol}://${host}`;
+
 
   const video_id = searchParams.id;
 
