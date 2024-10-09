@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { Home, Clock, ThumbsUp, PlaySquare, Film, Bookmark, History, Menu, X } from 'lucide-react';
+import { Home, Menu, X, Upload, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link"
@@ -57,7 +57,7 @@ const Sidebar = ({ defaultCollapsed = false }) => {
       )}
       
       <div 
-        className={`bg-gray-900 text-white h-[calc(100vh-4rem)] fixed top-16 left-0 transition-all duration-300 
+        className={`bg-gray-800 text-white h-[calc(100vh-4rem)] fixed top-16 left-0 transition-all duration-300 
           ${isMobile ? (isHidden ? '-translate-x-full' : 'translate-x-0 w-64') : (collapsed ? 'w-16' : 'w-64')} 
           ${isMobile ? 'z-40 shadow-lg' : 'relative'}`}
       >
@@ -81,32 +81,13 @@ const Sidebar = ({ defaultCollapsed = false }) => {
         <ScrollArea className="h-[calc(100vh-4rem-40px)] mt-14">
           <div className={`p-2 space-y-2 ${collapsed && !isMobile ? 'items-center' : ''}`}>
             <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
-            <SidebarItem icon={PlaySquare} label="Videos" collapsed={collapsed && !isMobile} href='/video' />
-            <SidebarItem icon={Film} label="Subscriptions" collapsed={collapsed && !isMobile} />
+            <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='#' />
+            <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
             
             {(!collapsed || isMobile) && <hr className="my-4 border-gray-700" />}
             
-            {(!collapsed || isMobile) && <h2 className="font-semibold mb-2">Library</h2>}
-            <SidebarItem icon={History} label="History" collapsed={collapsed && !isMobile} />
-            <SidebarItem icon={Clock} label="Watch Later" collapsed={collapsed && !isMobile} />
-            <SidebarItem icon={ThumbsUp} label="Liked Videos" collapsed={collapsed && !isMobile} />
-            <SidebarItem icon={Bookmark} label="Playlists" collapsed={collapsed && !isMobile} />
-            
             {(!collapsed || isMobile) && (
-              <>
-                <hr className="my-4 border-gray-700" />
-                <h2 className="font-semibold mb-2">Subscriptions</h2>
-                <SidebarItem icon={Film} label="Channel 1" collapsed={collapsed && !isMobile} />
-                <SidebarItem icon={Film} label="Channel 2" collapsed={collapsed && !isMobile} />
-                <SidebarItem icon={Film} label="Channel 3" collapsed={collapsed && !isMobile} />
-                
-                <hr className="my-4 border-gray-700" />
-                <h2 className="font-semibold mb-2">Explore</h2>
-                <SidebarItem icon={Home} label="Trending" collapsed={collapsed && !isMobile} />
-                <SidebarItem icon={Home} label="Music" collapsed={collapsed && !isMobile} />
-                <SidebarItem icon={Home} label="Gaming" collapsed={collapsed && !isMobile} />
-                <SidebarItem icon={Home} label="News" collapsed={collapsed && !isMobile} />
-              </>
+              <></>
             )}
           </div>
         </ScrollArea>
