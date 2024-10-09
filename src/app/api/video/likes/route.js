@@ -39,13 +39,15 @@ export async function POST(request) {
             await video_likes_db.insert({
                 account_id: account_id,
                 video_id: video_id,
-                liked: requestToLike ? true : false,
-                disliked: requestToDislike ? true : false,
+                liked: requestToLike ? true : requestToDislike ? false : false,
             }).eq("account_id", account_id).eq("video_id", video_id);
 
             await video_db.update({
-                likes: requestToLike ? (updateLikedData.likes <= 0 ? 1 : updateLikedData.likes + 1 ) : requestToDislike ? (updateLikedData.likes <= 0 ? 0 : updateLikedData.likes - 1 ) : updateLikedData.likes,
-                dislikes: requestToDislike ? (updateLikedData.dislikes <= 0 ? 1 : updateLikedData.dislikes + 1 ) : requestToLike ? (updateLikedData.dislikes <= 0 ? 0 : updateLikedData.dislikes - 1 ) : updateLikedData.dislikes,
+                likes: requestToLike && updateLikedData.likes !== 0 ? 
+                            updateLikedData.likes + 1 : 
+                        requestToDislike && updateLikedData.likes !== 0 ? 
+                            updateLikedData.likes + 1 : 0,
+
             }).eq("video_id", video_id);
 
         } else {

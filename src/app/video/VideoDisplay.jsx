@@ -1,54 +1,111 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { ThumbsUp, ThumbsDown, User } from 'lucide-react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import { ThumbsUp, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import VideoPlayer from "./VideoPlayer";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import Supabase from "@/supabase/client";
 
 const YouTubeStylePlayer = () => {
-  const [likeCount, setLikeCount] = useState(100);
-  const [dislikeCount, setDislikeCount] = useState(20);
+  const [likeCount, setLikeCount] = useState(0);
   const [userChoice, setUserChoice] = useState(null);
   const [videoData, setVideoData] = useState(null);
+  const [user, setUser] = useState(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
   
-  useEffect(() => {
-    async function getVideo() {
-      if (!video_id) return;
-      const { data } = await axios.get("/api/video/all");
+  const getVideo = useCallback(async () => {
+    if (!video_id) return;
+    try {
+      const response = await fetch("/api/video", {
+        timeout: 5000,
+      });
+
+      const data = await response.json();
+
       if (!data || data.success === false) return;
       const videos_data = data.data;
       const filtered_data = videos_data.filter(item => item.video_id === video_id);
       if (filtered_data.length === 0) return;
       setVideoData(filtered_data[0]);
+      setLikeCount(filtered_data[0].likes);
+
+      // Updating the View Count
+      /*await axios.post("/api/video/views", {}, {
+        params: {
+          id: video_id,
+        }
+      });*/
+    } catch (error) {
+      console.error("Error fetching video data:", error);
     }
-    getVideo();
   }, [video_id]);
 
-  const handleLike = () => {
-    if (userChoice === null) {
-      setLikeCount(prev => prev + 1);
-      setUserChoice('like');
-    } else if (userChoice === 'dislike') {
-      setLikeCount(prev => prev + 1);
-      setDislikeCount(prev => prev - 1);
-      setUserChoice('like');
+  const getUser = useCallback(async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      console.log(user, typeof user);
+      setUser(user);
+    } catch (error) {
+      console.error("Error getting user data:", error);
     }
-  };
+  }, []);
 
-  const handleDislike = () => {
-    if (userChoice === null) {
-      setDislikeCount(prev => prev + 1);
-      setUserChoice('dislike');
-    } else if (userChoice === 'like') {
-      setDislikeCount(prev => prev + 1);
+  const userLikedTheVideo = useCallback(async () => {
+    if (!user || !user.account_id) return;
+    try {
+      const supa_client = Supabase();
+      const { data, error } = await supa_client
+        .from("Video Likes")
+        .select("liked")
+        .eq("account_id", user.account_id)
+        .eq("video_id", video_id)
+        .single();
+      
+      if (error) throw error;
+      console.log(data, "liked data");
+    } catch (error) {
+      console.error("Error checking if user liked the video:", error);
+    }
+  }, [user, video_id]);
+
+  useEffect(() => {
+    getUser();
+    userLikedTheVideo();
+    getVideo();
+  }, [getUser, getVideo, userLikedTheVideo]);
+
+  const handleLike = async () => {
+
+    if (userChoice === null || userChoice === false) {
+      await axios.post("api/video/likes", {
+        account_id: user.account_id,
+      }, {
+        params: {
+          liked: true,
+          id: video_id,
+        }
+      })
+
+      setLikeCount(prev => prev + 1);
+      setUserChoice(true);
+    } else if (userChoice === true) {
+
+      await axios.post("api/video/likes", {
+        account_id: user.account_id,
+      }, {
+        params: {
+          disliked: true,
+          id: video_id,
+        }
+      })
+
       setLikeCount(prev => prev - 1);
-      setUserChoice('dislike');
+      setUserChoice(false);
     }
   };
 
@@ -86,7 +143,7 @@ const YouTubeStylePlayer = () => {
                 variant={userChoice === 'like' ? 'default' : 'outline'}
                 size="sm" 
                 className={`p-2 ${
-                  userChoice === 'like'
+                  userChoice === true
                     ? 'bg-blue-600 hover:bg-blue-700 text-white'
                     : 'bg-gray-700 hover:bg-gray-600 text-white'
                 }`}
@@ -94,19 +151,6 @@ const YouTubeStylePlayer = () => {
               >
                 <ThumbsUp className="w-4 h-4 mr-2" />
                 <span>{likeCount}</span>
-              </Button>
-              <Button
-                variant={userChoice === 'dislike' ? 'default' : 'outline'}
-                size="sm" 
-                className={`p-2 ${
-                  userChoice === 'dislike'
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 hover:bg-gray-600 text-white'
-                }`}
-                onClick={handleDislike}
-              >
-                <ThumbsDown className="w-4 h-4 mr-2" />
-                <span>{dislikeCount}</span>
               </Button>
             </div>
           </div>

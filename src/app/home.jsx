@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Play } from 'lucide-react';
-import Image from "next/image"
-import { unstable_noStore as noStore } from 'next/cache';
+import Image from "next/image";
 import axios from "axios";
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
@@ -72,9 +71,9 @@ function format_views(views) {
 }
 
 async function GetVideoData() {
-  noStore();
+  const response = await fetch("/api/video");
 
-  const { data } = await axios.get("/api/video/all");
+  const data = await response.json();
 
   if (!data) return [];
   if (data.success !== true) return [];
@@ -104,14 +103,12 @@ async function GetVideoData() {
 const ExampleVideoGrid = () => {
   const [video_data, setVideoData] = useState([]);
 
-  useEffect(() => {
-    async function get_data() {
-      const data = await GetVideoData();
-      setVideoData(data);
-    }
-
-    get_data()
+  const get_data = useCallback(async () => {
+    const data = await GetVideoData();
+    setVideoData(data);
   }, [setVideoData]);
+
+  useEffect(() => get_data, [get_data]);
 
   return (
     <div className="bg-gray-900 min-h-screen p-4">
