@@ -6,10 +6,9 @@ export async function generateMetadata({ searchParams }) {
     const headersList = headers();
     const host = headersList.get('host');
     const protocol = headersList.get('x-forwarded-proto') || 'http';
-    const domain =  process.env.VERCEL_URL
-                        ? `https://${process.env.VERCEL_URL}` : 
-                    process.env.VERCEL_BRANCH_URL 
-                        ? `https://${process.env.VERCEL_BRANCH_URL}`
+    const domain =  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` 
+                    : process.env.VERCEL_BRANCH_URL 
+                    ? `https://${process.env.VERCEL_BRANCH_URL}`
                     : `${protocol}://${host}`;
 
   const video_id = searchParams.id;
@@ -25,14 +24,6 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default function PAGE() {
-
-    const domain =  process.env.VERCEL_URL
-                        ? `https://${process.env.VERCEL_URL}` : 
-                    process.env.VERCEL_BRANCH_URL 
-                        ? `https://${process.env.VERCEL_BRANCH_URL}` : "no domain";
-    
-    console.log(domain)
-
   return (
     <Suspense>
       <MainVideoPage />
