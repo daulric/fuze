@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import Supabase from "@/supabase/server";
 
 
-export async function GET({nextUrl}) {
+export async function GET(request) {
     try {
-        const username = nextUrl.searchParams.get("username");
+        const username = request.nextUrl?.searchParams.get("username");
 
         if (!username) throw "No Username Provided";
         
