@@ -10,8 +10,7 @@ export async function generateMetadata({ searchParams }) {
                         ? `https://${process.env.VERCEL_URL}` : 
                     process.env.VERCEL_BRANCH_URL 
                         ? `https://${process.env.VERCEL_BRANCH_URL}`
-                        : `${protocol}://${host}`;
-
+                    : `${protocol}://${host}`;
 
   const video_id = searchParams.id;
 
@@ -26,6 +25,14 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default function PAGE() {
+
+    const domain =  process.env.VERCEL_URL
+                        ? `https://${process.env.VERCEL_URL}` : 
+                    process.env.VERCEL_BRANCH_URL 
+                        ? `https://${process.env.VERCEL_BRANCH_URL}` : "no domain";
+    
+    console.log(domain)
+
   return (
     <Suspense>
       <MainVideoPage />
