@@ -31,7 +31,7 @@ export async function POST(request) {
         if (LikeFetchError) throw "Server Error";
 
         // Updating the Video Total Likes and Dislikes;
-        const { data: updateLikedData, error: TotalLikedFetch } = await video_db.select("likes, dislikes").eq("video_id", video_id).single();
+        const { data: updateLikedData, error: TotalLikedFetch } = await video_db.select("likes").eq("video_id", video_id).single();
         if (TotalLikedFetch) throw "Server Error";
 
         // For First Time Users Only
@@ -43,18 +43,15 @@ export async function POST(request) {
             }).eq("account_id", account_id).eq("video_id", video_id);
 
             await video_db.update({
-                likes: requestToLike && updateLikedData.likes !== 0 ? 
-                            updateLikedData.likes + 1 : 
-                        requestToDislike && updateLikedData.likes !== 0 ? 
-                            updateLikedData.likes + 1 : 0,
+                likes:  requestToLike ? updateLikedData.likes + 1 :
+                        requestToDislike ? updateLikedData.likes + 1 : 0,
 
             }).eq("video_id", video_id);
 
         } else {
             // Update if user exsists!
             await video_likes_db.update({
-                liked: requestToLike ? true : false,
-                disliked: requestToDislike ? true : false,
+                liked: requestToLike ? true : requestToDislike ? false : false,
             }).eq("video_id", video_id).eq("account_id", account_id);
 
             await video_db.update({

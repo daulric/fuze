@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import VideoPlayer from "./VideoPlayer";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
-import Supabase from "@/supabase/client";
 
 const YouTubeStylePlayer = () => {
   const [likeCount, setLikeCount] = useState(0);
@@ -17,67 +16,61 @@ const YouTubeStylePlayer = () => {
   const [user, setUser] = useState(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
-  
+
   const getVideo = useCallback(async () => {
     if (!video_id) return;
     try {
-      const response = await fetch("/api/video", {
+      const {data} = await axios.get("/api/video", {
         timeout: 5000,
       });
-
-      const data = await response.json();
 
       if (!data || data.success === false) return;
       const videos_data = data.data;
       const filtered_data = videos_data.filter(item => item.video_id === video_id);
       if (filtered_data.length === 0) return;
-      setVideoData(filtered_data[0]);
       setLikeCount(filtered_data[0].likes);
+      setVideoData(filtered_data[0]);
 
       // Updating the View Count
-      /*await axios.post("/api/video/views", {}, {
+      await axios.post("/api/video/views", {}, {
         params: {
           id: video_id,
         }
-      });*/
+      });
     } catch (error) {
-      console.error("Error fetching video data:", error);
+      console.log("Error fetching video data:", error);
     }
   }, [video_id]);
 
   const getUser = useCallback(async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      console.log(user, typeof user);
       setUser(user);
     } catch (error) {
-      console.error("Error getting user data:", error);
+      console.log("Error getting user data:", error);
     }
-  }, []);
+  }, [setUser]);
 
-  const userLikedTheVideo = useCallback(async () => {
-    if (!user || !user.account_id) return;
-    try {
-      const supa_client = Supabase();
-      const { data, error } = await supa_client
-        .from("Video Likes")
-        .select("liked")
-        .eq("account_id", user.account_id)
-        .eq("video_id", video_id)
-        .single();
-      
-      if (error) throw error;
-      console.log(data, "liked data");
-    } catch (error) {
-      console.error("Error checking if user liked the video:", error);
+  const userAlreadyLiked = useCallback( async () => {
+    const { data } = await axios.get("/api/video/likes/userliked", {
+      params: {
+        account_id: user?.account_id,
+        video_id: video_id,
+      }
+    })
+
+    if (data.success === true) {
+      setUserChoice(data.liked);
     }
+
   }, [user, video_id]);
 
   useEffect(() => {
-    getUser();
-    userLikedTheVideo();
+    getUser().then(() => {
+      //userAlreadyLiked();
+    });
     getVideo();
-  }, [getUser, getVideo, userLikedTheVideo]);
+  }, [getUser, getVideo, userAlreadyLiked]);
 
   const handleLike = async () => {
 

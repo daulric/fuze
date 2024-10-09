@@ -71,9 +71,7 @@ function format_views(views) {
 }
 
 async function GetVideoData() {
-  const response = await fetch("/api/video");
-
-  const data = await response.json();
+  const {data} = await axios.get("/api/video");
 
   if (!data) return [];
   if (data.success !== true) return [];
@@ -108,7 +106,9 @@ const ExampleVideoGrid = () => {
     setVideoData(data);
   }, [setVideoData]);
 
-  useEffect(() => get_data, [get_data]);
+  useEffect(() => {
+    get_data()
+  }, [get_data]);
 
   return (
     <div className="bg-gray-900 min-h-screen p-4">
