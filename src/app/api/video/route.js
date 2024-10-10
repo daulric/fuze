@@ -12,7 +12,7 @@ export async function GET() {
         const video_storage = supa_client.storage.from("Videos")
         const thumbnail_storage = supa_client.storage.from("Video_Images");
 
-        const {data: video_data, error: VideoCollectionError} = await videos_db.select("*, Account (username)")
+        const {data: video_data, error: VideoCollectionError} = await videos_db.select("*,  Account (username)");
         if (VideoCollectionError) throw "Server Error";
 
         const {data: videoFiles, error: VideoFetchError} = await video_storage.list();
@@ -34,9 +34,14 @@ export async function GET() {
             Public_Data.push(temp_data);
         })
 
+        const Updated_Data = Public_Data.map(({account_id, ...rest}) => {
+            if  (!account_id) {}; 
+            return rest;
+        });
+
         return NextResponse.json({
             success: true,
-            data: Public_Data,
+            data: Updated_Data,
         });
     } catch(e) {
         return NextResponse.json({

@@ -81,7 +81,7 @@ const Sidebar = ({ defaultCollapsed = false }) => {
         <ScrollArea className="h-[calc(100vh-4rem-40px)] mt-14">
           <div className={`p-2 space-y-2 ${collapsed && !isMobile ? 'items-center' : ''}`}>
             <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
-            <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='#' />
+            <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='/profile' />
             <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
             
             {(!collapsed || isMobile) && <hr className="my-4 border-gray-700" />}

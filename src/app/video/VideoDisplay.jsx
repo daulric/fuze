@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import VideoPlayer from "./VideoPlayer";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const YouTubeStylePlayer = () => {
   const [videoData, setVideoData] = useState(null);
@@ -96,10 +97,10 @@ const YouTubeStylePlayer = () => {
               <AvatarImage src={videoData?.uploaderAvatar} alt="Uploader" />
               <AvatarFallback><User className="h-6 w-6" /></AvatarFallback>
             </Avatar>
-            <div>
+            <Link href={`/profile/${videoData?.Account?.username}`} >
               <p className="font-semibold">{videoData?.Account?.username || "Anonymous"}</p>
               <p className="text-sm text-gray-400">{videoData?.upload_at ? new Date(videoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "unknown"}</p>
-            </div>
+            </Link>
           </div>
         </div>
 

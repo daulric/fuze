@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import Supabase from "@/supabase/server";
-
+import { unstable_noStore } from "next/cache";
 
 export async function GET(request) {
     try {
+        unstable_noStore();
         const username = request.nextUrl?.searchParams.get("username");
 
         if (!username) throw "No Username Provided";
@@ -24,7 +25,6 @@ export async function GET(request) {
         if (user_data.length === 0) throw "User Doesn't Exist";
 
         const user_profile = user_data[0];
-        console.log(user_profile);
 
         return NextResponse.json({
             success: true,

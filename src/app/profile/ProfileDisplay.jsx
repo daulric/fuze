@@ -1,36 +1,76 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Video, FileText, Eye, Clock } from 'lucide-react';
+import { Video, FileText, Eye } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 
-// Mock data for demonstration
-const userData = {
-  name: 'John Doe',
-  avatar: null,
-  videos: [],
-  blogs: [],
-};
+import axios from 'axios';
 
 const UserProfilePage = ({username}) => {
   const [activeTab, setActiveTab] = useState('videos');
+  const [videos, setVideos] = useState([]);
+  //const [blogs, setBlogs] = useState([]);
+  const [profile, setProfileInfo] = useState(null);
+  
+  const GetProfile = useCallback(async () => {
+    let temp_username;
+    if (!username) {
+      temp_username = JSON.parse(localStorage.getItem("user"))?.username;
+    } else {
+      temp_username = username;
+    }
+  
+    const { data } = await axios.get("/api/profile", {
+      params: { username: temp_username }
+    });
+  
+    if (data.success) {
+      setProfileInfo(data.profile);
+    }
+  }, [username]);
+  
+  const GetVideos = useCallback(async () => {
+    if (!profile) return; // Don't fetch if profile is not loaded
+  
+    const { data } = await axios.get("/api/video");
+  
+    if (profile.Video) {
+      const videos = profile.Video.map(item => 
+        data.data.find(i => i.video_id === item.video_id)
+      ).filter(Boolean); // Filter out undefined results
+  
+      setVideos(videos);
+    }
+  }, [profile]);
+  
+  useEffect(() => {
+    if (!profile) {
+      GetProfile();  // Fetch profile only once
+    }
+  }, [GetProfile, profile]);
+  
+  useEffect(() => {
+    if (profile) {
+      GetVideos();  // Fetch videos only when profile is fetched
+    }
+  }, [GetVideos, profile]);
 
   return (
     <div className="container mx-auto p-4 bg-gray-900 text-gray-100 min-h-screen">
       <Card className="mb-6 bg-gray-800 shadow-md border border-gray-700">
         <CardContent className="flex items-center space-x-4 pt-6">
           <Avatar className="h-24 w-24 ring-2 ring-gray-700">
-            <AvatarImage src={userData.avatar} alt={userData.name} />
+            <AvatarImage src={profile?.avatar} alt={profile?.username} />
             <AvatarFallback className="bg-gray-700 text-gray-300">
-              {userData.name.split(' ').map(n => n[0]).join('')}
+              {profile?.username.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold text-white">{userData.name}</h1>
+            <h1 className="text-2xl font-bold text-white">{profile?.username}</h1>
             <p className="text-gray-400">Content Creator</p>
           </div>
         </CardContent>
@@ -53,8 +93,8 @@ const UserProfilePage = ({username}) => {
         </TabsList>
         <TabsContent value="videos">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {userData.videos.map((video) => (
-              <Link href={video.url} key={video.id} className="block">
+            {videos.map((video) => (
+              <Link href={`/video?id=${video.video_id}`} key={video.video_id} className="block">
                 <Card className="overflow-hidden bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader className="p-0">
                     <Image 
@@ -74,9 +114,6 @@ const UserProfilePage = ({username}) => {
                       <span className="flex items-center">
                         <Eye className="mr-1 h-4 w-4" /> {video.views}
                       </span>
-                      <span className="flex items-center">
-                        <Clock className="mr-1 h-4 w-4" /> {video.duration}
-                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -86,7 +123,7 @@ const UserProfilePage = ({username}) => {
         </TabsContent>
         <TabsContent value="blogs">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {userData.blogs.map((blog) => (
+            {[/* Blog Feature didn't come yet so this is blank for now */ ].map((blog) => (
               <Link href={blog.url} key={blog.id} className="block">
                 <Card className="bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader>
