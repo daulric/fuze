@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Eye, EyeOff, User, Lock, Mail, Calendar } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -67,7 +67,8 @@ const AuthPage = () => {
   const toggleForm = () => setIsLogin(!isLogin);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
     if (isLogining === true) return;
 
     setIsLogining(true);
@@ -95,27 +96,38 @@ const AuthPage = () => {
     }
   }, [isLogin, user_info, redirected_path, path_to_redirect, isLogining]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Enter') {
-        handleSubmit();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleSubmit]);
-
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-white mb-8">
           {isLogin ? 'Login' : 'Sign Up'}
         </h2>
-        <div className="space-y-6">
+        <form 
+          onSubmit={(e) => {
+            if (e.target.checkValidity()) {
+              handleSubmit(e);
+            } else {
+              setMsg({
+                success: false,
+                message: "Invalid Field Format"
+              });
+            }
+          }}
+
+          onKeyDown={(e) => {
+            if (e.key !== "Enter") return;
+            if (e.currentTarget.checkValidity()) {
+              handleSubmit(e)
+            } else {
+              setMsg({
+                success: false,
+                message: "Invalid Field Format"
+              });
+            }
+          }}
+          
+          className="space-y-6"
+          >
           {!isLogin && (
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium text-gray-300">
@@ -124,6 +136,7 @@ const AuthPage = () => {
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
+                  required
                   type="text"
                   id="name"
                   placeholder="example123"
@@ -141,8 +154,10 @@ const AuthPage = () => {
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
+                required
                 type="email"
                 id="email"
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                 placeholder="you@example.com"
                 className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
                 onChange={(e) => { setUserInfo((state) => { state.email = e.target.value; return state }) }}
@@ -158,6 +173,7 @@ const AuthPage = () => {
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
+                  required
                   type="date"
                   id="dob"
                   className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
@@ -182,6 +198,7 @@ const AuthPage = () => {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
+                required
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 placeholder="••••••••"
@@ -214,12 +231,12 @@ const AuthPage = () => {
           <Button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={ handleSubmit }
+            
             disabled={isLogining}
           >
             {isLogin ? 'Sign In' : 'Sign Up'}
           </Button>
-        </div>
+        </form>
 
         <div className="mt-6">
           <Button

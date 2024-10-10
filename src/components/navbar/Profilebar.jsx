@@ -122,7 +122,7 @@ const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, rout
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56 bg-gray-700 border-gray-700" align="end" forceMount>
-          <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50">
+          <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/profile"}>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </DropdownMenuItem>
