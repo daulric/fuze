@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run Jest tests
-        run: npm test -- --reporters=default --reporters=jest-junit
+        run: npm test
       - name: Report test results
         uses: actions/upload-artifact@v3
         with:
