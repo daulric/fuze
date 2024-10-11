@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 
 import axios from "axios";
-import { cookieStore } from "@/tools/cookieStore"
+import store from "@/tools/cookieStore";
+const cookieStore = store();
 
 const VideoUploadPage = () => {
   const [file, setFile] = useState(null);
@@ -96,7 +97,8 @@ const VideoUploadPage = () => {
                     type="file" 
                     className="hidden" 
                     onChange={handleFileChange} 
-                    accept="video/*" 
+                    accept="video/*"
+                    value=""
                   />
                 </label>
               </div>
@@ -122,7 +124,8 @@ const VideoUploadPage = () => {
                     type="file" 
                     className="hidden" 
                     onChange={handleThumbnailChange} 
-                    accept="image/*" 
+                    accept="image/*"
+                    value=""
                   />
                 </label>
               </div>

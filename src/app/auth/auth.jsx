@@ -140,6 +140,7 @@ const AuthPage = () => {
                   type="text"
                   id="name"
                   placeholder="example123"
+                  value=""
                   className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
                   onChange={(e) => { setUserInfo((state) => { state.username = e.target.value; return state }) }}
                 />
@@ -157,6 +158,7 @@ const AuthPage = () => {
                 required
                 type="email"
                 id="email"
+                value=""
                 pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                 placeholder="you@example.com"
                 className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
@@ -177,6 +179,7 @@ const AuthPage = () => {
                   type="date"
                   id="dob"
                   className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                  value=""
                   onChange={(e) => {
                     const selectedDate = e.target.value;
 
@@ -200,6 +203,7 @@ const AuthPage = () => {
               <Input
                 required
                 type={showPassword ? 'text' : 'password'}
+                value=""
                 id="password"
                 placeholder="••••••••"
                 className="pl-10 pr-10 bg-gray-700 text-gray-300 border-gray-600"

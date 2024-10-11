@@ -1,6 +1,7 @@
 "use client"
 
-import { cookieStore } from "@/tools/cookieStore"
+import store from "@/tools/cookieStore"
+const cookieStore = store();
 
 export default function LogoutSession(loggedOut) {
     if (loggedOut === false) {

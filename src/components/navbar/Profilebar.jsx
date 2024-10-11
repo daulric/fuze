@@ -5,10 +5,12 @@ import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import SupabaseClient from "@/supabase/client";
-import { cookieStore } from "@/tools/cookieStore";
+import store from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
+const cookieStore = store();
 
 import {
   DropdownMenu,
