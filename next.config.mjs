@@ -8,7 +8,7 @@ const nextConfig = {
       remotePatterns: [
         {
           protocol: "https",
-          hostname: process.env.URL_CONFIG,
+          hostname: process.env.URL_CONFIG ? process.env.URL_CONFIG : "example.com", // For jest tests
           pathname: "/storage/v1/**"
         }
       ]
