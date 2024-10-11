@@ -15,7 +15,11 @@ const config: Config = {
     '^@/components/(.*)$': '<rootDir>/components/$1',
   },
 
-
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/*.config.js', // Add the files you want to ignore
+    '<rootDir>/*.config.mjs',
+  ],
   verbose: true,
   preset: 'ts-jest',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
