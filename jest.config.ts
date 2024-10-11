@@ -17,8 +17,8 @@ const config: Config = {
 
   testPathIgnorePatterns: [
     '/node_modules/',
-    '<rootDir>/*.config.js', // Add the files you want to ignore
-    '<rootDir>/*.config.mjs',
+    '<rootDir>/next.config.js', // Add the files you want to ignore
+    '<rootDir>/next.config.mjs',
   ],
   verbose: true,
   preset: 'ts-jest',
