@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# zTube
+
+Welcome to zTube, where creativity meets community! This platform allows users to upload videos, make posts, and interact with content through comments. Our goal is to provide a vibrant space for content creators and consumers to connect, share ideas, and inspire one another.
+
+This is apart of our College Capstone Project. We hope this project make an impact on society.
+
+## Table of Contents
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+## Features
+- **Video Upload**: Users can easily upload videos and share their creativity with the community.
+- **Posts Creation**: Create text-based posts to share thoughts, stories, or tutorials.
+- **User Profiles**: Build a personal profile to showcase your content and interact with others.
+- **Community Interaction**: Comment on posts and videos to foster discussions and feedback.
 
 ## Getting Started
+To get started with the platform, follow these simple steps:
 
-First, run the development server:
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/daulric/capstone-project.git
+   cd capstone-project
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. **Install Dependencies**: 
+   Make sure you have Node.js installed. Then run:
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **Make sure to create an environment variable file and have all the various variables**:
+    ```env
+        NEXT_PUBLIC_supabase_url="supabase_db_url"
+        URL_CONFIG="supabase_db_url_without_the _https"
+        NEXT_PUBLIC_supabase_anon_key="your supabase anon key"
+    ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Run the Development Server**:
+   ```bash
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Navigate to `http://localhost:3000` in your browser to access the platform.
 
-## Learn More
+## Usage
+Once you have the platform running, you can:
 
-To learn more about Next.js, take a look at the following resources:
+1. **Create an Account**: Sign up for a new account to start sharing your content.
+2. **Upload Videos**: Use the upload feature to share your videos with the community.
+3. **Create Posts**: Write and publish posts that others can read, like, and share.
+4. **Engage with Content**: Comment on videos and posts to participate in the community.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contributing
+We welcome contributions from the community! If you have suggestions or want to help improve the platform, please follow these steps:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push to your branch.
+5. Submit a pull request.
 
-## Deploy on Vercel
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contact
+For any questions or inquiries, feel free to reach out:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Email: daulric@icloud.com
+- GitHub: [daulric](https://github.com/daulric)
+
+Feel free to customize any sections as needed, including adding more details about your platform's features, installation instructions, or any specific guidelines for contributions!
