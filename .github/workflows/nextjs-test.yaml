@@ -1,0 +1,24 @@
+name: zTube Build Test
+
+on:
+  push:
+    branches:
+      - main
+      - dev-branch
+      - ua-changes
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm install
+      - name: Run Jest tests
+        run: npm test
+      - name: Report test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: jest-results.xml
