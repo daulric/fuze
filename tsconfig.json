@@ -19,8 +19,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    "allowSyntheticDefaultImports": true,
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/video/VideoDisplay.jsx", "src/app/layout.jsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts"]
 }
