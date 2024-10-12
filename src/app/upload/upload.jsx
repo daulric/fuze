@@ -98,7 +98,6 @@ const VideoUploadPage = () => {
                     className="hidden" 
                     onChange={handleFileChange} 
                     accept="video/*"
-                    value=""
                   />
                 </label>
               </div>
@@ -125,7 +124,6 @@ const VideoUploadPage = () => {
                     className="hidden" 
                     onChange={handleThumbnailChange} 
                     accept="image/*"
-                    value=""
                   />
                 </label>
               </div>

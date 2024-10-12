@@ -13,7 +13,7 @@ export const metadata = {
 
 const Layout = ({ children }) => {
   return (
-    <html>
+    <html lang="es">
       <body className="relative h-screen overflow-hidden">
         <ProfileBar />
 
