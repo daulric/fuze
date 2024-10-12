@@ -19,9 +19,7 @@ const YouTubeStylePlayer = () => {
   const getVideo = useCallback(async () => {
     if (!video_id) return;
     try {
-      const {data} = await axios.get("/api/video", {
-        timeout: 5000,
-      });
+      const {data} = await axios.get("/api/video");
 
       if (!data || data.success === false) return;
       const videos_data = data.data;
