@@ -7,7 +7,7 @@ export async function generateMetadata({ searchParams }) {
   const host = headersList.get('host');
   const protocol = headersList.get('x-forwarded-proto') || 'http';
   
-  const domain = process.env.NEXT_PUBLIC_VERCEL_URL || `${protocol}://${host}`;
+  const domain = `${protocol}://${host}`;
   const video_id = searchParams.id;
 
   const response = await fetch(`${domain}/api/video`);
