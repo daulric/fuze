@@ -8,30 +8,49 @@ export async function generateMetadata({ searchParams }) {
   const protocol = headersList.get('x-forwarded-proto') || 'http';
   
   const domain = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL for production
-  : process.env.VERCEL_BRANCH_URL
-  ? `https://${process.env.VERCEL_BRANCH_URL}` // Use branch-specific URL if available
-  : `${protocol}://${host}`;
-  console.log(domain) // live production testing this rn
-  const video_id = searchParams.id;
-
-  const response = await fetch(`${domain}/api/video`);
+    ? `https://${process.env.VERCEL_URL}`
+    : process.env.VERCEL_BRANCH_URL
+    ? `https://${process.env.VERCEL_BRANCH_URL}`
+    : `${protocol}://${host}`;
   
-  if (!response.ok) {
-    console.error('Failed to fetch video data');
+  console.log('Domain:', domain);
+  console.log('Search Params:', searchParams);
+  
+  const video_id = searchParams.id;
+  console.log('Video ID:', video_id);
+
+  const apiUrl = `${domain}/api/video`;
+  console.log('API URL:', apiUrl);
+
+  try {
+    const response = await fetch(apiUrl);
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    const responseText = await response.text();
+    console.log('Response body:', responseText);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const video_data = JSON.parse(responseText);
+    console.log('Parsed video data:', video_data);
+
+    const item = video_data?.data?.filter((i) => i.video_id === video_id)[0];
+    console.log('Filtered item:', item);
+
     return {
-      title: 'Video not found - zTube',
-      description: 'Video description not available'
+      title: `${item ? item.title : 'Video not found'} - zTube`,
+      description: `${item ? item.description : 'Video description not available'}`
+    };
+  } catch (error) {
+    console.error('Error in generateMetadata:', error);
+    return {
+      title: 'Error fetching video - zTube',
+      description: 'An error occurred while fetching video data'
     };
   }
-
-  const video_data = await response.json();
-  const item = video_data?.data?.filter((i) => i.video_id === video_id)[0];
-
-  return {
-    title: `${item ? item.title : 'Video not found'} - zTube`,
-    description: `${item ? item.description : 'Video description not available'}`
-  };
 }
 
 export default function PAGE() {
