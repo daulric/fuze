@@ -27,15 +27,12 @@ export async function generateMetadata({ searchParams }) {
     console.log('Response status:', response.status);
     console.log('Response ok:', response.ok);
 
-    const responseText = await response.text();
-    console.log('Response body:', responseText);
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const video_data = JSON.parse(responseText);
-    console.log('Parsed video data:', video_data);
+     const video_data = await response.json();
+     console.log('Response body:', responseText);
 
     const item = video_data?.data?.filter((i) => i.video_id === video_id)[0];
     console.log('Filtered item:', item);
