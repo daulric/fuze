@@ -7,7 +7,11 @@ export async function generateMetadata({ searchParams }) {
   const host = headersList.get('host');
   const protocol = headersList.get('x-forwarded-proto') || 'http';
   
-  const domain = `${protocol}://${host}`;
+  const domain = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}` // Use the Vercel URL for production
+  : process.env.VERCEL_BRANCH_URL
+  ? `https://${process.env.VERCEL_BRANCH_URL}` // Use branch-specific URL if available
+  : `${protocol}://${host}`;
   console.log(domain) // live production testing this rn
   const video_id = searchParams.id;
 
