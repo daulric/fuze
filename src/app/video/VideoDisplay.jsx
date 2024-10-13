@@ -18,14 +18,19 @@ const YouTubeStylePlayer = () => {
 
   const getVideo = useCallback(async () => {
     if (!video_id) return;
+
     try {
-      const {data} = await axios.get("/api/video");
+      const {data} = await axios.get("/api/video", {
+        params: {
+          video_id: video_id,
+        }
+      });
+
+      console.log(data);
 
       if (!data || data.success === false) return;
-      const videos_data = data.data;
-      const filtered_data = videos_data.filter(item => item.video_id === video_id);
-      if (filtered_data.length === 0) return;
-      setVideoData(filtered_data[0]);
+      const video_data = data.data;
+      setVideoData(video_data[0]);
 
       // Updating the View Count
       await axios.post("/api/video/views", {}, {
@@ -76,7 +81,7 @@ const YouTubeStylePlayer = () => {
             <div className="absolute inset-0">
               {videoData ? (
                 <Suspense fallback={<p className="text-gray-400 flex items-center justify-center h-full">Loading video...</p>}>
-                  <VideoPlayer videoSrc={videoData.video} />
+                  <VideoPlayer videoSrc={videoData.video} poster={videoData.thumbnail} />
                 </Suspense>
               ) : (
                 <p className="text-gray-400 flex items-center justify-center h-full">No video available</p>

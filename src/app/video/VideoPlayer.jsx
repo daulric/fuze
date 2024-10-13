@@ -5,7 +5,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Rewind, FastForward 
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
-const VideoPlayer = ({ videoSrc }) => {
+const VideoPlayer = ({ videoSrc, poster }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -161,8 +161,9 @@ const VideoPlayer = ({ videoSrc }) => {
       <video
         ref={videoRef}
         src={videoSrc}
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full w-auto h-auto object-contain"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full w-auto h-auto"
         onClick={togglePlay}
+        poster={poster}
       />
       <div className="absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-2">
         <Slider
