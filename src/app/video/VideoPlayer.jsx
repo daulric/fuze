@@ -13,8 +13,10 @@ const VideoPlayer = ({ videoSrc, poster }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const videoRef = useRef(null);
   const containerRef = useRef(null);
+  const controlsTimeoutRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -69,7 +71,7 @@ const VideoPlayer = ({ videoSrc, poster }) => {
     }
   };
 
-  const toggleMute = useCallback( () => {
+  const toggleMute = useCallback(() => {
     const video = videoRef.current;
     if (video) {
       if (isMuted) {
@@ -93,8 +95,39 @@ const VideoPlayer = ({ videoSrc, poster }) => {
     }
   };
 
+  const handleMouseEnter = () => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  };
+
+  const handleMouseMove = () => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  };
+
   useEffect(() => {
     const handleKeyPress = (e) => {
+      setShowControls(true);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+
       switch (e.key.toLowerCase()) {
         case ' ':
         case 'k':
@@ -157,15 +190,24 @@ const VideoPlayer = ({ videoSrc, poster }) => {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full bg-black">
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full w-auto h-auto"
-        onClick={togglePlay}
-        poster={poster}
-      />
-      <div className="absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-2">
+    <div 
+      ref={containerRef} 
+      className="relative w-full h-full bg-black"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseMove={handleMouseMove}
+    >
+      <div className="absolute inset-0 flex items-center justify-center">
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          className="w-full h-full object-contain"
+          onClick={togglePlay}
+          poster={poster}
+        />
+      </div>
+      {/* Video Controls */}
+      <div className={`absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <Slider
           value={[currentTime]}
           max={duration || 100}
@@ -175,16 +217,16 @@ const VideoPlayer = ({ videoSrc, poster }) => {
         />
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" onClick={handleRewind} className="text-white active:text-white">
+            <Button variant="ghost" size="icon" onClick={handleRewind} className="text-white hover:text-white">
               <Rewind className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white active:text-white">
+            <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white hover:text-white">
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleForward} className="text-white active:text-white">
+            <Button variant="ghost" size="icon" onClick={handleForward} className="text-white hover:text-white">
               <FastForward className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white active:text-white">
+            <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white hover:text-white">
               {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </Button>
             <Slider
@@ -200,7 +242,7 @@ const VideoPlayer = ({ videoSrc, poster }) => {
               </span>
             )}
           </div>
-          <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white active:text-white">
+          <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:text-white">
             {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
           </Button>
         </div>
