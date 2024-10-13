@@ -8,6 +8,7 @@ export async function generateMetadata({ searchParams }) {
   const protocol = headersList.get('x-forwarded-proto') || 'http';
   
   const domain = `${protocol}://${host}`;
+  console.log(domain) // live production testing this rn
   const video_id = searchParams.id;
 
   const response = await fetch(`${domain}/api/video`);
