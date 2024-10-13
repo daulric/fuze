@@ -17,13 +17,14 @@ const VideoUploadPage = () => {
   const [file, setFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
   const [videoDetails, setVideoDetails] = useState({
-    title: null,
-    description: null,
+    title: "",
+    description: "",
     is_private: false,
     age_18: false
   });
 
   const [ isUploading, setIsUploading ] = useState(false);
+  const [msg, setMsg] = useState(null);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -72,6 +73,9 @@ const VideoUploadPage = () => {
     if (data.success === true) {
       console.log("Video Uploaded Successfully!", data.video_id);
       window.location.href = `/video?id=${data.video_id}`;
+    } else {
+      setMsg(data);
+      setIsUploading(false);
     }
   };
 
@@ -188,6 +192,15 @@ const VideoUploadPage = () => {
             }} >
               Upload Video
             </Button>
+
+            {msg !== null && (
+            // Center This
+            <div className="text-center">
+              <Label className={`${msg.success ? "text-green-500" : "text-red-500"}`}>
+                {typeof(msg.message) === "string" ? msg.message : "Server Error"}
+              </Label>
+            </div>
+          )}
           </div>
         </CardContent>
       </Card>

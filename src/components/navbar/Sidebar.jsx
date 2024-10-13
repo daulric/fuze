@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Home, Menu, X, Upload, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import Link from "next/link"
+import Link from "next/link";
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
-  <Link href={href} passHref>
-    <Button variant="ghost" className={`w-full justify-start ${collapsed ? 'px-2' : ''}`} asChild>
+  <Link href="#">
+    <Button variant="ghost" className={`w-full justify-start ${collapsed ? 'px-2' : ''}`} onClick={() => window.location.href = href} asChild>
       <span className="flex items-center">
         <Icon className={`h-5 w-5 ${collapsed ? '' : 'mr-2'}`} />
         {!collapsed && <span>{label}</span>}

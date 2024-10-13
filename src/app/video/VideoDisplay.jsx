@@ -92,17 +92,19 @@ const YouTubeStylePlayer = () => {
       </Card>
 
       <div className="mt-4 p-4">
-        <h2 className="text-xl font-bold mb-2">{videoData ? videoData.title : "Video Title"}</h2>
+        <h2 className="text-xl font-bold mb-2">{videoData ? videoData.title : ""}</h2>
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={videoData?.uploaderAvatar} alt="Uploader" />
-              <AvatarFallback><User className="h-6 w-6" /></AvatarFallback>
-            </Avatar>
+            <Link href={`/profile/${videoData?.Account?.username}`}>
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={videoData?.uploaderAvatar} alt="Uploader" />
+                <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
+              </Avatar>
+            </Link>
             <Link href={`/profile/${videoData?.Account?.username}`} >
-              <p className="font-semibold">{videoData?.Account?.username || "Anonymous"}</p>
-              <p className="text-sm text-gray-400">{videoData?.upload_at ? new Date(videoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "unknown"}</p>
+              <p className="font-semibold">{videoData?.Account?.username || ""}</p>
+              <p className="text-sm text-gray-400">{videoData?.upload_at ? new Date(videoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}</p>
             </Link>
           </div>
         </div>

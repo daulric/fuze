@@ -15,7 +15,8 @@ export async function POST(request) {
         const video_data = JSON.parse(video_upload_data.get("data"));
 
         if ( !video_data.account_id ) { throw "Account Needed!"; }
-        if ( !video_data.title, !video_data.description ) { throw "Missing Fields Required"; }
+        if ( !video_data.title, !video_data.description || video_data.title === "" || video_data.description === "" ) { throw "Missing Fields Required"; }
+        if ( video_file === null || video_thumbnail === null ) { throw "Missing Files"};
 
         const video_db = supa_client.from("Video");
         const video_storage = supa_client.storage.from("Videos");
