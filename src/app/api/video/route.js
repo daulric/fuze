@@ -2,43 +2,49 @@ import { NextResponse } from "next/server";
 import SupabaseServer from "@/supabase/server"
 import { unstable_noStore as noStore } from "next/cache";
 
-async function DatabaseQuery(supa_client, {video_id, ...query}) {
-    const videos_db = supa_client.from("Video");
-    const video_storage = supa_client.storage.from("Videos")
-    const thumbnail_storage = supa_client.storage.from("Video_Images");
+async function DatabaseQuery(supa_client, query) {
+    const Data = await GetFullData(supa_client);
 
-    if (query || video_id) {
-        const {data: video_data, error: VideoCollectionError} = await videos_db.select("*,  Account (username)").eq("video_id", video_id).single();
-        if (VideoCollectionError) throw "Server Error";
+    if (Data.length === 0) return NextResponse.json({ success: true, data: [] });
 
-        const {data: videoFiles, error: VideoFetchError} = await video_storage.list();
-        if (VideoFetchError) throw "Server Error";
+    const isMatch = (item, query) => {
+        return Object.entries(query).every(([key, value]) => {
 
-        const {data: thumbnail_data, error: ThumbnailFetchError} = await thumbnail_storage.list();
-        if (ThumbnailFetchError) throw "Server Error";
+            if (item.Account && item.Account[key] === value) {
+                return (value === "true" ? true : value === "false" ? false : value)
+            }
 
-        const video_file = videoFiles.filter(videoFile => videoFile.name.split('.')[0] === video_id)[0];
-        const thumb_file = thumbnail_data.filter(thumb_file => thumb_file.name.split('.')[0] === video_id)[0];
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                // If the value is an object, check if the corresponding item property matches
+                return item.hasOwnProperty(key) && isMatch(
+                    item[key], 
+                    (value === "true" ? true : value === "false" ? false : value)
+                );
+            } else {
+                // For non-object values, do a simple equality check
+                return item.hasOwnProperty(key) && item[key] === (value === "true" ? true : value === "false" ? false : value);
+            }
+        });
+    };
 
-        const thumb_url = thumbnail_storage.getPublicUrl(thumb_file?.name).data.publicUrl;
-        const video_url = video_storage.getPublicUrl(video_file.name).data.publicUrl;
+    const Filtered_Data = Data.filter((item) => {
+        const result = isMatch(item, query);
+        return result;
+    });
 
-        const temp_data = {
-            ...video_data,
-            video: video_url,
-            thumbnail: thumb_file ? thumb_url : "/logo.svg",
-        }
+    const Public_Data = Filtered_Data.map(({account_id, ...rest}) => {
+        if (account_id) {} // Omit account_id for security purposes
+        return rest;
+    });
 
-        return NextResponse.json({
-            success: true,
-            data: [temp_data],
-        })
-    }
-
+    return NextResponse.json({
+        success: true,
+        data: Public_Data,
+    });
 }
 
 async function GetFullData(supa_client) {
-    const Public_Data = [];
+    const Private_Data = [];
     const videos_db = supa_client.from("Video");
     const video_storage = supa_client.storage.from("Videos")
     const thumbnail_storage = supa_client.storage.from("Video_Images");
@@ -62,25 +68,15 @@ async function GetFullData(supa_client) {
             thumbnail: video_thumbnail.length !== 0 ? thumbnail_storage.getPublicUrl(video_thumbnail[0].name).data.publicUrl : "/logo.svg",
         };
 
-        Public_Data.push(temp_data);
+        Private_Data.push(temp_data);
     })
 
-    const Updated_Data = Public_Data.map(({account_id, ...rest}) => {
-        if  (!account_id) {}; 
-        return rest;
-    });
-
-    return NextResponse.json({
-        success: true,
-        data: Updated_Data,
-    });
+    return Private_Data;
 }
 
 export async function GET(request) {
     noStore();
-
     const searchParams = request.nextUrl.searchParams;
-    const video_id = searchParams.get("video_id");
 
     const queries = {
         ...Object.fromEntries(searchParams.entries()),
@@ -89,12 +85,11 @@ export async function GET(request) {
     try {
         const supa_client = SupabaseServer();
 
-        if (video_id) {
+        if (Object.keys(queries).length !== 0) {
             return DatabaseQuery(supa_client, queries);
         }
 
-        return GetFullData(supa_client);
-        
+        return DatabaseQuery(supa_client, {});
     } catch(e) {
         return NextResponse.json({
             success: false,

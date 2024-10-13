@@ -34,8 +34,8 @@ export async function generateMetadata({ searchParams }) {
 
     console.error('Error in generateMetadata:', error);
     return {
-      title: 'probaly a vercel problem - zTube',
-      description: 'this error only occurs with vercel for some reason. means this domain that you are using is mostly likely vercel.'
+      title: 'internet problem or probaly a vercel problem - zTube',
+      description: 'this error only occurs with vercel for some reason. means this domain that you are using is mostly likely vercel. or ur internet just sucks'
     };
   
   }

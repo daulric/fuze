@@ -34,18 +34,15 @@ const UserProfilePage = ({username}) => {
   }, [username]);
   
   const GetVideos = useCallback(async () => {
-    if (!profile) return; // Don't fetch if profile is not loaded
-  
-    const { data } = await axios.get("/api/video");
-  
-    if (profile.Video) {
-      const videos = profile.Video.map(item => 
-        data.data.find(i => i.video_id === item.video_id)
-      ).filter(Boolean); // Filter out undefined results
-  
-      setVideos(videos);
+
+    const { data } = await axios.get("/api/video", {
+      params: { username: username }
+    })
+
+    if (profile.Video && data.success) {
+      setVideos(data.data);
     }
-  }, [profile]);
+  }, [profile, username]);
   
   useEffect(() => {
     if (!profile) {
