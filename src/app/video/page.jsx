@@ -3,23 +3,29 @@ import MainVideoPage from './Main';
 import { headers } from 'next/headers';
 
 export async function generateMetadata({ searchParams }) {
-    const headersList = headers();
-    const host = headersList.get('host');
-    const protocol = headersList.get('x-forwarded-proto') || 'http';
-    const domain =  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` 
-                    : process.env.VERCEL_BRANCH_URL 
-                    ? `https://${process.env.VERCEL_BRANCH_URL}`
-                    : `${protocol}://${host}`;
-
+  const headersList = headers();
+  const host = headersList.get('host');
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  
+  const domain = process.env.NEXT_PUBLIC_VERCEL_URL || `${protocol}://${host}`;
   const video_id = searchParams.id;
 
   const response = await fetch(`${domain}/api/video`);
+  
+  if (!response.ok) {
+    console.error('Failed to fetch video data');
+    return {
+      title: 'Video not found - zTube',
+      description: 'Video description not available'
+    };
+  }
+
   const video_data = await response.json();
-  const item = video_data.data.filter((i) => i.video_id === video_id)[0];
+  const item = video_data?.data?.filter((i) => i.video_id === video_id)[0];
 
   return {
-    title: `${item ? item.title : 'Video'} - zTube`,
-    description: `${item ? item.description : 'Video description'}`
+    title: `${item ? item.title : 'Video not found'} - zTube`,
+    description: `${item ? item.description : 'Video description not available'}`
   };
 }
 
