@@ -34,8 +34,8 @@ export async function generateMetadata({ searchParams }) {
 
     console.error('Error in generateMetadata:', error);
     return {
-      title: 'Error fetching video - zTube',
-      description: 'An error occurred while fetching video data'
+      title: 'probaly a vercel problem - zTube',
+      description: 'this error only occurs with vercel for some reason. means this domain that you are using is mostly likely vercel.'
     };
   
   }
