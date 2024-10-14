@@ -60,8 +60,9 @@ const VideoUploadPage = () => {
       account_id: account_id
     }
   
-    form_data.set("video_file", file);
-    form_data.set("video_thumbnail", thumbnail);
+    if (file !== null) {form_data.set("video_file", file)};
+    if (thumbnail !== null) {form_data.set("video_thumbnail", thumbnail)};
+    
     form_data.set("data", JSON.stringify(updatedVideoDetails));
   
     const { data } = await axios.post("/api/video/upload", form_data, {

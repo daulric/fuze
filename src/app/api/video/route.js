@@ -58,18 +58,21 @@ async function GetFullData(supa_client) {
     const {data: thumbnail_data, error: ThumbnailFetchError} = await thumbnail_storage.list();
     if (ThumbnailFetchError) throw "Server Error";
 
-    video_data.map(videoData => {
-        const video_file = videoFiles.filter((item) => item.name.split('.')[0] === videoData.video_id);
-        const video_thumbnail = thumbnail_data.filter((item) => item.name.split('.')[0] === videoData.video_id);
+    video_data.forEach(videoData => {
+        const video_file = videoFiles.filter((item) => item && item.name && item.name.split(".")[0] === videoData.video_id);
+        const videoUrl = video_file.length > 0 ? video_storage.getPublicUrl(video_file[0].name).data.publicUrl : null;
+
+        const video_thumbnail = thumbnail_data.filter((item) => item && item.name && item.name.split('.')[0] === videoData.video_id);
+        const thumbnailUrl = video_thumbnail.length > 0 ? thumbnail_storage.getPublicUrl(video_thumbnail[0].name).data.publicUrl : "/logo.svg";
 
         const temp_data = {
             ...videoData,
-            video: video_storage.getPublicUrl(video_file[0].name).data.publicUrl,
-            thumbnail: video_thumbnail.length !== 0 ? thumbnail_storage.getPublicUrl(video_thumbnail[0].name).data.publicUrl : "/logo.svg",
+            video: videoUrl,
+            thumbnail: thumbnailUrl,
         };
 
         Private_Data.push(temp_data);
-    })
+    });
 
     return Private_Data;
 }

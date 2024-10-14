@@ -1,7 +1,6 @@
 "use client"
-
-import React, { useState, useEffect } from 'react';
-import { Home, Menu, X, Upload, User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Home, Menu, Upload, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
@@ -21,6 +20,10 @@ const Sidebar = ({ defaultCollapsed = false }) => {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const sidebarRef = useRef(null);
+  const minSwipeDistance = 50;
 
   useEffect(() => {
     const checkMobile = () => {
@@ -29,11 +32,26 @@ const Sidebar = ({ defaultCollapsed = false }) => {
       setIsHidden(mobile);
       setCollapsed(mobile);
     };
-
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (isMobile && !isHidden && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsHidden(true);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [isMobile, isHidden]);
 
   const toggleSidebar = () => {
     if (isMobile) {
@@ -43,49 +61,55 @@ const Sidebar = ({ defaultCollapsed = false }) => {
     }
   };
 
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      setIsHidden(true);
+    } else if (isRightSwipe) {
+      setIsHidden(false);
+    }
+  };
+
   return (
     <>
       {/* Mobile Menu Button */}
-      {isMobile && (
-        <Button 
-          variant="ghost" 
+      {isMobile && isHidden && (
+        <Button
+          variant="ghost"
           className="fixed top-20 left-4 z-50 p-2 md:hidden"
           onClick={toggleSidebar}
         >
           <Menu className="h-6 w-6" />
         </Button>
       )}
-      
-      <div 
-        className={`bg-gray-800 text-white h-[calc(100vh-4rem)] fixed top-16 left-0 transition-all duration-300 
-          ${isMobile ? (isHidden ? '-translate-x-full' : 'translate-x-0 w-64') : (collapsed ? 'w-16' : 'w-64')} 
+     
+      <div
+        ref={sidebarRef}
+        className={`bg-gray-800 text-white h-[calc(100vh-4rem)] fixed top-16 left-0 transition-all duration-300
+          ${isMobile ? (isHidden ? '-translate-x-full' : 'translate-x-0 w-64') : (collapsed ? 'w-16' : 'w-64')}
           ${isMobile ? 'z-40 shadow-lg' : 'relative'}`}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
-        <div className="relative">
-          <Button 
-            variant="ghost" 
-            className={`absolute top-4 p-2 transition-all duration-300
-              ${(isMobile && !isHidden) || (!isMobile && !collapsed)
-                ? 'right-2 translate-x-1 translate-y-1 shadow-md' 
-                : 'left-2 -translate-x-0.5 -translate-y-0.5 shadow-inner'}
-              ${isMobile ? 'md:hidden' : ''}`}
-            onClick={toggleSidebar}
-          >
-            {(isMobile && !isHidden) || (!isMobile && !collapsed) ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </Button>
-        </div>
-        <ScrollArea className="h-[calc(100vh-4rem-40px)] mt-14">
-          <div className={`p-2 space-y-2 ${collapsed && !isMobile ? 'items-center' : ''}`}>
+        <ScrollArea className="h-full">
+          <div className={`p-4 space-y-4 ${collapsed && !isMobile ? 'items-center' : ''}`}>
             <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
             <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='/profile' />
             <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
-            
+           
             {(!collapsed || isMobile) && <hr className="my-4 border-gray-700" />}
-            
+           
             {(!collapsed || isMobile) && (
               <></>
             )}
