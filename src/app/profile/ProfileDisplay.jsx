@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Video, FileText, Eye } from 'lucide-react';
+import { Video, FileText, Eye, User } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 
@@ -63,12 +63,12 @@ const UserProfilePage = ({username}) => {
           <Avatar className="h-24 w-24 ring-2 ring-gray-700">
             <AvatarImage src={profile?.avatar} alt={profile?.username} />
             <AvatarFallback className="bg-gray-700 text-gray-300">
-              {profile?.username.split(' ').map(n => n[0]).join('')}
+              <User className="h-20 w-20"/>
             </AvatarFallback>
           </Avatar>
           <div>
             <h1 className="text-2xl font-bold text-white">{profile?.username}</h1>
-            <p className="text-gray-400">Content Creator</p>
+            <p className="text-gray-400">{profile?.aboutme}</p>
           </div>
         </CardContent>
       </Card>
