@@ -1,14 +1,13 @@
 "use client"
 
-import React, { useState } from 'react';
-import { Save, Trash2, User, Lock, Globe, Camera, Link } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Save, Trash2, User, Lock, Camera, Link, Copy, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -21,6 +20,18 @@ const SettingsPage = () => {
     linkedin: "",
     github: ""
   });
+
+  const [user, setUser] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const fetchUser = useCallback(() => {
+    if (user) return;
+
+    const temp_user = JSON.parse(localStorage.getItem('user'));
+    if (!temp_user) return;
+    
+    setUser(temp_user);
+  }, [user, setUser])
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -36,6 +47,17 @@ const SettingsPage = () => {
   const handleSocialLinkChange = (platform, value) => {
     setSocialLinks(prev => ({ ...prev, [platform]: value }));
   };
+
+  const handleCopyUserId = () => {
+    if (user && user.account_id) {
+      navigator.clipboard.writeText(user.account_id).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+      });
+    }
+  };
+
+  useEffect(() => fetchUser(), [fetchUser])
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
@@ -55,19 +77,7 @@ const SettingsPage = () => {
             >
               Account
             </TabsTrigger>
-            <TabsTrigger 
-              value="appearance" 
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400 hover:bg-gray-900 transition-colors duration-200"
-            >
-              Appearance
-            </TabsTrigger>
-            <TabsTrigger 
-              value="content" 
-              className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400 hover:bg-gray-900 transition-colors duration-200"
-            >
-              Content
-            </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="privacy" 
               className="data-[state=active]:bg-gray-800 data-[state=active]:text-white text-gray-400 hover:bg-gray-900 transition-colors duration-200"
             >
@@ -157,15 +167,36 @@ const SettingsPage = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="username" type="text" className="text-gray-200">Username</Label>
-                  <Input id="username" autoComplete='off' className="bg-gray-800 text-white border-gray-700" icon={<User className="text-gray-400" />} />
+                  <Input id="username" autoComplete='off' className="bg-gray-800 text-white border-gray-700" icon={<User className="text-gray-400" />} value={user?.username} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-gray-200">Password</Label>
                   <Input id="password" autoComplete='off' type="password" className="bg-gray-800 text-white border-gray-700" icon={<Lock className="text-gray-400" />} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-200">Email</Label>
-                  <Input id="email" autoComplete='off' type="email" className="bg-gray-800 text-white border-gray-700" icon={<Globe className="text-gray-400" />} />
+                  <Label htmlFor="userid" className="text-gray-200">Account ID</Label>
+                  <div className="flex items-center space-x-2">
+                    <Input 
+                      id="userid" 
+                      readOnly 
+                      value={user?.account_id || 'No user ID available'} 
+                      className="bg-gray-800 text-white border-gray-700 flex-grow"
+                    />
+                    <div className="relative">
+                      <Button 
+                        onClick={handleCopyUserId}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        disabled={!user?.account_id}
+                      >
+                        {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                      {copied && (
+                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-600 text-white py-1 px-2 rounded text-sm whitespace-nowrap opacity-100 transition-opacity duration-300">
+                          ID copied!
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
@@ -173,73 +204,6 @@ const SettingsPage = () => {
                   <Save className="mr-2 h-4 w-4" /> Save Changes
                 </Button>
               </CardFooter>
-            </Card>
-          </TabsContent>
-          <TabsContent value="appearance">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white">Appearance</CardTitle>
-                <CardDescription className="text-gray-400">Customize how Acme looks on your device.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-gray-200">Dark mode</Label>
-                    <p className="text-sm text-gray-400">
-                      Turn on dark mode to reduce eye strain and save battery.
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-                <Separator className="bg-gray-800" />
-                <div className="space-y-2">
-                  <Label htmlFor="language" className="text-gray-200">Language</Label>
-                  <Select>
-                    <SelectTrigger id="language" className="bg-gray-800 text-white border-gray-700">
-                      <SelectValue placeholder="Select Language" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 text-white border-gray-700">
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Spanish</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="content">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white">Content Preferences</CardTitle>
-                <CardDescription className="text-gray-400">Manage your content viewing experience.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="categories" className="text-gray-200">Favorite Categories</Label>
-                  <Select>
-                    <SelectTrigger id="categories" className="bg-gray-800 text-white border-gray-700">
-                      <SelectValue placeholder="Select Categories" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 text-white border-gray-700">
-                      <SelectItem value="tech">Technology</SelectItem>
-                      <SelectItem value="science">Science</SelectItem>
-                      <SelectItem value="arts">Arts</SelectItem>
-                      <SelectItem value="sports">Sports</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Separator className="bg-gray-800" />
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-gray-200">Auto-play videos</Label>
-                    <p className="text-sm text-gray-400">
-                      Automatically play videos as you scroll.
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-              </CardContent>
             </Card>
           </TabsContent>
           <TabsContent value="privacy">
