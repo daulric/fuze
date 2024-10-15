@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Video, FileText, Eye, User } from 'lucide-react';
+import { Video, FileText, Eye, User, BadgeCheck } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 
@@ -34,7 +34,6 @@ const UserProfilePage = ({username}) => {
   }, [username]);
   
   const GetVideos = useCallback(async () => {
-
     const { data } = await axios.get("/api/video", {
       params: { username: username }
     })
@@ -61,13 +60,18 @@ const UserProfilePage = ({username}) => {
       <Card className="mb-6 bg-gray-800 shadow-md border border-gray-700">
         <CardContent className="flex items-center space-x-4 pt-6">
           <Avatar className="h-24 w-24 ring-2 ring-gray-700">
-            <AvatarImage src={profile?.avatar} alt={profile?.username} />
+            <AvatarImage src={profile?.avatar_url} alt={profile?.username} />
             <AvatarFallback className="bg-gray-700 text-gray-300">
               <User className="h-20 w-20"/>
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-bold text-white">{profile?.username}</h1>
+            <h1 className="text-2xl font-bold text-white flex items-center">
+              {profile?.username}
+              { profile?.is_verified === true && (
+                <BadgeCheck className="ml-2 h-5 w-5 text-blue-400" />
+              )}
+            </h1>
             <p className="text-gray-400">{profile?.aboutme}</p>
           </div>
         </CardContent>
@@ -82,7 +86,7 @@ const UserProfilePage = ({username}) => {
             Videos
           </TabsTrigger>
           <TabsTrigger 
-            value="blogs" 
+            value="blogs"
             className="data-[state=active]:bg-gray-700 data-[state=active]:text-white"
           >
             Blogs

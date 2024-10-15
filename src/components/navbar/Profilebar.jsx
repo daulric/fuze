@@ -31,17 +31,15 @@ async function Logout() {
   window.location.reload();
 }
 
-const AccountProfileBar = ({ avatarSrc, logoSrc="" }) => {
+const AccountProfileBar = () => {
   const [user, setUser] = useState(null);
   const router = useRouter();
   const currentPathName = usePathname();
 
   // Wrap this inside a Suspense boundary
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <AccountProfileContent 
-        avatarSrc={avatarSrc} 
-        logoSrc={logoSrc}
+    <Suspense>
+      <AccountProfileContent
         user={user} 
         setUser={setUser} 
         currentPathName={currentPathName} 
@@ -51,7 +49,7 @@ const AccountProfileBar = ({ avatarSrc, logoSrc="" }) => {
   );
 };
 
-const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, router }) => {
+const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
   const searchParams = useSearchParams();
 
   // Memoize allQueryParams to prevent recalculation on every render
@@ -119,7 +117,7 @@ const AccountProfileContent = ({ avatarSrc, user, setUser, currentPathName, rout
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar>
-                <AvatarImage src={avatarSrc} alt={user?.username} />
+                <AvatarImage src={user?.avatar_url} alt={user?.username} />
                 <AvatarFallback className='text-gray-800'>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>

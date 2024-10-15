@@ -1,7 +1,7 @@
 import ProfileDisplay from "./ProfileDisplay"
 
 export const metadata = {
-    title: "Profile",
+    title: "My Profile",
 }
 
 export default function PAGE() {

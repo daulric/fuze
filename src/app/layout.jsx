@@ -21,7 +21,6 @@ const Layout = ({ children }) => {
           <Sidebar />
 
           <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-y-auto">
-            <br/>
             {children}
           </main>
 

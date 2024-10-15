@@ -116,7 +116,7 @@ const SettingsPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="about-me" className="text-gray-200">About Me</Label>
-                  <Textarea 
+                  <Textarea
                     id="about-me" 
                     placeholder="Tell us about yourself..." 
                     className="bg-gray-800 text-white border-gray-700 h-32"
@@ -174,7 +174,7 @@ const SettingsPage = () => {
                   <Input id="password" autoComplete='off' type="password" className="bg-gray-800 text-white border-gray-700" icon={<Lock className="text-gray-400" />} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="userid" className="text-gray-200">Account ID</Label>
+                  <Label htmlFor="userid" className="text-gray-200">{"Account ID <API USE>"}</Label>
                   <div className="flex items-center space-x-2">
                     <Input 
                       id="userid" 

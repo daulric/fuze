@@ -13,8 +13,12 @@ export async function GET(request) {
 
         const { data: user_data, error: UserProfileFetchError } = await account_db.select(
             `
-            username, 
+            username,
+            is_verified,
+            social_links,
             time_created, 
+            aboutme,
+            avatar_url,
             Video (video_id, title, views),
             Blogs (blog_id)
             `
