@@ -35,13 +35,13 @@ const UserProfilePage = ({username}) => {
   
   const GetVideos = useCallback(async () => {
     const { data } = await axios.get("/api/video", {
-      params: { username: username }
+      params: { username: profile?.username, is_private: false }
     })
 
     if (profile.Video && data.success) {
       setVideos(data.data);
     }
-  }, [profile, username]);
+  }, [profile]);
   
   useEffect(() => {
     if (!profile) {

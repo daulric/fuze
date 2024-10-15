@@ -72,7 +72,7 @@ export async function PUT(request) {
     // Login
     try {
         const { loginType, email, password } = await request.json();
-
+        console.log("request working!");
         if (!loginType || !email || !password) {
             throw "Missing Fields Required!";
         }
@@ -81,10 +81,11 @@ export async function PUT(request) {
         const accounts_db = supa_client.from("Account");
         const cookieStore = cookies();
 
+        console.log("here")
         if (loginType !== "login") { throw "Invalid Login Type for Method!"; }
         const { data: exsisting_accounts, error: checkError } = await accounts_db.select().or(`email.eq.${email}`)
 
-        if (checkError) {  throw "Server Error" }
+        if (checkError) { throw "Server Error" }
 
         if (exsisting_accounts && exsisting_accounts.length === 0) {
             throw "Account Doesn't Exsist!";

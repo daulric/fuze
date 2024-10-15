@@ -71,7 +71,11 @@ function format_views(views) {
 }
 
 async function GetVideoData() {
-  const {data} = await axios.get("/api/video");
+  const {data} = await axios.get("/api/video", {
+    params: {
+      is_private: false,
+    }
+  });
 
   if (!data) return [];
   if (data.success !== true) return [];
