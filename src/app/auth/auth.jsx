@@ -49,12 +49,10 @@ const AuthPage = () => {
   const [isLogining, setIsLogining] = useState(false);
   const [user_info, setUserInfo] = useState({});
   const [isAnimating, setIsAnimating] = useState(false);
+  const [dobError, setDobError] = useState('');
   const searchParams = useSearchParams();
-  let redirected_path = searchParams.get("p");
+  const redirected_path = searchParams.get("p");
 
-  if (!redirected_path) {
-    redirected_path = "/"
-  }
   let path_to_redirect = "";
 
   for (const [key, value] of Object.entries(Object.fromEntries(searchParams.entries()))) {
@@ -68,14 +66,42 @@ const AuthPage = () => {
     setTimeout(() => {
       setIsLogin(!isLogin);
       setIsAnimating(false);
+      setDobError('');
+      setUserInfo({});
     }, 300); // Half of the animation duration
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  const validateDateOfBirth = (dob) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    if (age < 13) {
+      setDobError('You must be at least 13 years old to register.');
+      return false;
+    } else if (age > 120) {
+      setDobError('Please enter a valid date of birth.');
+      return false;
+    }
+
+    setDobError('');
+    return true;
+  };
+
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     if (isLogining === true) return;
+
+    if (!isLogin && !validateDateOfBirth(user_info.dob)) {
+      return;
+    }
 
     setIsLogining(true);
     if (isLogin === true) {
@@ -110,20 +136,10 @@ const AuthPage = () => {
           </h2>
           <form
             onSubmit={(e) => {
-              if (e.target.checkValidity()) {
+              if (e.target.checkValidity() && (!isLogin || validateDateOfBirth(user_info.dob))) {
                 handleSubmit(e);
               } else {
-                setMsg({
-                  success: false,
-                  message: "Invalid Field Format"
-                });
-              }
-            }}
-            onKeyDown={(e) => {
-              if (e.key !== "Enter") return;
-              if (e.currentTarget.checkValidity()) {
-                handleSubmit(e)
-              } else {
+                e.preventDefault();
                 setMsg({
                   success: false,
                   message: "Invalid Field Format"
@@ -144,7 +160,7 @@ const AuthPage = () => {
                     type="text"
                     id="name"
                     placeholder="example123"
-                    className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                    className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
                     onChange={(e) => { setUserInfo((state) => ({ ...state, username: e.target.value })) }}
                   />
                 </div>
@@ -163,7 +179,7 @@ const AuthPage = () => {
                   id="email"
                   pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                   placeholder="you@example.com"
-                  className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                  className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
                   onChange={(e) => { setUserInfo((state) => ({ ...state, email: e.target.value })) }}
                 />
               </div>
@@ -180,13 +196,16 @@ const AuthPage = () => {
                     required
                     type="date"
                     id="dob"
-                    className="pl-10 bg-gray-700 text-gray-300 border-gray-600"
+                    max={new Date().toISOString().split('T')[0]}
+                    className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
                     onChange={(e) => {
                       const selectedDate = e.target.value;
                       setUserInfo((state) => ({ ...state, dob: selectedDate }));
+                      validateDateOfBirth(selectedDate);
                     }}
                   />
                 </div>
+                {dobError && <p className="text-red-500 text-sm mt-1">{dobError}</p>}
               </div>
             )}
 
@@ -201,7 +220,7 @@ const AuthPage = () => {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   placeholder="••••••••"
-                  className="pl-10 pr-10 bg-gray-700 text-gray-300 border-gray-600"
+                  className="pl-10 pr-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
                   onChange={(e) => { setUserInfo((state) => ({ ...state, password: e.target.value })) }}
                 />
                 <button
@@ -229,7 +248,7 @@ const AuthPage = () => {
             <Button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              disabled={isLogining}
+              disabled={isLogining || (!isLogin && dobError)}
             >
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
@@ -239,7 +258,7 @@ const AuthPage = () => {
             <Button
               variant="ghost"
               onClick={toggleForm}
-              className="w-full text-sm text-gray-400 hover:bg-gray-600 hover:text-gray-400"
+              className="w-full text-sm text-gray-400 hover:text-gray-300 hover:bg-grayy-600"
             >
               {isLogin
                 ? "Don't have an account? Sign up"
