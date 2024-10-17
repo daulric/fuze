@@ -22,20 +22,32 @@ export async function POST(request) {
             const last_index =  profile_picture.name.lastIndexOf(".");
             const file_extension = last_index !== -1 ? profile_picture.name.slice(last_index + 1) : '';
             
+            const {data: prepareToDelete, error: deleteFilesRetError} = await Profile_Storage.list(`${account_id}`);
+            if (deleteFilesRetError) { throw "Error Retriving to Delete" }
+
+            if (prepareToDelete && prepareToDelete.length > 0) {
+                const file = prepareToDelete.find(i => i.name.split(".")[0] === "profile_pic");
+                const file_path = `${account_id}/${file.name}`;
+
+                const { error: RemovalError } = await Profile_Storage.remove([file_path]);
+                if (RemovalError) { throw "No Files Here!" }
+            }
+
+            const {error: deleteError } = await Profile_Storage.remove(`${account_id}`);
+            if (deleteError) {  throw "Error Replacing Files" };
+
             const { error: ProfilePicError } = await Profile_Storage.upload(
-                `${account_id}/profile_pic.${file_extension}`
+                `${account_id}/profile_pic.${file_extension}`,
+                profile_picture, {
+                    upsert: true
+                }
             );
 
             if (ProfilePicError) { throw "Updating Profile Picture Error" };
         }
 
-        const { data: ProfileDataStorage} = await Profile_Storage.list(`${account_id}`);
-        const ProfilePicFile = ProfileDataStorage.find(file => file.name.startsWith("profile_pic"));
-        const ProfilePicPath = `${account_id}${ProfilePicFile.name}`;
-
         AccountDB.update({
             aboutme: account_data.aboutme,
-            avatar_url: Profile_Storage.getPublicUrl(ProfilePicPath).data.publicUrl,
             social_links: account_data.socialLinks,
         }).eq("account_id", account_data.account_id);
 

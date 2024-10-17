@@ -30,6 +30,7 @@ const UserProfilePage = ({username}) => {
   
     if (data.success) {
       setProfileInfo(data.profile);
+      console.log(data);
     }
   }, [username]);
   

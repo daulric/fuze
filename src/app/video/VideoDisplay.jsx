@@ -13,6 +13,7 @@ import Link from "next/link";
 const YouTubeStylePlayer = () => {
   const [videoData, setVideoData] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const [uploaderPicFetched, setUploaderPicFetched] = useState(false);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
 
@@ -32,6 +33,7 @@ const YouTubeStylePlayer = () => {
       const video_data = data.data;
       setVideoData(video_data[0]);
 
+
       // Updating the View Count
       await axios.post("/api/video/views", {}, {
         params: {
@@ -46,6 +48,29 @@ const YouTubeStylePlayer = () => {
   useEffect(() => {
     getVideo();
   }, [getVideo]);
+
+  useEffect(() => {
+    async function getUploaderPic() {
+      const { data: uplaoder } = await axios.get("/api/profile", {
+        params: {
+          username: videoData.Account.username,
+        }
+      })
+
+      if (uplaoder.profile) {
+        setVideoData({
+          ...videoData,
+          uploaderPic: uplaoder.profile.avatar_url,
+        })
+      }
+    }
+
+    if (videoData && !uploaderPicFetched) {
+      console.log("getting picture!")
+      getUploaderPic();
+      setUploaderPicFetched(true);
+    }
+  }, [uploaderPicFetched, videoData])
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
@@ -98,7 +123,7 @@ const YouTubeStylePlayer = () => {
           <div className="flex items-center space-x-3">
             <Link href={`/profile/${videoData?.Account?.username}`}>
               <Avatar className="h-10 w-10">
-                <AvatarImage src={videoData?.uploaderAvatar} alt="Uploader" />
+                <AvatarImage src={videoData?.uploaderPic} alt="Uploader" />
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
               </Avatar>
             </Link>

@@ -44,38 +44,43 @@ async function DatabaseQuery(supa_client, query) {
 }
 
 async function GetFullData(supa_client) {
-    const Private_Data = [];
-    const videos_db = supa_client.from("Video");
-    const video_storage = supa_client.storage.from("Videos")
-    const thumbnail_storage = supa_client.storage.from("Video_Images");
+    try {
+        const videos_db = supa_client.from("Video");
+        const video_storage = supa_client.storage.from("Videos");
+        const thumbnail_storage = supa_client.storage.from("Video_Images");
 
-    const {data: video_data, error: VideoCollectionError} = await videos_db.select("*,  Account (username)");
-    if (VideoCollectionError) throw "Server Error";
+        const [videoData, videoFiles, thumbnailFiles] = await Promise.all([
+            videos_db.select("*, Account (username)"),
+            video_storage.list(),
+            thumbnail_storage.list()
+        ]);
 
-    const {data: videoFiles, error: VideoFetchError} = await video_storage.list();
-    if (VideoFetchError) throw "Server Error";
+        if (videoData.error || videoFiles.error || thumbnailFiles.error) {
+            throw new Error("Failed to fetch data from Supabase");
+        }
 
-    const {data: thumbnail_data, error: ThumbnailFetchError} = await thumbnail_storage.list();
-    if (ThumbnailFetchError) throw "Server Error";
+        const processedData = videoData.data.map((videoData) => {
+            const video_file = videoFiles.data.find((item) => item?.name?.split(".")[0] === videoData.video_id);
+            const videoUrl = video_file ? video_storage.getPublicUrl(video_file.name).data.publicUrl : null;
+            
+            const video_thumbnail = thumbnailFiles.data.find((item) => item?.name?.split('.')[0] === videoData.video_id);
+            const thumbnailUrl = video_thumbnail ? thumbnail_storage.getPublicUrl(video_thumbnail.name).data.publicUrl : "/logo.svg";
 
-    video_data.forEach(videoData => {
-        const video_file = videoFiles.filter((item) => item && item.name && item.name.split(".")[0] === videoData.video_id);
-        const videoUrl = video_file.length > 0 ? video_storage.getPublicUrl(video_file[0].name).data.publicUrl : null;
+            return {
+                ...videoData,
+                video: videoUrl,
+                thumbnail: thumbnailUrl,
 
-        const video_thumbnail = thumbnail_data.filter((item) => item && item.name && item.name.split('.')[0] === videoData.video_id);
-        const thumbnailUrl = video_thumbnail.length > 0 ? thumbnail_storage.getPublicUrl(video_thumbnail[0].name).data.publicUrl : "/logo.svg";
+            };
+        });
 
-        const temp_data = {
-            ...videoData,
-            video: videoUrl,
-            thumbnail: thumbnailUrl,
-        };
-
-        Private_Data.push(temp_data);
-    });
-
-    return Private_Data;
+        return processedData;
+    } catch (error) {
+        console.error('Error processing video data:', error);
+        return []
+    }
 }
+
 
 export async function GET(request) {
     noStore();

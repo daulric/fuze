@@ -4,11 +4,11 @@ import { Suspense, useEffect, useState, useMemo } from 'react';
 import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import SupabaseClient from "@/supabase/client";
 import store from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
 
 const cookieStore = store();
 
@@ -81,23 +81,25 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
       }
 
       if (user_data) {
-        const converted_data = JSON.parse(user_data);
-        setUser(converted_data);
+        setUser(JSON.parse(user_data));
       } else {
-        const supa_client = SupabaseClient();
-        const accounts_db = supa_client.from("Account");
-        const { data: account_data, error: checkError } = await accounts_db.select().eq("account_id", user_token).single();
-
+        const { data: account_data, error: checkError } = await axios.get("/api/profile", {
+          params: {
+            account_id: user_token,
+          }
+        });
+  
         if (checkError) {
           return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
         }
-
-        if (account_data) {
-          const string_data = JSON.stringify(account_data);
+  
+        if (account_data.profile) {
+          const string_data = JSON.stringify(account_data.profile);
           localStorage.setItem("user", string_data);
-          setUser(account_data);
+          setUser(account_data.profile);
         }
       }
+
     };
 
     fetch_profile();
@@ -107,7 +109,7 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
     <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       {/* Logo and text */}
       <Link href="/" className="flex items-center space-x-2">
-        <Image src="/logo.svg" alt="Logo" className="h-5 w-5" width={20} height={20} />
+        <Image src="/logo.svg" priority alt="Logo" className="h-5 w-5" width={20} height={20} />
         <span className="text-white text-lg font-semibold">zTube</span>
       </Link>
       

@@ -6,34 +6,52 @@ export async function GET(request) {
     try {
         unstable_noStore();
         const username = request.nextUrl?.searchParams.get("username");
-        if (!username) throw "No Username Provided";
+        const account_id = request.nextUrl?.searchParams.get("account_id");
         
+        if (!username && !account_id) { throw "No Valid Params" };
+       
         const supa_client = Supabase();
         const account_db = supa_client.from("Account");
+        const ProfileDB = supa_client.storage.from("Profiles");
 
-        const { data: user_data, error: UserProfileFetchError } = await account_db.select(
-            `
+        let query = account_db.select(`
+            account_id,
             username,
             is_verified,
             social_links,
-            time_created, 
+            time_created,
             aboutme,
-            avatar_url,
             Video (video_id, title, views),
             Blogs (blog_id)
-            `
-        ).eq("username", username);
+        `);
+
+        if (account_id) {
+            query = query.eq('account_id', account_id);
+        }
+        
+        if (username) {
+            query = query.eq('username', username);
+        }
+
+        const { data: user_data, error: UserProfileFetchError } = await query;
 
         if (UserProfileFetchError) throw `Server Error: ${UserProfileFetchError.message}`;
+        
         if (user_data.length === 0) throw "User Doesn't Exist";
-
-        const user_profile = user_data[0];
-
+        
+        const user = user_data[0];
+        
+        const { data: ProfilePic} = await ProfileDB.list(`${user.account_id}`);
+        const findPic = ProfilePic.find(item => item?.name?.split(".")[0] === "profile_pic");
+        user.avatar_url = findPic ? ProfileDB.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl : null;
+        
+        const user_profile = { ...user };
+        delete user_profile.account_id;
+        
         return NextResponse.json({
             success: true,
             profile: user_profile,
         })
-
     } catch (e) {
         return NextResponse.json({
             success: false,
