@@ -73,9 +73,11 @@ const SettingsPage = () => {
     setProfileSaving(true);
     const { account_id } = user;
 
+    console.log("id is ready", account_id);
+
     const form_data = new FormData();
     form_data.set("account_data", JSON.stringify({
-      account_id,
+      account_id: account_id,
       social_links: socialLinks,
     }))
 
@@ -90,7 +92,7 @@ const SettingsPage = () => {
     console.log(data);
     if (data.success === false) { setProfileSaving(false); return;}
     
-    //return window.location.href = "/settings";
+    return window.location.href = "/settings";
   };
 
   return (

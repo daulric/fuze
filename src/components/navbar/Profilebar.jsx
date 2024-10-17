@@ -71,7 +71,6 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
   useEffect(() => {
     const fetch_profile = async () => {
       const user_token = cookieStore.get("user");
-      const user_data = localStorage.getItem("user");
 
       if (!user_token) {
         localStorage.removeItem("user");
@@ -80,24 +79,21 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
         return (window.location.href = `/auth?p=${currentPathName}${queryParams}`);
       }
 
-      if (user_data) {
-        setUser(JSON.parse(user_data));
-      } else {
-        const { data: account_data, error: checkError } = await axios.get("/api/profile", {
-          params: {
-            account_id: user_token,
-          }
-        });
-  
-        if (checkError) {
-          return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
-        }
-  
-        if (account_data.profile) {
-          const string_data = JSON.stringify(account_data.profile);
-          localStorage.setItem("user", string_data);
-          setUser(account_data.profile);
-        }
+      const { data: account_data, error: checkError } = await axios.get("/api/profile", {
+        params: {
+          account_id: user_token,
+          allowId: true,
+        },
+      });
+
+      if (checkError) {
+        return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
+      }
+
+      if (account_data.profile) {
+        const string_data = JSON.stringify(account_data.profile);
+        localStorage.setItem("user", string_data);
+        setUser(account_data.profile);
       }
 
     };

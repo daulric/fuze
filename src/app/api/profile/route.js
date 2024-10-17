@@ -7,7 +7,8 @@ export async function GET(request) {
         unstable_noStore();
         const username = request.nextUrl?.searchParams.get("username");
         const account_id = request.nextUrl?.searchParams.get("account_id");
-        
+        const allowId = request.nextUrl?.searchParams.get("allowId");
+
         if (!username && !account_id) { throw "No Valid Params" };
        
         const supa_client = Supabase();
@@ -46,7 +47,10 @@ export async function GET(request) {
         user.avatar_url = findPic ? ProfileDB.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl : null;
         
         const user_profile = { ...user };
-        delete user_profile.account_id;
+        
+        if (!allowId) {
+            delete user_profile.account_id;
+        }
         
         return NextResponse.json({
             success: true,
