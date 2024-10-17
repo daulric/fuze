@@ -48,10 +48,10 @@ export async function GET(request) {
         
         const user_profile = { ...user };
         
-        if (!allowId) {
+        if ((!allowId && !account_id) || !account_id || !allowId) {
             delete user_profile.account_id;
         }
-        
+
         return NextResponse.json({
             success: true,
             profile: user_profile,
