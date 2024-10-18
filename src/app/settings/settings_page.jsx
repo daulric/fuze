@@ -189,10 +189,11 @@ function AccountTab(user, handleCopyUserId, copied) {
             <Input id="password" autoComplete='off' type="password" className="bg-gray-800 text-white border-gray-700" icon={<Lock className="text-gray-400" />} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="userid" className="text-gray-200">{"Account ID <API USE>"}</Label>
+            <Label htmlFor="userid" className="text-gray-200">{"Account ID <API USE> Dont Share!"}</Label>
             <div className="flex items-center space-x-2">
               <Input
                 id="userid"
+                type="password"
                 readOnly
                 value={user?.account_id || 'No user ID available'}
                 className="bg-gray-800 text-white border-gray-700 flex-grow" />

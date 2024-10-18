@@ -108,7 +108,7 @@ const AuthPage = () => {
       handleLoginForm(user_info, setMsg).then((success) => {
         if (success === true) {
           setTimeout(() => {
-            window.location.href = `${redirected_path}?${path_to_redirect}`;
+            window.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
           }, 1000);
         } else if (success === false) {
           setIsLogining(false);
