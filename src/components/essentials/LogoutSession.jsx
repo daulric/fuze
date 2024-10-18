@@ -3,6 +3,7 @@
 import store from "@/tools/cookieStore"
 const cookieStore = store();
 
+// Module to Logout of the Session
 export default function LogoutSession(loggedOut) {
     if (loggedOut === false) {
         return null;

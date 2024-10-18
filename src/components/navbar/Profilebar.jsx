@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 async function Logout() {
+  // Logout Session
   const user_token = cookieStore.get("user");
   const user_data = localStorage.getItem("user");
 
