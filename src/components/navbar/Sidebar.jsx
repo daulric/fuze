@@ -4,6 +4,7 @@ import { Home, Menu, Upload, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
+import { unstable_noStore as noStore } from 'next/cache';
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
   <Link href="#">
@@ -17,13 +18,28 @@ const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
 );
 
 const Sidebar = ({ defaultCollapsed = false }) => {
+  noStore();
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [user, setUser] = useState(null)
   const sidebarRef = useRef(null);
   const minSwipeDistance = 50;
+
+  useEffect(() => {
+    const checkStorage = () => {
+      const item = localStorage.getItem("user");
+      if (item !== null) {
+          setUser(JSON.parse(item));
+      } else {
+        setTimeout(checkStorage, 3);
+      }
+    };
+
+    checkStorage()
+  }, [setUser])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -105,8 +121,12 @@ const Sidebar = ({ defaultCollapsed = false }) => {
         <ScrollArea className="h-full">
           <div className={`p-4 space-y-4 ${collapsed && !isMobile ? 'items-center' : ''}`}>
             <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
-            <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='/profile' />
-            <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
+            {user && (
+              <>
+                <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='/profile' />
+                <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
+              </>
+            )}
            
             {(!collapsed || isMobile) && <hr className="my-4 border-gray-700" />}
            

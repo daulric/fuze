@@ -18,6 +18,8 @@ export async function POST(request) {
         const AccountDB = supa_client.from("Account");
         const Profile_Storage = supa_client.storage.from("Profiles");
 
+        console.log(account_data);
+
         if (profile_picture) {
             const last_index =  profile_picture.name.lastIndexOf(".");
             const file_extension = last_index !== -1 ? profile_picture.name.slice(last_index + 1) : '';
@@ -46,10 +48,10 @@ export async function POST(request) {
             if (ProfilePicError) { throw "Updating Profile Picture Error" };
         }
 
-        AccountDB.update({
+        await AccountDB.update({
             aboutme: account_data.aboutme,
             social_links: account_data.socialLinks,
-        }).eq("account_id", account_data.account_id);
+        }).eq("account_id", account_id);
 
         return NextResponse.json({
             success: true,

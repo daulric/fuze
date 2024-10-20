@@ -4,6 +4,10 @@ const nextConfig = {
       ignoreDuringBuilds: true,
     },
 
+    env: {
+      
+    },
+
     images: {
       remotePatterns: [
         {

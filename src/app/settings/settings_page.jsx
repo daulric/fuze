@@ -28,10 +28,9 @@ const SettingsPage = () => {
 
   const fetchUser = useCallback(() => {
     if (user) return;
-
     const temp_user = JSON.parse(localStorage.getItem('user'));
     if (!temp_user) return;
-    
+
     setUser(temp_user);
   }, [user, setUser])
 
@@ -42,7 +41,7 @@ const SettingsPage = () => {
       reader.onloadend = () => {
         setProfilePicture({
           result: reader.result,
-          picure: file,
+          picture: file,
         });
       };
       reader.readAsDataURL(file);
@@ -73,15 +72,16 @@ const SettingsPage = () => {
     setProfileSaving(true);
     const { account_id } = user;
 
-    console.log("id is ready", account_id);
-
     const form_data = new FormData();
     form_data.set("account_data", JSON.stringify({
       account_id: account_id,
       social_links: socialLinks,
+      aboutme: aboutMe,
     }))
 
-    form_data.set("profile_picture", profilePicture?.picure);
+    if (profilePicture?.picture) {
+      form_data.set("profile_picture", profilePicture?.picture);
+    }
     
     const {data} = await axios.post("/api/settings/profile", form_data, {
       headers: {
@@ -89,10 +89,8 @@ const SettingsPage = () => {
       },
     })
 
-    console.log(data);
     if (data.success === false) { setProfileSaving(false); return;}
-    
-    return window.location.href = "/settings";
+    return window.location.reload();
   };
 
   return (
@@ -120,7 +118,15 @@ const SettingsPage = () => {
               Privacy
             </TabsTrigger>
           </TabsList>
-          {ProfileTab(profilePicture, handleProfilePictureChange, aboutMe, setAboutMe, socialLinks, handleSocialLinkChange, HandleAccountSubmission, ProfileSaving)}
+          {ProfileTab(
+            profilePicture, 
+            handleProfilePictureChange, 
+            aboutMe, setAboutMe, 
+            socialLinks, 
+            handleSocialLinkChange, 
+            HandleAccountSubmission, 
+            ProfileSaving, user
+            )}
           {AccountTab (user, handleCopyUserId, copied) }
           <PrivacyTab />
         </Tabs>
@@ -224,7 +230,7 @@ function AccountTab(user, handleCopyUserId, copied) {
   );
 }
 
-function ProfileTab(profilePicture, handleProfilePictureChange, aboutMe, setAboutMe, socialLinks, handleSocialLinkChange, HandleAccountSubmission, ProfileSaving) {
+function ProfileTab(profilePicture, handleProfilePictureChange, aboutMe, setAboutMe, socialLinks, handleSocialLinkChange, HandleAccountSubmission, ProfileSaving, user) {
   return (
     <TabsContent value="profile">
       <Card className="bg-gray-900 border-gray-800">
@@ -235,7 +241,7 @@ function ProfileTab(profilePicture, handleProfilePictureChange, aboutMe, setAbou
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={profilePicture?.result} alt="Profile picture" />
+              <AvatarImage src={profilePicture?.result || user?.avatar_url} alt="Profile picture" />
               <AvatarFallback>
                 <User className="h-12 w-12 text-gray-400" />
               </AvatarFallback>

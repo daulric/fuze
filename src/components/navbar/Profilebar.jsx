@@ -92,6 +92,10 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
       }
 
       if (account_data.profile) {
+        
+        delete account_data.profile.Video;
+        delete account_data.profile.Blogs;
+
         const string_data = JSON.stringify(account_data.profile);
         localStorage.setItem("user", string_data);
         setUser(account_data.profile);

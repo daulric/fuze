@@ -17,21 +17,34 @@ const UserProfilePage = ({username}) => {
   const [profile, setProfileInfo] = useState(null);
   
   const GetProfile = useCallback(async () => {
-    let temp_username;
+
     if (!username) {
-      temp_username = JSON.parse(localStorage.getItem("user"))?.username;
+      const checkStorage = () => {
+
+        const item = localStorage.getItem("user");
+
+        if (item !== null) {
+            let temp_profile = JSON.parse(item);
+            setProfileInfo(temp_profile);
+        } else {
+          setTimeout(checkStorage, 3);
+        }
+
+      };
+
+      checkStorage()
     } else {
-      temp_username = username;
+
+      const { data } = await axios.get("/api/profile", {
+        params: { username: username }
+      });
+    
+      if (data.success) {
+        setProfileInfo(data.profile);
+      }
+
     }
-  
-    const { data } = await axios.get("/api/profile", {
-      params: { username: temp_username }
-    });
-  
-    if (data.success) {
-      setProfileInfo(data.profile);
-      console.log(data);
-    }
+    
   }, [username]);
   
   const GetVideos = useCallback(async () => {
@@ -39,7 +52,7 @@ const UserProfilePage = ({username}) => {
       params: { username: profile?.username, is_private: false }
     })
 
-    if (profile.Video && data.success) {
+    if (data.success) {
       setVideos(data.data);
     }
   }, [profile]);
