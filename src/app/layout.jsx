@@ -7,8 +7,11 @@ export const metadata = {
   title: "zTube",
   description: "A Temu Version Social Media",
   icons: {
-    icon: "/logo.svg"
-  }
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
+
+  manifest: "/manifest.json",
 };
 
 const Layout = ({ children }) => {
