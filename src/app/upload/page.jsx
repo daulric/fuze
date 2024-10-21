@@ -2,7 +2,7 @@ import UploadPage from "./upload";
 import { Suspense } from "react";
 
 export const metadata = {
-    title: "zTube - Video Upload",
+    title: "Upload",
     description: "Share a video with the world."
 }
 

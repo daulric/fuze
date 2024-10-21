@@ -4,7 +4,7 @@ import ProfileBar from "@/components/navbar/Profilebar";
 import Sidebar from "@/components/navbar/Sidebar";
 
 export const metadata = {
-  title: "zTube",
+  title: "Home",
   description: "A Temu Version Social Media",
   icons: {
     icon: "/logo.svg",

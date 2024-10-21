@@ -27,14 +27,14 @@ export async function generateMetadata({ searchParams }) {
      const item = video_data.data[0];
 
     return {
-      title: `${item ? item.title : 'Video not found'} - zTube`,
+      title: `${item ? item.title : 'Video not found'}`,
       description: `${item ? item.description : 'Video description not available'}`
     };
   } catch (error) {
 
     console.error('Error in generateMetadata:', error);
     return {
-      title: 'Server Error - zTube',
+      title: 'Server Error',
       description: 'This Error Occurs when internet connection is slow or a server error'
     };
   

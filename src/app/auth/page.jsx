@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import AuthPage from "./auth"
 
 export const metadata = {
-    title: "zTube - Authorization"
+    title: "Authentication"
 }
 
 export default function PAGE() {

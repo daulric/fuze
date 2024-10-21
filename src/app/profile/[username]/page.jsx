@@ -2,7 +2,7 @@ import ProfileDisplay from "../ProfileDisplay"
 
 export async function generateMetadata({params}) {
     return {
-        title: `${params.username} - Profile`,
+        title: `${params.username} Profile`,
         description: `Profile about ${params.username} and all their information.`
     }
 }
