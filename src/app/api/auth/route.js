@@ -52,7 +52,9 @@ export async function POST(request) {
         }).select().single();
 
         if (insertError) { throw "Server Error"; }
-        cookieStore.set("user", account_data.account_id);
+        cookieStore.set("user", account_data.account_id, {
+            maxAge: 2592000
+        });
 
         return NextResponse.json({
             success: true,
@@ -99,7 +101,9 @@ export async function PUT(request) {
         }
 
         const account_data = exsisting_accounts[0];
-        cookieStore.set("user", account_data.account_id);
+        cookieStore.set("user", account_data.account_id, {
+            maxAge: 2592000
+        });
 
         return NextResponse.json({
             success: true,
