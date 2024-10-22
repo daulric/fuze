@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,18 @@ const SearchBar = () => {
   const inputRef = useRef(null);
   const router = useRouter();
 
-  // Mock recommendations - replace with actual API call
-  const mockRecommendations = ['video tutorial', 'music video', 'tech review', 'cooking recipe'];
+  const recommended_storage = useMemo(() => {
+    let search_storage = JSON.parse(localStorage.getItem("search_storage"));
+    if (!search_storage || search_storage.length === 0) return [];
+
+    const store = [];
+
+    search_storage.map((s) => {
+      store.push(s);
+    })
+
+    return store;
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -24,10 +34,9 @@ const SearchBar = () => {
     setIsActive(true);
     setSelectedIndex(-1);
     
-    // Filter recommendations based on input
     if (e.target.value) {
       setRecommendations(
-        mockRecommendations.filter(rec =>
+        recommended_storage.filter(rec =>
           rec.toLowerCase().includes(e.target.value.toLowerCase())
         )
       );
@@ -43,6 +52,10 @@ const SearchBar = () => {
       setRecommendations([]);
       setIsActive(false);
       inputRef.current?.blur();
+      if (recommended_storage.indexOf(search)) {
+        recommended_storage.push(search);
+      }
+      localStorage.setItem("search_storage", JSON.stringify(recommended_storage));
       return router.push(`/search?query=${search}`)
     }, 500)
   };
@@ -103,6 +116,7 @@ const SearchBar = () => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -114,7 +128,7 @@ const SearchBar = () => {
     setSelectedIndex(-1);
     if (searchTerm) {
       setRecommendations(
-        mockRecommendations.filter(rec => 
+        recommended_storage.filter(rec => 
           rec.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
