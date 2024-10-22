@@ -10,6 +10,8 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+import { notFound } from 'next/navigation';
+
 const YouTubeStylePlayer = () => {
   const [videoData, setVideoData] = useState(null);
   const [expanded, setExpanded] = useState(false);
@@ -97,6 +99,10 @@ const YouTubeStylePlayer = () => {
       </React.Fragment>
     ));
   };
+
+  if (!video_id) {
+    return notFound();
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto bg-gray-900 text-white">

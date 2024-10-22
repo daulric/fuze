@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Eye, EyeOff, User, Lock, Mail, Calendar } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { encrypt } from "@/tools/encryption";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
+import { notFound } from "next/navigation";
+import cookieStore from "@/tools/cookieStore";
 
 async function handleSignupForm({email, password, username, dob}, setMsg) {
   const user_info = {
@@ -52,6 +54,7 @@ const AuthPage = () => {
   const [dobError, setDobError] = useState('');
   const searchParams = useSearchParams();
   const redirected_path = searchParams.get("p");
+  const cookies = cookieStore();
 
   let path_to_redirect = "";
 
@@ -126,6 +129,16 @@ const AuthPage = () => {
       });
     }
   }, [isLogin, user_info, redirected_path, path_to_redirect, isLogining]);
+
+  const user_exists = useMemo(() => {
+    const user = cookies.get("user");
+    if (user) return true;
+    return false;
+  }, [cookies])
+
+  if (user_exists) { 
+    return notFound();
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">

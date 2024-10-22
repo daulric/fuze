@@ -17,7 +17,8 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 
 async function Logout() {
@@ -137,7 +138,13 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
+            <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/policy"} >
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Policy</span>
+            </DropdownMenuItem>
             
+            <DropdownMenuSeparator className='bg-gray-400' />
+
             {user !== null && (
               <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700" onClick={() => Logout(router)}>
                 <LogOut className="mr-2 h-4 w-4" />
