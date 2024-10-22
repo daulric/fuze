@@ -1,15 +1,15 @@
 "use client";
 
 import { Suspense, useEffect, useState, useMemo } from 'react';
-import { Settings, LogOut, User, Search } from 'lucide-react';
+import { Settings, LogOut, User } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import store from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
+import SearchBar from './Searchbar';
 
 const cookieStore = store();
 
@@ -38,7 +38,6 @@ const AccountProfileBar = () => {
   const router = useRouter();
   const currentPathName = usePathname();
 
-  // Wrap this inside a Suspense boundary
   return (
     <Suspense>
       <AccountProfileContent
@@ -53,15 +52,11 @@ const AccountProfileBar = () => {
 
 const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
   const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [recommendations, setRecommendations] = useState([]);
 
-  // Memoize allQueryParams to prevent recalculation on every render
   const allQueryParams = useMemo(() => {
     return Object.fromEntries(searchParams.entries());
   }, [searchParams]);
 
-  // Memoize queryParams to prevent recalculation on every render
   const queryParams = useMemo(() => {
     let temp_string = "";
     for (const [key, value] of Object.entries(allQueryParams)) {
@@ -95,7 +90,6 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
       }
 
       if (account_data.profile) {
-        
         delete account_data.profile.Video;
         delete account_data.profile.Blogs;
 
@@ -108,14 +102,6 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
     fetch_profile();
   }, [currentPathName, queryParams, allQueryParams, setUser]);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    // Here you would typically call an API to get search recommendations
-    // For this example, we'll use a mock function
-    const mockRecommendations = ['video tutorial', 'music video', 'tech review', 'cooking recipe'];
-    setRecommendations(mockRecommendations.filter(rec => rec.toLowerCase().includes(e.target.value.toLowerCase())));
-  };
-
   return (
     <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       {/* Logo and text */}
@@ -125,30 +111,14 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
       </Link>
       
       {/* Centered search bar */}
-      <div className="flex-grow flex justify-center max-w-2xl">
-        <div className="relative w-full max-w-lg">
-          <Input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-700 text-white"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          {recommendations.length > 0 && (
-            <ul className="absolute z-10 w-full bg-gray-700 mt-1 rounded-md shadow-lg">
-              {recommendations.map((rec, index) => (
-                <li key={index} className="px-4 py-2 hover:bg-gray-600 cursor-pointer text-white">
-                  {rec}
-                </li>
-              ))}
-            </ul>
-          )}
+      {user && (
+        <div className="flex-grow flex justify-center max-w-2xl">
+          <SearchBar />
         </div>
-      </div>
+      )}
       
       {/* User dropdown */}
-      { user && (
+      {user && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
