@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {useRouter} from "next/navigation"
 
 const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,6 +11,7 @@ const SearchBar = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchBarRef = useRef(null);
   const inputRef = useRef(null);
+  const router = useRouter();
 
   // Mock recommendations - replace with actual API call
   const mockRecommendations = ['video tutorial', 'music video', 'tech review', 'cooking recipe'];
@@ -32,15 +34,15 @@ const SearchBar = () => {
     }
   };
 
-  const executeSearch = () => {
-    if (!searchTerm.trim()) return;
+  const executeSearch = (search) => {
+    if (!search.trim()) return;
+
     setTimeout(() => {
       setRecommendations([]);
       setIsActive(false);
       inputRef.current?.blur();
-      return window.location.href = `/search?query=${searchTerm}`
+      return router.push(`/search?query=${search}`)
     }, 500)
-    
   };
 
   const handleRecommendationClick = (recommendation) => {
@@ -49,7 +51,7 @@ const SearchBar = () => {
     setIsActive(false);
     setSelectedIndex(-1);
     inputRef.current?.blur();
-    executeSearch();
+    executeSearch(recommendation);
   };
 
   const handleKeyDown = (e) => {
@@ -59,7 +61,7 @@ const SearchBar = () => {
         handleRecommendationClick(recommendations[selectedIndex]);
       } else if (searchTerm) {
         e.preventDefault();
-        executeSearch();
+        executeSearch(searchTerm);
       }
       return;
     }
@@ -135,7 +137,7 @@ const SearchBar = () => {
           className="w-full pl-4 pr-12 py-2 rounded-full bg-gray-700 text-white border-gray-600 focus:border-gray-500"
         />
         <Button 
-          onClick={executeSearch}
+          onClick={() => executeSearch(searchTerm)}
           disabled={!searchTerm.trim()}
           className="absolute right-1 top-1/2 transform -translate-y-1/2 p-2 rounded-full hover:bg-gray-600"
           variant="ghost"

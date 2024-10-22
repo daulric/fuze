@@ -3,42 +3,49 @@ import MainVideoPage from './Main';
 import { headers } from 'next/headers';
 
 export async function generateMetadata({ searchParams }) {
-  const headersList = headers();
+  const headersList = await headers();
   const host = headersList.get('host');
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  
-  const domain = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.VERCEL_BRANCH_URL
-    ? `https://${process.env.VERCEL_BRANCH_URL}`
-    : `${protocol}://${host}`;
-  
-  const video_id = searchParams.id;
-  const apiUrl = `${domain}/api/video`;
+  const protocol = headersList.get('x-forwarded-proto') || 'https';
+  const videoId = (await searchParams).id;
 
-  try {
-    const response = await fetch(`${apiUrl}?video_id=${video_id}`);
+  const baseUrl = `${protocol}://${host}`;
+  const canonicalUrl = `${baseUrl}/video?id=${videoId}`;
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+  if (!videoId) {
+    return {
+      title: 'Video Not Found',
+      description: 'No video ID provided',
+    };
+  }
+
+  const videoData = await fetch(`${baseUrl}/api/video?video_id=${videoId}`, {
+    cache: 'no-store' 
+  }).then(async (response) => {
+    if (response.ok)  {
+      const jsonData = await response.json();
+      return jsonData.data[0]
     }
 
-     const video_data = await response.json();
-     const item = video_data.data[0];
-
-    return {
-      title: `${item ? item.title : 'Video not found'}`,
-      description: `${item ? item.description : 'Video description not available'}`
-    };
-  } catch (error) {
-
-    console.error('Error in generateMetadata:', error);
-    return {
-      title: 'Server Error',
-      description: 'This Error Occurs when internet connection is slow or a server error'
-    };
+    return [];
+  });
   
+  if (!videoData || videoData.length === 0) {
+    return {
+      title: 'Video Not Found',
+      description: 'The requested video could not be found',
+    };
   }
+
+  return {
+    title: videoData.title || 'Video',
+    description: videoData.description || 'No description available',
+    openGraph: {
+      title: videoData.title || 'Video',
+      description: videoData.description || 'No description available',
+      url: canonicalUrl,
+      type: 'video.other',
+    },
+  };
 }
 
 export default function PAGE() {
