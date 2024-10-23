@@ -7,8 +7,8 @@ import Link from "next/link";
 import { unstable_noStore as noStore } from 'next/cache';
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
-  <Link href="#">
-    <Button variant="ghost" className={`w-full justify-start ${collapsed ? 'px-2' : ''}`} onClick={() => window.location.href = href} asChild>
+  <Link href={href}>
+    <Button variant="ghost" className={`w-full justify-start ${collapsed ? 'px-2' : ''}`} asChild>
       <span className="flex items-center">
         <Icon className={`h-5 w-5 ${collapsed ? '' : 'mr-2'}`} />
         {!collapsed && <span>{label}</span>}

@@ -168,7 +168,7 @@ const VideoUploadPage = () => {
                 <Checkbox 
                   className="bg-gray-50"
                   id="isPrivate" 
-                  checked={videoDetails.isPrivate}
+                  checked={videoDetails.is_private}
                   onCheckedChange={(checked) => handleDetailsChange('is_private', checked)}
                 />
                 <Label htmlFor="isPrivate">Private Video</Label>

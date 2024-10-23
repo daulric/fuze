@@ -26,6 +26,8 @@ export async function POST(request) {
             title: video_data.title,
             description: video_data.description,
             account_id: video_data.account_id,
+            is_private: video_data.is_private,
+            age_18: video_data.age_18,
         }).select().single();
 
         if (data_error) { throw "Server Error" }

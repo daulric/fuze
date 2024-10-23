@@ -19,7 +19,7 @@ export async function POST(request) {
 
         const supabase_client = SupabaseServer();
         const accounts_db = supabase_client.from("Account")
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
 
         if (loginType !== "signup") { throw "Invalid Login Type!"; }
         const { data: exsisting_accounts, error: checkError } = await accounts_db.select().or(`username.eq.${username},email.eq.${email}`);
@@ -81,7 +81,7 @@ export async function PUT(request) {
 
         const supa_client = SupabaseServer();
         const accounts_db = supa_client.from("Account");
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
 
         if (loginType !== "login") { throw "Invalid Login Type for Method!"; }
         const { data: exsisting_accounts, error: checkError } = await accounts_db.select().or(`email.eq.${email}`)
@@ -120,7 +120,7 @@ export async function PUT(request) {
 }
 
 export async function DELETE() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     const user_token = cookieStore.get("user");
 
