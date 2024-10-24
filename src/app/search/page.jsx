@@ -12,8 +12,8 @@ export async function generateMetadata({searchParams}) {
   }
 
   return {
-    title: `Search Results for ${query}`,
-    description: `Search results for ${query}`,
+    title: `Search Results for "${query}"`,
+    description: `Search results for "${query}"`,
   }
 
 }

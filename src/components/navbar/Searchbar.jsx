@@ -52,7 +52,7 @@ const SearchBar = () => {
       setRecommendations([]);
       setIsActive(false);
       inputRef.current?.blur();
-      if (recommended_storage.indexOf(search)) {
+      if (!recommended_storage.includes(search)) {
         recommended_storage.push(search);
       }
       localStorage.setItem("search_storage", JSON.stringify(recommended_storage));

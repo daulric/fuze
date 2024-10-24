@@ -81,6 +81,29 @@ async function GetFullData(supa_client) {
     }
 }
 
+async function GetSearchData(supa_client, search_query) {
+    const Data = await GetFullData(supa_client);
+
+    if (Data.length === 0) return NextResponse.json({ success: true, data: []});
+
+    const searched_data = Data.filter(item => {
+        const search_query_lower = search_query.toLowerCase();
+        return (
+            (
+                item.Account.username.toLowerCase().includes(search_query_lower) ||
+                item.title.toLowerCase().includes(search_query_lower) ||
+                item.description.toLowerCase().includes(search_query_lower)
+            ) &&
+            item.is_private === false
+        )
+    })
+
+    return NextResponse.json({
+        success: true,
+        data: searched_data,
+    });
+
+}
 
 export async function GET(request) {
     noStore();
@@ -88,12 +111,17 @@ export async function GET(request) {
 
     const queries = {
         ...Object.fromEntries(searchParams.entries()),
-    } 
+    }
 
     try {
         const supa_client = SupabaseServer();
 
         if (Object.keys(queries).length !== 0) {
+
+            if (queries.search) {
+                return GetSearchData(supa_client, queries.search);
+            }
+
             return DatabaseQuery(supa_client, queries);
         }
 

@@ -3,13 +3,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import Image from "next/image";
+import Link from "next/link";
 import axios from "axios";
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <a 
+    <Link
       href={link} 
       className="block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       onMouseEnter={() => setIsHovered(true)}
@@ -26,7 +27,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
         <p className="text-sm text-gray-400">{channel}</p>
         <p className="text-xs text-gray-500">{views} views • {uploadTime}</p>
       </div>
-    </a>
+    </Link>
   );
 };
 
