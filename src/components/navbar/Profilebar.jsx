@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, useMemo } from 'react';
-import { Settings, LogOut, User } from 'lucide-react';
+import { Settings, LogOut, User, Menu } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import store from "@/tools/cookieStore";
@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 async function Logout() {
-  // Logout Session
   const user_token = cookieStore.get("user");
   const user_data = localStorage.getItem("user");
 
@@ -34,7 +33,7 @@ async function Logout() {
   window.location.reload();
 }
 
-const AccountProfileBar = () => {
+const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
   const currentPathName = usePathname();
@@ -42,16 +41,27 @@ const AccountProfileBar = () => {
   return (
     <Suspense>
       <AccountProfileContent
-        user={user} 
-        setUser={setUser} 
-        currentPathName={currentPathName} 
-        router={router} 
+        user={user}
+        setUser={setUser}
+        currentPathName={currentPathName}
+        router={router}
+        toggleSidebar={toggleSidebar}
+        isSidebarHidden={isSidebarHidden}
+        isMobile={isMobile}
       />
     </Suspense>
   );
 };
 
-const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
+const AccountProfileContent = ({ 
+  user, 
+  setUser, 
+  currentPathName, 
+  router,
+  toggleSidebar,
+  isSidebarHidden,
+  isMobile
+}) => {
   const searchParams = useSearchParams();
 
   const allQueryParams = useMemo(() => {
@@ -105,11 +115,22 @@ const AccountProfileContent = ({ user, setUser, currentPathName, router }) => {
 
   return (
     <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
-      {/* Logo and text */}
-      <Link href="/" className="flex items-center space-x-2">
-        <Image src="/logo.svg" priority alt="Logo" className="h-5 w-5" width={20} height={20} />
-        <span className="text-white text-lg font-semibold">zTube</span>
-      </Link>
+      <div className="flex items-center space-x-4">
+        {isMobile && (
+          <Button
+            variant="ghost"
+            className="p-2"
+            onClick={toggleSidebar}
+          >
+            <Menu className="h-6 w-6 text-white" />
+          </Button>
+        )}
+        
+        <Link href="/" className="flex items-center space-x-2">
+          <Image src="/logo.svg" priority alt="Logo" className="h-5 w-5" width={20} height={20} />
+          <span className="text-white text-lg font-semibold">zTube</span>
+        </Link>
+      </div>
       
       {/* Centered search bar */}
       {user && (

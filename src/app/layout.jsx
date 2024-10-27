@@ -1,7 +1,5 @@
 import "./globals.css";
-
-import ProfileBar from "@/components/navbar/Profilebar";
-import Sidebar from "@/components/navbar/Sidebar";
+import LayoutClient from "@/components/navbar/LayoutClient";
 
 export const metadata = {
   title: "Home",
@@ -10,27 +8,19 @@ export const metadata = {
     icon: "/logo.svg",
     apple: "/logo.svg",
   },
-
   manifest: "/manifest.json",
 };
 
-const Layout = ({ children }) => {
+const RootLayout = ({ children }) => {
   return (
-    <html>
-      <body className="relative h-screen overflow-hidden">
-        <ProfileBar />
-
-        <div className="flex h-screen">
-          <Sidebar />
-
-          <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-y-auto">
-            {children}
-          </main>
-
-        </div>
+    <html lang="en">
+      <body>
+        <LayoutClient>
+          {children}
+        </LayoutClient>
       </body>
     </html>
   );
 };
 
-export default Layout;
+export default RootLayout;
