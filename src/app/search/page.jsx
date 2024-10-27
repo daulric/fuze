@@ -1,4 +1,5 @@
 import SearchPage from "./searchPage"
+import { Suspense } from "react";
 
 export async function generateMetadata({searchParams}) {
 
@@ -20,8 +21,8 @@ export async function generateMetadata({searchParams}) {
 
 export default function PAGE() {
   return (
-    <>
-    <SearchPage />
-    </>
+    <Suspense fallback={<div>loading search...</div>} >
+      <SearchPage />
+    </Suspense>
   )
 }

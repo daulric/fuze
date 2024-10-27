@@ -50,7 +50,7 @@ export async function generateMetadata({ searchParams }) {
 
 export default function PAGE() {
   return (
-    <Suspense>
+    <Suspense fallback={<div>loading video display...</div>}>
       <MainVideoPage />
     </Suspense>
   );

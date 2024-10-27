@@ -1,4 +1,5 @@
 import ProfileDisplay from "./ProfileDisplay"
+import { Suspense } from "react"
 
 export const metadata = {
     title: "My Profile",
@@ -6,5 +7,9 @@ export const metadata = {
 
 export default function PAGE() {
     // Fetch username here
-    return <ProfileDisplay />
+    return (
+        <Suspense fallback={<div>loading profile...</div>} >
+            <ProfileDisplay />
+        </Suspense>
+    )
 }

@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function PAGE() {
     return (
-        <Suspense>
+        <Suspense fallback={<div>loading authentication...</div>} >
             <AuthPage />
         </Suspense>
     )

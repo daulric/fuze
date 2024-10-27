@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ProfileDisplay from "../ProfileDisplay"
 
 export async function generateMetadata({params}) {
@@ -10,5 +11,9 @@ export async function generateMetadata({params}) {
 
 export default async function PAGE({params}) {
     const isparams = await params;
-    return <ProfileDisplay username={isparams?.username} />
+    return (
+        <Suspense fallback={<div>loading user profile...</div>} >
+            <ProfileDisplay username={isparams?.username} />
+        </Suspense>
+    )
 }

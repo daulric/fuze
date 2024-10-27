@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import PolicyPage from "./policy"
 
 export const metadata = {
@@ -7,6 +8,8 @@ export const metadata = {
 
 export default function PAGE() {
     return (
-        <PolicyPage />
+        <Suspense fallback={<div>loading policy...</div>} >
+            <PolicyPage />
+        </Suspense>
     )
 }
