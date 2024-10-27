@@ -133,7 +133,7 @@ const SearchBar = () => {
         )}
 
         {isExpanded && (
-          <div className="relative top-0 right-0 w-full z-50 bg-gray-800 p-2 rounded-lg shadow-lg">
+          <div className="relative top-0 right-0 w-full z-50 bg-transparent p-2 rounded-lg shadow-lg">
             <div className="relative">
               <Input
                 ref={inputRef}
@@ -142,7 +142,7 @@ const SearchBar = () => {
                 value={searchTerm}
                 onChange={handleSearch}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-4 pr-12 py-2 rounded-full bg-gray-700 text-white border-gray-600 focus:border-gray-500"
+                className="w-full pl-4 pr-12 py-2 rounded-full bg-transparent text-white border-gray-600 focus:border-gray-500"
                 autoFocus
               />
               <Button 
