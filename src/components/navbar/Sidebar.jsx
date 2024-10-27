@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Upload, User } from 'lucide-react';
+import { Home, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
@@ -20,7 +20,7 @@ const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
 
 const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) => {
   noStore();
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const [collapsed] = useState(defaultCollapsed);
   const [user, setUser] = useState(null);
   const sidebarRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -90,7 +90,6 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
           <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
           {user && (
             <>
-              <SidebarItem icon={User} label="Profile" collapsed={collapsed && !isMobile} href='/profile' />
               <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
             </>
           )}
