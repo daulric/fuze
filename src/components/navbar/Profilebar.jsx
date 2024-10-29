@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, useMemo } from 'react';
-import { Settings, LogOut, User, Menu } from 'lucide-react';
+import { Settings, LogOut, User, Menu, X } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import store from "@/tools/cookieStore";
@@ -122,7 +122,11 @@ const AccountProfileContent = ({
             className="p-2"
             onClick={toggleSidebar}
           >
-            <Menu className="h-6 w-6 text-white" />
+            {isSidebarHidden ? (
+              <Menu className="h-6 w-6 text-white" />
+            ) : (
+              <X className="h-6 w-6 text-white" />
+            )}
           </Button>
         )}
         

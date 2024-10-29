@@ -19,11 +19,17 @@ const ClientWrapper = ({ children }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const toggleSidebar = () => {
+  const toggleSidebar = (newState) => {
     if (isMobile) {
-      setIsHidden(!isHidden);
+      if (typeof newState === 'boolean') {
+        setIsHidden(newState);
+      } else {
+        setIsHidden(prev => !prev);
+      }
     }
   };
+
+  console.log(isHidden);
 
   return (
     <div className="relative h-screen overflow-hidden">
@@ -38,7 +44,7 @@ const ClientWrapper = ({ children }) => {
           setIsHidden={setIsHidden}
           isMobile={isMobile}
         />
-        <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-y-auto">
+        <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-y-auto overscroll-none">
           {children}
         </main>
       </div>
