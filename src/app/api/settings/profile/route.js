@@ -48,7 +48,7 @@ export async function POST(request) {
 
         await AccountDB.update({
             aboutme: account_data.aboutme,
-            social_links: account_data.socialLinks,
+            social_links: account_data.social_links,
         }).eq("account_id", account_id);
 
         return NextResponse.json({
