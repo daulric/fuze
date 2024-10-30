@@ -29,8 +29,6 @@ const ClientWrapper = ({ children }) => {
     }
   };
 
-  console.log(isHidden);
-
   return (
     <div className="relative h-screen overflow-hidden">
       <ProfileBar

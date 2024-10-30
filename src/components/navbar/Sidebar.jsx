@@ -43,7 +43,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (isMobile && !isHidden && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        setIsHidden(true);
+        setIsHidden(prev => !prev);
       }
     };
 

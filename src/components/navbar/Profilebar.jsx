@@ -119,8 +119,8 @@ const AccountProfileContent = ({
         {isMobile && (
           <Button
             variant="ghost"
-            className="p-2"
-            onClick={toggleSidebar}
+            className="p-2 hover:bg-gray-700"
+            onClick={() => toggleSidebar(prev => !prev)}
           >
             {isSidebarHidden ? (
               <Menu className="h-6 w-6 text-white" />
