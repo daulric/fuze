@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { Play } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
@@ -102,8 +102,7 @@ async function GetVideoData() {
   return newData;
 }
 
-// Example usage
-const ExampleVideoGrid = () => {
+const VideosGrid = () => {
   const [video_data, setVideoData] = useState([]);
 
   const get_data = useCallback(async () => {
@@ -117,9 +116,11 @@ const ExampleVideoGrid = () => {
 
   return (
     <div className="bg-gray-900 min-h-screen p-4">
-      <VideoGrid videos={video_data} />
+      <Suspense fallback={<div>loading some vids...</div>} >
+        <VideoGrid videos={video_data} />
+      </Suspense>
     </div>
   );
 };
 
-export default ExampleVideoGrid;
+export default VideosGrid;

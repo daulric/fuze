@@ -39,3 +39,5 @@ next-env.d.ts
 *.snap
 sw*
 workbox*
+/temp
+/logs
