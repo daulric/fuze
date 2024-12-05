@@ -23,8 +23,8 @@ To get started with the platform, follow these simple steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/daulric/capstone-project.git
-   cd capstone-project
+   git clone https://github.com/daulric/ztube.git
+   cd ztube
    ```
 
 2. **Install Dependencies**: 
