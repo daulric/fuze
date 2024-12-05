@@ -12,7 +12,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-import axios from "axios";
 import store from "@/tools/cookieStore";
 const cookieStore = store();
 
@@ -126,16 +125,8 @@ const VideoUploadPage = () => {
     form_data.set("data", JSON.stringify(updatedVideoDetails));
 
     try {
-      const { data } = await axios.post("/api/video/upload", form_data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress(percentCompleted);
-        },
+      const data = await uploadWithProgress("/api/video/upload", form_data, (progress) => {
+        setUploadProgress(progress);
       });
 
       if (data.success === true) {
@@ -152,6 +143,41 @@ const VideoUploadPage = () => {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const uploadWithProgress = async (url, formData, onUploadProgress) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+  
+      // Open the request
+      xhr.open("POST", url);
+  
+      // Set headers
+      xhr.setRequestHeader("Accept", "application/json");
+  
+      // Track upload progress
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentCompleted = Math.round((event.loaded * 100) / event.total);
+          onUploadProgress(percentCompleted);
+        }
+      };
+  
+      // Handle successful response
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(JSON.parse(xhr.responseText));
+        } else {
+          reject(new Error(`Error: ${xhr.status} ${xhr.statusText}`));
+        }
+      };
+  
+      // Handle network errors
+      xhr.onerror = () => reject(new Error("Network error"));
+  
+      // Send the request with formData
+      xhr.send(formData);
+    });
   };
 
   // Cleanup URLs when component unmounts
