@@ -8,14 +8,12 @@ import { Video, FileText, Eye, User, BadgeCheck } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 
-import axios from 'axios';
-
 const UserProfilePage = ({username}) => {
   const [activeTab, setActiveTab] = useState('videos');
   const [videos, setVideos] = useState([]);
   //const [blogs, setBlogs] = useState([]);
   const [profile, setProfileInfo] = useState(null);
-  
+
   const GetProfile = useCallback(async () => {
 
     if (!username) {
@@ -35,9 +33,13 @@ const UserProfilePage = ({username}) => {
       checkStorage()
     } else {
 
-      const { data } = await axios.get("/api/profile", {
-        params: { username: username }
-      });
+      const response = await fetch(`/api/profile?username=${username}`);
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
     
       if (data.success) {
         setProfileInfo(data.profile);
@@ -48,9 +50,16 @@ const UserProfilePage = ({username}) => {
   }, [username]);
   
   const GetVideos = useCallback(async () => {
-    const { data } = await axios.get("/api/video", {
-      params: { username: profile?.username, is_private: false }
-    })
+
+    const query = new URLSearchParams({
+      username: profile?.username,
+      is_private: false,
+    });
+
+    const response = await fetch(`/api/video?${query.toString()}`);
+    if (!response.ok) return;
+
+    const data = await response.json();
 
     if (data.success) {
       setVideos(data.data);

@@ -8,7 +8,6 @@ import store from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import axios from "axios";
 import SearchBar from './Searchbar';
 
 const cookieStore = store();
@@ -89,16 +88,18 @@ const AccountProfileContent = ({
         return (window.location.href = `/auth?p=${currentPathName}${queryParams}`);
       }
 
-      const { data: account_data, error: checkError } = await axios.get("/api/profile", {
-        params: {
-          account_id: user_token,
-          allowId: true,
-        },
+      const query = new URLSearchParams({
+        account_id: user_token,
+        allowId: true,
       });
 
-      if (checkError) {
+      const response = await fetch(`/api/profile?${query.toString()}`);
+
+      if (!response.ok) {
         return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
       }
+
+      const account_data = await response.json();
 
       if (account_data.profile) {
         delete account_data.profile.Video;

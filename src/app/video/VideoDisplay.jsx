@@ -6,7 +6,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import VideoPlayer from "./VideoPlayer";
-import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -23,25 +22,17 @@ const YouTubeStylePlayer = () => {
     if (!video_id) return;
 
     try {
-      const {data} = await axios.get("/api/video", {
-        params: {
-          video_id: video_id,
-        }
-      });
+      const response = await fetch(`/api/video?video_id=${video_id}`);
+      if (!response.ok) return;
 
-      console.log(data);
+      const data = await response.json();
 
       if (!data || data.success === false) return;
       const video_data = data.data;
       setVideoData(video_data[0]);
 
+      await fetch(`/api/video/views?id=${video_id}`, { method: "post" });
 
-      // Updating the View Count
-      await axios.post("/api/video/views", {}, {
-        params: {
-          id: video_id,
-        }
-      });
     } catch (error) {
       console.log("Error fetching video data:", error);
     }
@@ -53,16 +44,16 @@ const YouTubeStylePlayer = () => {
 
   useEffect(() => {
     async function getUploaderPic() {
-      const { data: uplaoder } = await axios.get("/api/profile", {
-        params: {
-          username: videoData.Account.username,
-        }
-      })
 
-      if (uplaoder.profile) {
+      const response = await fetch(`/api/profile?username=${videoData.Account.username}`);
+      if (!response.ok) return;
+
+      const uploader = await response.json();
+
+      if (uploader.profile) {
         setVideoData({
           ...videoData,
-          uploaderPic: uplaoder.profile.avatar_url,
+          uploaderPic: uploader.profile.avatar_url,
         })
       }
     }

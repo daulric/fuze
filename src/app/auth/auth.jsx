@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { encrypt } from "@/tools/encryption";
-import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import cookieStore from "@/tools/cookieStore";
@@ -20,7 +19,19 @@ async function handleSignupForm({email, password, username, dob}, setMsg) {
     dob: dob,
   }
 
-  const { data } = await axios.post("/api/auth", user_info);
+  const response = await fetch("/api/auth", { 
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user_info),
+  });
+
+  if (!response.ok) {
+    setMsg({message: "Server Error!"});
+  }
+
+  const data = await response.json();
 
   if (data) {
     setMsg(data);
@@ -36,7 +47,20 @@ async function handleLoginForm({email, password}, setMsg) {
     password: password,
   }
 
-  const { data } = await axios.put("/api/auth", user_info);
+  const response = await fetch("api/auth", {
+    method: "put",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user_info),
+  });
+
+  if (!response.ok) {
+    setMsg({message: "Server Error"});
+    return;
+  };
+
+  const data = await response.json();
 
   if (data) {
     setMsg(data);

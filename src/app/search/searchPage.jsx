@@ -4,7 +4,6 @@ import React, { useEffect,  useState } from 'react';
 import { Play } from 'lucide-react';
 import Image from "next/image"
 import { notFound } from 'next/navigation';
-import axios from "axios";
 import Link from "next/link"
 
 import { useSearchParams } from "next/navigation"
@@ -76,11 +75,11 @@ const SearchResults = () => {
         setIsLoading(true);
 
         try {
-          const { data } = await axios.get("/api/video", {
-            params: {
-              search: searchQuery,
-            }
-          });
+          const response = await fetch(`/api/video?search=${searchQuery}`);
+          if (!response.ok) throw "error fetching query";
+
+          const data = await response.json();
+
           setSearchedVideos(data ? data.data : []);
         } catch (error) {
           console.error("Error fetching videos:", error);

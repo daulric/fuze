@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import axios from "axios";
 
 const SettingsPage = () => {
   const [profilePicture, setProfilePicture] = useState(null);
@@ -82,12 +81,19 @@ const SettingsPage = () => {
     if (profilePicture?.picture) {
       form_data.set("profile_picture", profilePicture?.picture);
     }
-    
-    const {data} = await axios.post("/api/settings/profile", form_data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
+
+    const response = await fetch("/api/settings/profile", {
+      method: "post",
+      body: form_data,
+    });
+
+    if (!response.ok) {
+      console.log("no response from server");
+      return;
+    };
+
+    const data = await response.json();
+    console.log(data);
 
     if (data.success === false) { setProfileSaving(false); return;}
     return window.location.reload();
