@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import { User, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,59 +11,10 @@ import Link from "next/link";
 
 import { notFound } from 'next/navigation';
 
-const YouTubeStylePlayer = () => {
-  const [videoData, setVideoData] = useState(null);
+const YouTubeStylePlayer = ({VideoData}) => {
   const [expanded, setExpanded] = useState(false);
-  const [uploaderPicFetched, setUploaderPicFetched] = useState(false);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
-
-  const getVideo = useCallback(async () => {
-    if (!video_id) return;
-
-    try {
-      const response = await fetch(`/api/video?video_id=${video_id}`);
-      if (!response.ok) return;
-
-      const data = await response.json();
-
-      if (!data || data.success === false) return;
-      const video_data = data.data;
-      setVideoData(video_data[0]);
-
-      await fetch(`/api/video/views?id=${video_id}`, { method: "post" });
-
-    } catch (error) {
-      console.log("Error fetching video data:", error);
-    }
-  }, [video_id]);
-
-  useEffect(() => {
-    getVideo();
-  }, [getVideo]);
-
-  useEffect(() => {
-    async function getUploaderPic() {
-
-      const response = await fetch(`/api/profile?username=${videoData.Account.username}`);
-      if (!response.ok) return;
-
-      const uploader = await response.json();
-
-      if (uploader.profile) {
-        setVideoData({
-          ...videoData,
-          uploaderPic: uploader.profile.avatar_url,
-        })
-      }
-    }
-
-    if (videoData && !uploaderPicFetched) {
-      console.log("getting picture!")
-      getUploaderPic();
-      setUploaderPicFetched(true);
-    }
-  }, [uploaderPicFetched, videoData])
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
@@ -101,9 +52,9 @@ const YouTubeStylePlayer = () => {
         <CardContent className="p-0">
           <div className="relative pt-[56.25%] bg-gray-800">
             <div className="absolute inset-0">
-              {videoData ? (
+              {VideoData ? (
                 <Suspense fallback={<p className="text-gray-400 flex items-center justify-center h-full">Loading video...</p>}>
-                  <VideoPlayer videoSrc={videoData.video} poster={videoData.thumbnail} />
+                  <VideoPlayer videoSrc={VideoData.video} poster={VideoData.thumbnail} />
                 </Suspense>
               ) : (
                 <p className="text-gray-400 flex items-center justify-center h-full">No video available</p>
@@ -114,19 +65,19 @@ const YouTubeStylePlayer = () => {
       </Card>
 
       <div className="mt-4 p-4">
-        <h2 className="text-xl font-bold mb-2">{videoData ? videoData.title : ""}</h2>
+        <h2 className="text-xl font-bold mb-2">{VideoData ? VideoData.title : ""}</h2>
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <Link href={`/profile/${videoData?.Account?.username}`}>
+            <Link href={`/profile/${VideoData?.Account?.username}`}>
               <Avatar className="h-10 w-10">
-                <AvatarImage src={videoData?.uploaderPic} alt="Uploader" />
+                <AvatarImage src={VideoData?.uploaderPic} alt="Uploader" />
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
               </Avatar>
             </Link>
-            <Link href={`/profile/${videoData?.Account?.username}`} >
-              <p className="font-semibold">{videoData?.Account?.username || ""}</p>
-              <p className="text-sm text-gray-400">{videoData?.upload_at ? new Date(videoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}</p>
+            <Link href={`/profile/${VideoData?.Account?.username}`} >
+              <p className="font-semibold">{VideoData?.Account?.username || ""}</p>
+              <p className="text-sm text-gray-400">{VideoData?.upload_at ? new Date(VideoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}</p>
             </Link>
           </div>
         </div>
@@ -134,11 +85,11 @@ const YouTubeStylePlayer = () => {
         <div className="mt-4">
           <div className="text-sm text-gray-300 whitespace-pre-wrap">
             {expanded 
-              ? formatDescription(videoData?.description)
-              : truncateDescription(videoData?.description)
+              ? formatDescription(VideoData?.description)
+              : truncateDescription(VideoData?.description)
             }
           </div>
-          {videoData?.description && videoData.description.length > 150 && (
+          {VideoData?.description && VideoData.description.length > 150 && (
             <Button 
               variant="ghost" 
               className="mt-2 text-blue-400 hover:text-blue-300 p-0"

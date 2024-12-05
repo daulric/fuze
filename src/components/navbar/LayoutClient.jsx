@@ -31,18 +31,18 @@ const ClientWrapper = ({ children }) => {
 
   return (
     <div className="relative h-screen overflow-hidden">
+      <div className="flex h-screen">
       <ProfileBar
         toggleSidebar={toggleSidebar}
         isSidebarHidden={isHidden}
         isMobile={isMobile}
       />
-      <div className="flex h-screen">
         <Sidebar
           isHidden={isHidden}
           setIsHidden={setIsHidden}
           isMobile={isMobile}
         />
-        <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-y-auto overscroll-none">
+        <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-y-auto">
           {children}
         </main>
       </div>

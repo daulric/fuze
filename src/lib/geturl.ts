@@ -6,7 +6,7 @@ async function getURL() {
     const protocol = headersList.get('x-forwarded-proto') || 'http';
     const url = `${protocol}://${host}`;
 
-    return url
+    return url;
 };
 
 export default getURL;

@@ -1,40 +1,35 @@
 import { Suspense } from 'react';
 import MainVideoPage from './Main';
-import { headers } from 'next/headers';
+import getUrl from "@/lib/geturl";
+
+async function getVideoData(url, video_id) {
+  if (!url || !video_id) return null;
+
+  const response = await fetch(`${url}/api/video?video_id=${video_id}`);
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  if (!data || data.length <= 0) return null;
+
+  return data.data;
+}
 
 export async function generateMetadata({ searchParams }) {
-  const headersList = await headers();
-  const host = headersList.get('host');
-  const protocol = headersList.get('x-forwarded-proto') || 'https';
   const videoId = (await searchParams).id;
 
-  const baseUrl = `${protocol}://${host}`;
+  const baseUrl = await getUrl();
   const canonicalUrl = `${baseUrl}/video?id=${videoId}`;
 
-  if (!videoId) {
-    return {
-      title: 'Video Not Found',
-      description: 'No video ID provided',
-    };
-  }
+  const temp_data = await getVideoData(baseUrl, videoId);
 
-  const videoData = await fetch(`${baseUrl}/api/video?video_id=${videoId}`, {
-    cache: 'no-store' 
-  }).then(async (response) => {
-    if (response.ok)  {
-      const jsonData = await response.json();
-      return jsonData.data[0]
+  if (temp_data === null) {
+    return {
+    title: "Video Not Found",
+    description: "Video not found",
     }
-
-    return [];
-  });
-  
-  if (!videoData || videoData.length === 0) {
-    return {
-      title: 'Video Not Found',
-      description: 'The requested video could not be found',
-    };
   }
+
+  const videoData = temp_data[0];
 
   return {
     title: videoData.title || 'Video',
@@ -48,10 +43,34 @@ export async function generateMetadata({ searchParams }) {
   };
 }
 
-export default function PAGE() {
+export default async function PAGE({searchParams}) {
+
+  const url = await getUrl();
+  const id = (await searchParams).id;
+  const video_data = await getVideoData(url, id);
+
+  await fetch(`${url}/api/video/views?id=${id}`, { method: "post" });
+
+  let data = {};
+
+  if (video_data !== null) {
+    const temp_data = video_data[0];
+
+    const res = await fetch(`${url}/api/profile?username=${temp_data.Account.username}`);
+    
+    if (res.ok) {
+      const user_profile = await res.json();
+      data = {
+        ...temp_data,
+        uploaderPic: user_profile.profile.avatar_url,
+      }
+    }
+
+  }
+
   return (
     <Suspense fallback={<div>loading video display...</div>}>
-      <MainVideoPage />
+      <MainVideoPage VideoData={data} />
     </Suspense>
   );
 }
