@@ -31,6 +31,7 @@ export async function POST(request) {
         }).select().single();
 
         if (data_error) { throw "Server Error" }
+        console.log("Video Info Uploaded!")
 
         if (final_video_data.video_id) {
             const last_index =  video_file.name.lastIndexOf(".");
@@ -42,6 +43,7 @@ export async function POST(request) {
             );
 
             if (videoUploadError) { throw "Error Uploading Video" };
+            console.log("Video Uploaded")
 
             if (video_thumbnail) {
                 const last_index =  video_thumbnail.name.lastIndexOf(".");
@@ -53,6 +55,7 @@ export async function POST(request) {
                 )
 
                 if (ImageUploadError) {throw "Error Uploading Thumbnail"};
+                console.log("Thumbnail Uploaded")
             }
 
             return NextResponse.json({

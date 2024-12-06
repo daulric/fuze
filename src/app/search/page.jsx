@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 export async function generateMetadata({searchParams}) {
 
-  const query = (await searchParams).query || "";
+  const query = (await searchParams).query;
 
   if (!query) {
     return {

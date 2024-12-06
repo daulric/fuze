@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect, Fragment } from 'react';
 import { User, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,12 +35,24 @@ const YouTubeStylePlayer = ({VideoData}) => {
     
     // Replace newline characters with <br /> for proper HTML rendering
     return text.split(/\r\n|\n|\r/).map((line, index) => (
-      <React.Fragment key={index}>
+      <Fragment key={index}>
         {line}
         <br />
-      </React.Fragment>
+      </Fragment>
     ));
   };
+
+  useEffect(() => {
+    const user_client = JSON.parse(localStorage.getItem("user"));
+
+    if (!user_client) {
+      notFound();
+    }
+
+    if (user_client.username !== VideoData.Account.username) {
+      notFound();
+    }
+  }, [VideoData]);
 
   if (!video_id) {
     return notFound();

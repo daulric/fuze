@@ -55,7 +55,6 @@ export default async function PAGE({searchParams}) {
 
   if (video_data !== null) {
     const temp_data = video_data[0];
-
     const res = await fetch(`${url}/api/profile?username=${temp_data.Account.username}`);
     
     if (res.ok) {
@@ -65,7 +64,6 @@ export default async function PAGE({searchParams}) {
         uploaderPic: user_profile.profile.avatar_url,
       }
     }
-
   }
 
   return (

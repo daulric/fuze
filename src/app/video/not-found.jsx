@@ -12,9 +12,6 @@ export default function NotFound() {
             <span className="text-4xl">❌</span>
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">No Video To Display</h1>
-          <p className="text-gray-400 mb-8">
-            This video id was not available
-          </p>
         </div>
         <Link 
           href="/" 
