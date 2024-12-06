@@ -1,5 +1,5 @@
 import "./globals.css";
-import LayoutClient from "@/components/navbar/LayoutClient";
+import LayoutProvider from "@/components/LayoutProvider"
 
 export const metadata = {
   title: "Home",
@@ -15,9 +15,9 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <body>
-        <LayoutClient>
+        <LayoutProvider>
           {children}
-        </LayoutClient>
+        </LayoutProvider>
       </body>
     </html>
   );
