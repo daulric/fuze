@@ -36,13 +36,18 @@ To get started with the platform, follow these simple steps:
 3. **Make sure to create an environment variable file and have all the various variables**:
     ```env
         NEXT_PUBLIC_supabase_url="supabase_db_url"
-        URL_CONFIG="supabase_db_url_without_the _https"
+        URL_CONFIG="supabase_db_url without the https://"
         NEXT_PUBLIC_supabase_anon_key="your supabase anon key"
     ```
 
 3. **Run the Development Server**:
    ```bash
    npm run dev
+   ```
+
+   **To Deploy**:
+   ```bash
+    npm run deploy
    ```
 
 4. Navigate to `http://localhost:3000` in your browser to access the platform.
@@ -70,7 +75,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 For any questions or inquiries, feel free to reach out:
 
-- Email: daulric@icloud.com
+- Email: ulricaird@yahoo.com
 - GitHub: [daulric](https://github.com/daulric)
 
 Feel free to customize any sections as needed, including adding more details about your platform's features, installation instructions, or any specific guidelines for contributions!
