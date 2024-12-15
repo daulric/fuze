@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 40",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "shadcn": "npx shadcn@latest",
-    "deploy": "next build && next start -p 40"
+    "deploy": "next build && next start"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.0",
