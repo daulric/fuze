@@ -5,7 +5,7 @@ import NavbarLayout from "@/components/navbar/LayoutClient"
 
 export default function LayoutProvider({children}) {
 
-    const excluded_paths = ["dashboard"];
+    const excluded_paths = ["dashboar"];
     const paths = usePathname();
     const pathName = paths.split("/")[1];
 
