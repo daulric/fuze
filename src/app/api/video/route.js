@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server"
-import { unstable_noStore as noStore } from "next/cache";
+import SupabaseServer from "@/supabase/server";
 
 async function DatabaseQuery(supa_client, query) {
     const Data = await GetFullData(supa_client);
@@ -106,7 +105,6 @@ async function GetSearchData(supa_client, search_query) {
 }
 
 export async function GET(request) {
-    noStore();
     const searchParams = request.nextUrl.searchParams;
 
     const queries = {

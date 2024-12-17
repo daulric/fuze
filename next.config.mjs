@@ -8,9 +8,6 @@ const withPWA = pwa({
   cacheOnFrontEndNav: true,
   disable: process.env.NODE_ENV === "development",
   skipWaiting: true,
-  workboxOptions: {
-    ignoreURLParametersMatching: [/.*/]
-  }
 });
 
 const nextConfig = {

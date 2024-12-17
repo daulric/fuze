@@ -11,8 +11,20 @@ import Link from "next/link";
 
 import { notFound } from 'next/navigation';
 
+function createProtectedBuffer(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "arraybuffer";
+    xhr.onload = () => resolve(xhr.response);
+    xhr.onerror = () => reject(new Error("Network error"));
+    xhr.open("GET", url);
+    xhr.send();
+  });
+}
+
 const YouTubeStylePlayer = ({VideoData}) => {
   const [expanded, setExpanded] = useState(false);
+  const [protectedSrc, setProtectedSrc] = useState(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
 
@@ -42,7 +54,22 @@ const YouTubeStylePlayer = ({VideoData}) => {
     ));
   };
 
-  useEffect(() => {
+  useEffect( () => {
+
+    async function getProtectedItems() {
+      const [vid_url, thumb_url] = await Promise.all([
+        createProtectedBuffer(VideoData.video),
+        createProtectedBuffer(VideoData.thumbnail),
+      ]);
+      
+      console.log("protected items created!");
+  
+      setProtectedSrc({
+        thumbnail: URL.createObjectURL(new Blob([thumb_url])),
+        video: URL.createObjectURL(new Blob([vid_url])),
+      });
+    }
+
     const user_client = JSON.parse(localStorage.getItem("user"));
 
     if (!user_client) {
@@ -52,6 +79,8 @@ const YouTubeStylePlayer = ({VideoData}) => {
     if (user_client.username !== VideoData.Account.username) {
       notFound();
     }
+
+    getProtectedItems();
   }, [VideoData]);
 
   if (!video_id) {
@@ -64,9 +93,9 @@ const YouTubeStylePlayer = ({VideoData}) => {
         <CardContent className="p-0">
           <div className="relative pt-[56.25%] bg-gray-800">
             <div className="absolute inset-0">
-              {VideoData ? (
+              {protectedSrc ? (
                 <Suspense fallback={<p className="text-gray-400 flex items-center justify-center h-full">Loading video...</p>}>
-                  <VideoPlayer videoSrc={VideoData.video} poster={VideoData.thumbnail} />
+                  <VideoPlayer videoSrc={protectedSrc.video} poster={protectedSrc.thumbnail} />
                 </Suspense>
               ) : (
                 <p className="text-gray-400 flex items-center justify-center h-full">No video available</p>
