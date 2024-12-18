@@ -1,51 +1,32 @@
 "use client";
 
-import { useState, Suspense, useEffect, Fragment } from 'react';
-import { User, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState, Suspense, useEffect, Fragment, useRef } from 'react';
+import { User, ChevronDown, ChevronUp, Calendar, Eye } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import VideoPlayer from "./VideoPlayer";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-
 import { notFound } from 'next/navigation';
 
-function createProtectedBuffer(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = "arraybuffer";
-    xhr.onload = () => resolve(xhr.response);
-    xhr.onerror = () => reject(new Error("Network error"));
-    xhr.open("GET", url);
-    xhr.send();
-  });
-}
-
-const YouTubeStylePlayer = ({VideoData}) => {
+const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
-  const [protectedSrc, setProtectedSrc] = useState(null);
+  const videoContainerRef = useRef(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
-    
-    // Replace newline characters with spaces for truncation
     const flatText = text.replace(/(\r\n|\n|\r)/gm, " ");
-    
     if (flatText.length <= limit) return text;
-    
-    // Truncate the flattened text
     const truncated = flatText.slice(0, limit).trim() + '...';
-    
     return truncated;
   };
 
   const formatDescription = (text) => {
     if (!text) return "No description available.";
-    
-    // Replace newline characters with <br /> for proper HTML rendering
     return text.split(/\r\n|\n|\r/).map((line, index) => (
       <Fragment key={index}>
         {line}
@@ -54,33 +35,34 @@ const YouTubeStylePlayer = ({VideoData}) => {
     ));
   };
 
-  useEffect( () => {
+  useEffect(() => {
+    async function ScaleVideo() {
+      // Create a temporary video element to get the aspect ratio
+      const tempVideo = document.createElement('video');
+      tempVideo.src = VideoData.video;
 
-    async function getProtectedItems() {
-      const [vid_url, thumb_url] = await Promise.all([
-        createProtectedBuffer(VideoData.video),
-        createProtectedBuffer(VideoData.thumbnail),
-      ]);
-      
-      console.log("protected items created!");
-  
-      setProtectedSrc({
-        thumbnail: URL.createObjectURL(new Blob([thumb_url])),
-        video: URL.createObjectURL(new Blob([vid_url])),
-      });
+      tempVideo.onloadedmetadata = () => {
+        const videoAspectRatio = tempVideo.videoWidth / tempVideo.videoHeight;
+
+        if (videoContainerRef.current) {
+          const containerWidth = videoContainerRef.current.offsetWidth;
+          const containerHeight = containerWidth / videoAspectRatio;
+          videoContainerRef.current.style.height = `${containerHeight}px`;
+        }
+
+        URL.revokeObjectURL(tempVideo.src);
+      };
     }
 
     const user_client = JSON.parse(localStorage.getItem("user"));
 
-    if (!user_client) {
-      notFound();
+    if (VideoData.is_private === true) {
+      if (user_client.username !== VideoData.Account.username) {
+        notFound();
+      }
     }
 
-    if (user_client.username !== VideoData.Account.username) {
-      notFound();
-    }
-
-    getProtectedItems();
+    ScaleVideo();
   }, [VideoData]);
 
   if (!video_id) {
@@ -88,66 +70,90 @@ const YouTubeStylePlayer = ({VideoData}) => {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-gray-900 text-white">
-      <Card className="shadow-xl border-gray-800 rounded-lg overflow-hidden">
-        <CardContent className="p-0">
-          <div className="relative pt-[56.25%] bg-gray-800">
-            <div className="absolute inset-0">
-              {protectedSrc ? (
-                <Suspense fallback={<p className="text-gray-400 flex items-center justify-center h-full">Loading video...</p>}>
-                  <VideoPlayer videoSrc={protectedSrc.video} poster={protectedSrc.thumbnail} />
-                </Suspense>
-              ) : (
-                <p className="text-gray-400 flex items-center justify-center h-full">No video available</p>
-              )}
+    <div className="w-full max-w-4xl mx-auto bg-gray-900 text-white">
+      <div ref={videoContainerRef} className="relative bg-black rounded-lg overflow-hidden shadow-lg mb-6">
+        {VideoData ? (
+          <Suspense fallback={
+            <div className="w-full h-full flex items-center justify-center bg-gray-800">
+              <Skeleton className="w-full h-full" />
             </div>
+          }>
+            <VideoPlayer 
+              videoSrc={VideoData.video} 
+              poster={VideoData.thumbnail}
+            />
+          </Suspense>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-800">
+            <Skeleton className="w-full h-full" />
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
 
-      <div className="mt-4 p-4">
-        <h2 className="text-xl font-bold mb-2">{VideoData ? VideoData.title : ""}</h2>
+      <div className="px-4 space-y-4">
+        <h1 className="text-2xl font-bold leading-tight">{VideoData ? VideoData.title : <Skeleton className="h-8 w-3/4" />}</h1>
         
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <Link href={`/profile/${VideoData?.Account?.username}`}>
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={VideoData?.uploaderPic} alt="Uploader" />
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+          <div className="flex items-center space-x-4">
+            <Link href={`/profile/${VideoData?.Account?.username}`} className="flex items-center space-x-3">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={VideoData?.uploaderPic} alt={VideoData?.Account?.username} />
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
               </Avatar>
+              <div>
+                <p className="font-semibold text-lg">{VideoData?.Account?.username || <Skeleton className="h-6 w-24" />}</p>
+                <p className="text-sm text-gray-400">
+                  {VideoData?.upload_at ? (
+                    <span className="flex items-center">
+                      <Calendar className="mr-1 h-4 w-4" />
+                      {new Date(VideoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
+                  ) : (
+                    <Skeleton className="h-4 w-32" />
+                  )}
+                </p>
+              </div>
             </Link>
-            <Link href={`/profile/${VideoData?.Account?.username}`} >
-              <p className="font-semibold">{VideoData?.Account?.username || ""}</p>
-              <p className="text-sm text-gray-400">{VideoData?.upload_at ? new Date(VideoData.upload_at).toLocaleString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}</p>
-            </Link>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-400">
+            <Eye className="h-5 w-5" />
+            <span>{VideoData?.views || 0} views</span>
           </div>
         </div>
 
-        <div className="mt-4">
-          <div className="text-sm text-gray-300 whitespace-pre-wrap">
-            {expanded 
-              ? formatDescription(VideoData?.description)
-              : truncateDescription(VideoData?.description)
-            }
-          </div>
-          {VideoData?.description && VideoData.description.length > 150 && (
-            <Button 
-              variant="ghost" 
-              className="mt-2 text-blue-400 hover:text-blue-300 p-0"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? (
+        <Card className="bg-gray-800 border-gray-700">
+          <CardContent className="p-4">
+            <div className="text-sm text-gray-300 whitespace-pre-wrap">
+              {VideoData?.description ? (
                 <>
-                  Show less <ChevronUp className="ml-1 h-4 w-4" />
+                  {expanded 
+                    ? formatDescription(VideoData.description)
+                    : truncateDescription(VideoData.description)
+                  }
+                  {VideoData.description.length > 150 && (
+                    <Button 
+                      variant="ghost" 
+                      className="mt-2 text-blue-400 hover:text-blue-300 p-0"
+                      onClick={() => setExpanded(!expanded)}
+                    >
+                      {expanded ? (
+                        <>
+                          Show less <ChevronUp className="ml-1 h-4 w-4" />
+                        </>
+                      ) : (
+                        <>
+                          Show more <ChevronDown className="ml-1 h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </>
               ) : (
-                <>
-                  Show more <ChevronDown className="ml-1 h-4 w-4" />
-                </>
+                <Skeleton className="h-20 w-full" />
               )}
-            </Button>
-          )}
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -85,7 +85,7 @@ const AccountProfileContent = ({
         localStorage.removeItem("user");
 
         if (currentPathName === "/auth" && allQueryParams) return;
-        return (window.location.href = `/auth?p=${currentPathName}${queryParams}`);
+        return //(window.location.href = `/auth?p=${currentPathName}${queryParams}`);
       }
 
       const query = new URLSearchParams({
@@ -138,24 +138,22 @@ const AccountProfileContent = ({
       </div>
       
       {/* Centered search bar */}
-      {user && (
-        <div className="flex-grow flex justify-center max-w-2xl">
-          <SearchBar />
-        </div>
-      )}
+      <div className="flex-grow flex justify-center max-w-2xl">
+        <SearchBar />
+      </div>
       
       {/* User dropdown */}
-      {user && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar>
-                <AvatarImage src={user?.avatar_url} alt={user?.username} />
-                <AvatarFallback className='text-gray-800'>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 bg-gray-700 border-gray-700" align="end" forceMount>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar>
+              <AvatarImage src={user?.avatar_url} alt={user?.username} />
+              <AvatarFallback className='text-gray-800'>{user?.username.charAt(0).toUpperCase() || "G"}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56 bg-gray-700 border-gray-700" align="end" forceMount>
+          {user && (<>
             <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/profile"}>
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
@@ -164,22 +162,28 @@ const AccountProfileContent = ({
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/policy"} >
+          </>)}
+          {!user && (
+            <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/auth"} >
               <Settings className="mr-2 h-4 w-4" />
-              <span>Policy</span>
+              <span>Login</span>
             </DropdownMenuItem>
-            
-            <DropdownMenuSeparator className='bg-gray-400' />
+          )}
+          <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/policy"} >
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Policy</span>
+          </DropdownMenuItem>
+          
+          {user && (<DropdownMenuSeparator className='bg-gray-400' />)}
 
-            {user !== null && (
-              <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700" onClick={() => Logout(router)}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+          {user !== null && (
+            <DropdownMenuItem className="flex items-center text-red-500 bg-gray-700" onClick={() => Logout(router)}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

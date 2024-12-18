@@ -49,7 +49,9 @@ export default async function PAGE({searchParams}) {
   const id = (await searchParams).id;
   const video_data = await getVideoData(url, id);
 
-  await fetch(`${url}/api/video/views?id=${id}`, { method: "post" });
+  if (process.env.NODE_ENV !== "development") {
+    await fetch(`${url}/api/video/views?id=${id}`, { method: "post" });
+  }
 
   let data = {};
 
