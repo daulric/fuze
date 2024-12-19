@@ -148,6 +148,7 @@ const VideoUploadPage = () => {
         setMsg(data);
       }
     } catch (error) {
+      console.log(error);
       setMsg({ 
         success: false,
         message: error.response?.data?.message || error || "Error uploading video",

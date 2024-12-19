@@ -36,24 +36,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   };
 
   useEffect(() => {
-    async function ScaleVideo() {
-      // Create a temporary video element to get the aspect ratio
-      const tempVideo = document.createElement('video');
-      tempVideo.src = VideoData.video;
-
-      tempVideo.onloadedmetadata = () => {
-        const videoAspectRatio = tempVideo.videoWidth / tempVideo.videoHeight;
-
-        if (videoContainerRef.current) {
-          const containerWidth = videoContainerRef.current.offsetWidth;
-          const containerHeight = containerWidth / videoAspectRatio;
-          videoContainerRef.current.style.height = `${containerHeight}px`;
-        }
-
-        URL.revokeObjectURL(tempVideo.src);
-      };
-    }
-
     const user_client = JSON.parse(localStorage.getItem("user"));
 
     if (VideoData.is_private === true) {
@@ -61,8 +43,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         notFound();
       }
     }
-
-    ScaleVideo();
   }, [VideoData]);
 
   if (!video_id) {
@@ -71,23 +51,28 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-900 text-white">
+      <br/>
       <div ref={videoContainerRef} className="relative bg-black rounded-lg overflow-hidden shadow-lg mb-6">
-        {VideoData ? (
-          <Suspense fallback={
-            <div className="w-full h-full flex items-center justify-center bg-gray-800">
+        <div style={{ paddingTop: '56.25%' }} className="relative">
+          {VideoData ? (
+            <Suspense fallback={
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                <Skeleton className="w-full h-full" />
+              </div>
+            }>
+              <div className="absolute inset-0">
+                <VideoPlayer 
+                  videoSrc={VideoData.video} 
+                  poster={VideoData.thumbnail}
+                />
+              </div>
+            </Suspense>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
               <Skeleton className="w-full h-full" />
             </div>
-          }>
-            <VideoPlayer 
-              videoSrc={VideoData.video} 
-              poster={VideoData.thumbnail}
-            />
-          </Suspense>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-800">
-            <Skeleton className="w-full h-full" />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="px-4 space-y-4">

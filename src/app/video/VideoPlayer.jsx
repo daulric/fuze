@@ -164,7 +164,7 @@ const VideoPlayer = ({ videoSrc, poster }) => {
   return (
     <div 
       ref={containerRef} 
-      className="relative bg-black rounded-lg overflow-hidden shadow-lg w-full h-full"
+      className="relative w-full h-full bg-black"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
