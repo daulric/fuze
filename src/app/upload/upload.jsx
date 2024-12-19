@@ -105,35 +105,37 @@ const VideoUploadPage = () => {
     e.preventDefault();
     setIsUploading(true);
     setUploadProgress(0);
-    const form_data = new FormData();
-
-    const account_id = cookieStore.get("user");
-    if (!account_id) {
-      throw "Please log in to upload videos";
-    }
-
-    const updatedVideoDetails = {
-      ...videoDetails,
-      account_id: account_id
-    };
-
-    const video_file_size = file.size / (1024 * 1024);
-    const thumbnail_file_size = thumbnail.size / (1024 * 1024);
-
-    if (video_file_size > 50 ) {
-      throw "Video file must be less than 50MB";
-    }
-
-    if (thumbnail_file_size > 50 ) {
-      throw "Thumbnail file must be less than 50MB";
-    }
-
-    if (file !== null) form_data.set("video_file", file);
-    if (thumbnail !== null) {form_data.set("video_thumbnail", thumbnail)};
-  
-    form_data.set("data", JSON.stringify(updatedVideoDetails));
 
     try {
+
+      const form_data = new FormData();
+      const account_id = cookieStore.get("user");
+
+      if (!account_id) {
+        throw "Please log in to upload videos";
+      }
+
+      const updatedVideoDetails = {
+        ...videoDetails,
+        account_id: account_id
+      };
+
+      const video_file_size = file.size / (1024 * 1024);
+      const thumbnail_file_size = thumbnail.size / (1024 * 1024);
+
+      if (video_file_size > 50 ) {
+        throw "Video file must be less than 50MB";
+      }
+  
+      if (thumbnail_file_size > 50 ) {
+        throw "Thumbnail file must be less than 50MB";
+      }
+
+      if (file !== null) form_data.set("video_file", file);
+      if (thumbnail !== null) {form_data.set("video_thumbnail", thumbnail)};
+    
+      form_data.set("data", JSON.stringify(updatedVideoDetails));
+
       const data = await uploadWithProgress("/api/video/upload", form_data, (progress) => {
         setUploadProgress(progress);
       })
