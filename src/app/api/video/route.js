@@ -45,35 +45,40 @@ async function DatabaseQuery(supa_client, query) {
 async function GetFullData(supa_client) {
     try {
         const videos_db = supa_client.from("Video");
-        const video_storage = supa_client.storage.from("Videos");
-        const thumbnail_storage = supa_client.storage.from("Video_Images");
+        const Uploads_Storage = supa_client.storage.from("Uploads");
 
-        const [videoData, videoFiles, thumbnailFiles] = await Promise.all([
-            videos_db.select("*, Account (username)"),
-            video_storage.list(),
-            thumbnail_storage.list()
-        ]);
+        const {data: Vid_Data} = await videos_db.select("*, Account(username)");
 
-        if (videoData.error || videoFiles.error || thumbnailFiles.error) {
-            throw new Error("Failed to fetch data from Supabase");
-        }
+        const handler_data = await Promise.all(Vid_Data.map(async (videoData) => {
 
-        const processedData = videoData.data.map((videoData) => {
-            const video_file = videoFiles.data.find((item) => item?.name?.split(".")[0] === videoData.video_id);
-            const videoUrl = video_file ? video_storage.getPublicUrl(video_file.name).data.publicUrl : null;
-            
-            const video_thumbnail = thumbnailFiles.data.find((item) => item?.name?.split('.')[0] === videoData.video_id);
-            const thumbnailUrl = video_thumbnail ? thumbnail_storage.getPublicUrl(video_thumbnail.name).data.publicUrl : "/logo.svg";
-
+            // List files asynchronously
+            const { data, error } = await Uploads_Storage.list(videoData.video_id, { limit: 1000 });
+        
+            if (error) {
+                console.error("Error fetching files:", error);
+                return {
+                    ...videoData,
+                    video: null,
+                    thumbnail: "/logo.svg", // Default fallback in case of an error
+                };
+            }
+        
+            // Assuming you're getting file names or paths for video and thumbnail
+            const videoFile = data.find(file => file.name.includes("video")); // Adjust this according to your file structure
+            const thumbnailFile = data.find(file => file.name.includes("thumbnail")); // Adjust this as well
+        
+            // Get public URLs
+            const videoUrl = videoFile ? Uploads_Storage.getPublicUrl(`${videoData.video_id}/${videoFile.name}`).data?.publicUrl : null;
+            const thumbnailUrl = thumbnailFile ? Uploads_Storage.getPublicUrl(`${videoData.video_id}/${thumbnailFile.name}`).data?.publicUrl : "/logo.svg";
+        
             return {
                 ...videoData,
                 video: videoUrl,
                 thumbnail: thumbnailUrl,
-
             };
-        });
+        }));
 
-        return processedData;
+        return handler_data;
     } catch (error) {
         console.error('Error processing video data:', error);
         return []

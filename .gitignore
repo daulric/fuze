@@ -41,3 +41,4 @@ sw*
 workbox*
 /temp
 /logs
+src/migrate_uploads.js
