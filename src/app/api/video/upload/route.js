@@ -20,8 +20,6 @@ export async function POST(request) {
 
         const video_db = supa_client.from("Video");
         const Uploads_Storage = supa_client.storage.from("Uploads");
-        //const video_storage = supa_client.storage.from("Videos");
-        //const video_thumbnail_storage = supa_client.storage.from("Video_Images");
 
         const { data: final_video_data, error: data_error } = await video_db.insert({
             title: video_data.title,
@@ -32,7 +30,7 @@ export async function POST(request) {
         }).select().single();
 
         if (data_error) { throw "Server Error" }
-        console.log("Video Info Uploaded!")
+        console.log("Video Info Uploaded!");
 
         if (final_video_data.video_id) {
             const video_last_index =  video_file.name.lastIndexOf(".");

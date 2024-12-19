@@ -5,8 +5,8 @@ export const metadata = {
   title: "Home",
   description: "A Temu Version Social Media",
   icons: {
-    icon: "/logo2.svg",
-    apple: "/logo2.svg",
+    icon: "/logo.svg",
+    apple: "/logo.svg",
   },
   manifest: "/manifest.json",
 };
