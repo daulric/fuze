@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, useMemo } from 'react';
-import { Settings, LogOut, User, Menu, X } from 'lucide-react';
+import { Settings, LogOut, LogIn, User, Menu, X } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import store from "@/tools/cookieStore";
@@ -165,7 +165,7 @@ const AccountProfileContent = ({
           </>)}
           {!user && (
             <DropdownMenuItem className="flex items-center bg-gray-700 text-gray-50" onClick={() => window.location.href = "/auth"} >
-              <Settings className="mr-2 h-4 w-4" />
+              <LogIn className="mr-2 h-4 w-4" />
               <span>Login</span>
             </DropdownMenuItem>
           )}
