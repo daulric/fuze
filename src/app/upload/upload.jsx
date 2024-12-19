@@ -109,15 +109,24 @@ const VideoUploadPage = () => {
 
     const account_id = cookieStore.get("user");
     if (!account_id) {
-      setMsg({ success: false, message: "Please log in to upload videos" });
-      setIsUploading(false);
-      return;
+      throw "Please log in to upload videos";
     }
 
     const updatedVideoDetails = {
       ...videoDetails,
       account_id: account_id
     };
+
+    const video_file_size = file.size / (1024 * 1024);
+    const thumbnail_file_size = thumbnail.size / (1024 * 1024);
+
+    if (video_file_size > 50 ) {
+      throw "Video file must be less than 50MB";
+    }
+
+    if (thumbnail_file_size > 50 ) {
+      throw "Thumbnail file must be less than 50MB";
+    }
 
     if (file !== null) form_data.set("video_file", file);
     if (thumbnail !== null) {form_data.set("video_thumbnail", thumbnail)};
@@ -127,6 +136,9 @@ const VideoUploadPage = () => {
     try {
       const data = await uploadWithProgress("/api/video/upload", form_data, (progress) => {
         setUploadProgress(progress);
+      })
+      .catch((err) => {
+        throw err;
       });
 
       if (data.success === true) {
@@ -137,8 +149,8 @@ const VideoUploadPage = () => {
       }
     } catch (error) {
       setMsg({ 
-        success: false, 
-        message: error.response?.data?.message || "Error uploading video" 
+        success: false,
+        message: error.response?.data?.message || error || "Error uploading video",
       });
     } finally {
       setIsUploading(false);
