@@ -5,7 +5,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { User } from 'lucide-react';
 
-const Comment = ({ username, profilePic, content, timestamp }) => {
+import SupabaseClient from "@/supabase/server";
+
+const Comment = ({ username, profilePic, content, created_at }) => {
   const timeAgo = (date) => {
     const seconds = Math.floor((new Date() - date) / 1000);
     let interval = seconds / 31536000;
@@ -30,7 +32,7 @@ const Comment = ({ username, profilePic, content, timestamp }) => {
       <div className="flex-1">
         <div className="flex items-center space-x-2">
           <span className="font-semibold text-sm text-gray-200">{username}</span>
-          <span className="text-xs text-gray-400">{timeAgo(new Date(timestamp))}</span>
+          <span className="text-xs text-gray-400">{timeAgo(new Date(created_at))}</span>
         </div>
         <p className="mt-1 text-sm text-gray-300">{content}</p>
       </div>
@@ -38,49 +40,25 @@ const Comment = ({ username, profilePic, content, timestamp }) => {
   );
 };
 
-// Mock API function to simulate fetching comments
-const fetchComments = async (videoId) => {
-  // Simulate API delay
-  console.log(videoId);
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Mock data
-  return [
-    {
-      id: 1,
-      username: "JohnDoe",
-      profilePic: "/placeholder.svg?height=40&width=40",
-      content: "Great video! Really enjoyed the content.",
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-    },
-    {
-      id: 2,
-      username: "JaneSmith",
-      profilePic: "/placeholder.svg?height=40&width=40",
-      content: "Thanks for sharing this. Very informative!",
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      id: 3,
-      username: "AliceJohnson",
-      profilePic: "/placeholder.svg?height=40&width=40",
-      content: `This video really helped me understand the topic better. I'd love to see more content like this!`,
-      timestamp: new Date(Date.now() - 172800000).toISOString(),
-    },
-  ];
-};
-
 const CommentSection = ({ videoId, setIsTyping }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  const supabase = SupabaseClient();
+  const user_client = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
     const loadComments = async () => {
       setIsLoading(true);
       try {
-        const fetchedComments = await fetchComments(videoId);
-        setComments(fetchedComments);
+        //const fetchedComments = await fetchComments(videoId);
+        const {data: Comments} = await supabase.from("Video Comments")
+          .select("*")
+          .eq("video_id", videoId)
+          .order("created_at", {ascending: true});
+
+        setComments(Comments);
       } catch (error) {
         console.error("Failed to fetch comments:", error);
         // Here you might want to set an error state and display an error message to the user
@@ -90,7 +68,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     };
 
     loadComments();
-  }, [videoId]);
+  }, [supabase, videoId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,10 +77,10 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     // In a real app, you'd send this to your API
     const comment = {
       id: Date.now(), // This would normally be set by the backend
-      username: "CurrentUser", // In a real app, this would be the logged-in user
-      profilePic: "/placeholder.svg?height=40&width=40",
+      username: user_client.username, // In a real app, this would be the logged-in user
+      profilePic: user_client.avatar_url,
       content: newComment,
-      timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     };
 
     // Optimistically update the UI
@@ -136,9 +114,9 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   return (
     <div className="mt-8 bg-gray-900 text-gray-100">
       <h2 className="text-lg font-semibold mb-4 text-gray-100">{comments.length} Comments</h2>
-      <div className="flex space-x-4 mb-6">
+      {user_client && <div className="flex space-x-4 mb-6">
         <Avatar className="w-10 h-10">
-          <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Current User" />
+          <AvatarImage src={user_client.avatar_url} alt="Current User" />
           <AvatarFallback className='bg-gray-600'><User /></AvatarFallback>
         </Avatar>
         <form onSubmit={handleSubmit} className="flex-1">
@@ -152,7 +130,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
             <Button type="submit" variant="secondary" className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
           </div>
         </form>
-      </div>
+      </div>}
       <Separator className="my-4 bg-gray-700" />
       {comments.length === 0 ? (
         <div className="text-center py-8">
