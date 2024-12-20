@@ -125,16 +125,21 @@ const CommentSection = ({ videoId, setIsTyping }) => {
         table: "VideoComments"
       },
       async (payload) => {
-        console.log("Change received:", payload);
-        
         if (payload.new?.video_id === videoId) {
           // Get the user information for the new comment
+
+          const {data: payload_user_comment} = await supabase.from("VideoComments")
+          .select("id, comment, created_at, Account(username)")
+          .eq("video_id", videoId)
+          .eq("id", payload.new.id)
+          .single();
+
           const user = pre_comment_profiles.find(
-            profile => profile.username === payload.new.Account.username
+            profile => profile.username === payload_user_comment.Account.username
           );
 
           const processedComment = {
-            ...payload.new,
+            ...payload_user_comment,
             user: user
           };
 
@@ -144,7 +149,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
       }
     )
     .subscribe((status) => {
-      console.log("Current Status:", status)
+      console.log("Comment Section Live Connection", status)
     });
 
     return () => {
