@@ -3,7 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Rewind, FastForward 
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
-const VideoPlayer = ({ videoSrc, poster }) => {
+const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -114,6 +114,9 @@ const VideoPlayer = ({ videoSrc, poster }) => {
 
   useEffect(() => {
     const handleKeyPress = (e) => {
+
+      if (isCommenting) return;
+
       switch (e.key.toLowerCase()) {
         case ' ':
         case 'k':
@@ -152,7 +155,7 @@ const VideoPlayer = ({ videoSrc, poster }) => {
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute]);
+  }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute, isCommenting]);
 
   const formatTime = (time) => {
     if (!isFinite(time)) return '0:00';

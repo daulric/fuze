@@ -70,7 +70,7 @@ const fetchComments = async (videoId) => {
   ];
 };
 
-const CommentSection = ({ videoId }) => {
+const CommentSection = ({ videoId, setIsTyping }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -122,6 +122,13 @@ const CommentSection = ({ videoId }) => {
     }
   };
 
+  function handleTyping(e) {
+    setIsTyping(true);
+    setNewComment(e.target.value);
+    clearTimeout(window.typingTimeout);
+    window.typingTimeout = setTimeout(() => setIsTyping(false), 1000);
+  }
+
   if (isLoading) {
     return <div className="mt-8 text-gray-300">Loading comments...</div>;
   }
@@ -137,7 +144,7 @@ const CommentSection = ({ videoId }) => {
         <form onSubmit={handleSubmit} className="flex-1">
           <Textarea
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            onChange={handleTyping}
             placeholder="Add a comment..."
             className="mb-2 resize-none bg-gray-800 text-gray-100 border-gray-700"
           />

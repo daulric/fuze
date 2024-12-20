@@ -17,6 +17,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const videoContainerRef = useRef(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
+  const [isCommenting, setIsCommenting] = useState(false);
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
@@ -65,6 +66,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                 <VideoPlayer 
                   videoSrc={VideoData.video} 
                   poster={VideoData.thumbnail}
+                  isCommenting={isCommenting}
                 />
               </div>
             </Suspense>
@@ -141,7 +143,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           </CardContent>
         </Card>
 
-        <CommentSection videoId={VideoData.video_id} />
+        <CommentSection videoId={VideoData.video_id} setIsTyping={setIsCommenting} />
       </div>
     </div>
   );
