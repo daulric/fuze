@@ -143,7 +143,9 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           </CardContent>
         </Card>
 
-        <CommentSection videoId={VideoData.video_id} setIsTyping={setIsCommenting} />
+            <Suspense fallback={<div>loading comments</div>} >
+            <CommentSection videoId={VideoData.video_id} setIsTyping={setIsCommenting} />
+            </Suspense>
       </div>
     </div>
   );

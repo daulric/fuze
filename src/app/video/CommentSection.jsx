@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -7,7 +9,7 @@ import { User } from 'lucide-react';
 
 import SupabaseClient from "@/supabase/server";
 
-const Comment = ({ username, profilePic, content, created_at }) => {
+const Comment = ({ user, comment, created_at }) => {
   const timeAgo = (date) => {
     const seconds = Math.floor((new Date() - date) / 1000);
     let interval = seconds / 31536000;
@@ -26,15 +28,15 @@ const Comment = ({ username, profilePic, content, created_at }) => {
   return (
     <div className="flex space-x-4 py-4">
       <Avatar className="w-10 h-10">
-        <AvatarImage src={profilePic} alt={username} />
+        <AvatarImage src={user.avatar_url} alt={user.username} />
         <AvatarFallback className='bg-gray-600' ><User /></AvatarFallback>
       </Avatar>
       <div className="flex-1">
         <div className="flex items-center space-x-2">
-          <span className="font-semibold text-sm text-gray-200">{username}</span>
+          <span className="font-semibold text-sm text-gray-200">{user.username}</span>
           <span className="text-xs text-gray-400">{timeAgo(new Date(created_at))}</span>
         </div>
-        <p className="mt-1 text-sm text-gray-300">{content}</p>
+        <p className="mt-1 text-sm text-gray-300">{comment}</p>
       </div>
     </div>
   );
@@ -44,31 +46,77 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [user_client, setUserClient] = useState(null);
+  const [pre_comment_profiles, setPreCommentProfiles] = useState(null);
+  const [all_profile_fetched, setAllProfilesFetched] = useState(false);
 
   const supabase = SupabaseClient();
-  const user_client = JSON.parse(localStorage.getItem("user"));
+  
+
+  async function getProfiles() {
+    const response = await fetch("/api/profile?all=true");
+    if (!response.ok) return;
+
+    const data = await response.json();
+    return data.profiles;
+  }
 
   useEffect(() => {
+    async function getProfilesForComments() {
+      if (all_profile_fetched) return;
+      const profiles = await getProfiles();
+      setPreCommentProfiles(() => {
+        setAllProfilesFetched(true);
+        return profiles;
+      });
+    }
+
+    async function process_comments(comments) {
+      if (comments.length === 0) return;
+  
+      const processed = comments.map((comment) => {
+        let user_vid_comment = comment.Account.username;
+        let found = pre_comment_profiles.find(user => user.username === user_vid_comment);
+
+        let comment_proccessed = { ...comment };
+        delete comment_proccessed.Account;
+  
+        return {
+          ...comment_proccessed,
+          user: found,
+        }
+      });
+  
+      console.log("Comments:", processed);
+      setComments(processed);
+    }
+
     const loadComments = async () => {
       setIsLoading(true);
       try {
-        //const fetchedComments = await fetchComments(videoId);
-        const {data: Comments} = await supabase.from("Video Comments")
-          .select("*")
+        const {data: Comments, error} = await supabase.from("Video Comments")
+          .select("comment, created_at, Account(username)")
           .eq("video_id", videoId)
           .order("created_at", {ascending: true});
+          
+        if (error) {
+          console.log(error);
+        }
 
-        setComments(Comments);
+        //console.log(videoId, Comments);
+        process_comments(Comments);
       } catch (error) {
         console.error("Failed to fetch comments:", error);
-        // Here you might want to set an error state and display an error message to the user
       } finally {
         setIsLoading(false);
       }
     };
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserClient(user);
+    getProfilesForComments();
     loadComments();
-  }, [supabase, videoId]);
+  }, [all_profile_fetched, pre_comment_profiles, supabase, videoId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

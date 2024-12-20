@@ -2,12 +2,56 @@ import { NextResponse } from "next/server";
 import Supabase from "@/supabase/server";
 import { unstable_noStore } from "next/cache";
 
+async function GetUserProfiles() {
+    const supa_client = Supabase();
+    const accounts_db = supa_client.from("Account");
+    const ProfileStorage = supa_client.storage.from("Profiles");
+
+    const {data, error} = await accounts_db.select(`
+        account_id,
+        username,
+        is_verified,
+        social_links,
+        time_created,
+        aboutme
+    `);
+
+    if (error) {
+        return `Error Fetching Profiles : ${error}`
+    }
+
+    const all_users = await Promise.all(
+        data.map(async (user) => {
+            const { data: ProfilePic } = await ProfileStorage.list(`${user.account_id}`);
+            const findPic = ProfilePic?.find(item => item?.name?.split(".")[0] === "profile_pic");
+            user.avatar_url = findPic
+                ? ProfileStorage.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl
+                : null;
+            
+            delete user.account_id;
+            return user;
+        })
+    );
+
+    return all_users;
+}
+
 export async function GET(request) {
     try {
         unstable_noStore();
         const username = request.nextUrl?.searchParams.get("username");
         const account_id = request.nextUrl?.searchParams.get("account_id");
         const allowId = request.nextUrl?.searchParams.get("allowId");
+        const all_users = request.nextUrl?.searchParams.get("all");
+
+        if (all_users) {
+            const get_all_users = await GetUserProfiles();
+
+            return NextResponse.json({
+                success: true,
+                profiles: get_all_users,
+            });
+        };
 
         if (!username && !account_id) { throw "No Valid Params" };
        
@@ -55,7 +99,7 @@ export async function GET(request) {
         return NextResponse.json({
             success: true,
             profile: user_profile,
-        })
+        });
     } catch (e) {
         return NextResponse.json({
             success: false,
