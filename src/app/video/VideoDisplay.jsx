@@ -10,6 +10,7 @@ import VideoPlayer from "./VideoPlayer";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { notFound } from 'next/navigation';
+import CommentSection from './CommentSection';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -139,6 +140,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
             </div>
           </CardContent>
         </Card>
+
+        <CommentSection videoId={VideoData.video_id} />
       </div>
     </div>
   );
