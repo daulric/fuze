@@ -28,12 +28,12 @@ const Comment = ({ user, comment, created_at }) => {
   return (
     <div className="flex space-x-4 py-4">
       <Avatar className="w-10 h-10">
-        <AvatarImage src={user.avatar_url} alt={user.username} />
+        <AvatarImage src={user?.avatar_url} alt={user?.username} />
         <AvatarFallback className='bg-gray-600' ><User /></AvatarFallback>
       </Avatar>
       <div className="flex-1">
         <div className="flex items-center space-x-2">
-          <span className="font-semibold text-sm text-gray-200">{user.username}</span>
+          <span className="font-semibold text-sm text-gray-200">{user?.username}</span>
           <span className="text-xs text-gray-400">{timeAgo(new Date(created_at))}</span>
         </div>
         <p className="mt-1 text-sm text-gray-300">{comment}</p>
@@ -76,7 +76,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   
       const processed = comments.map((comment) => {
         let user_vid_comment = comment.Account.username;
-        let found = pre_comment_profiles.find(user => user.username === user_vid_comment);
+        let found = pre_comment_profiles.find(user => user.username === user_vid_comment) || null;
 
         let comment_proccessed = { ...comment };
         delete comment_proccessed.Account;
@@ -86,24 +86,22 @@ const CommentSection = ({ videoId, setIsTyping }) => {
           user: found,
         }
       });
-  
-      console.log("Comments:", processed);
-      setComments(processed);
-    }
+
+      setComments((prev) => [...prev, ...processed]);
+    };
 
     const loadComments = async () => {
       setIsLoading(true);
       try {
-        const {data: Comments, error} = await supabase.from("Video Comments")
-          .select("comment, created_at, Account(username)")
+        const {data: Comments, error} = await supabase.from("VideoComments")
+          .select("id, comment, created_at, Account(username)")
           .eq("video_id", videoId)
-          .order("created_at", {ascending: true});
+          .order("created_at", {ascending: false});
           
         if (error) {
           console.log(error);
         }
 
-        //console.log(videoId, Comments);
         process_comments(Comments);
       } catch (error) {
         console.error("Failed to fetch comments:", error);
@@ -116,35 +114,64 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     setUserClient(user);
     getProfilesForComments();
     loadComments();
+
+    // Modify your realtime subscription code:
+    const realtime_comments = supabase.channel(videoId)
+    .on(
+      "postgres_changes",
+      { 
+        event: "INSERT", 
+        schema: "public", 
+        table: "VideoComments"
+      },
+      async (payload) => {
+        console.log("Change received:", payload);
+        
+        if (payload.new?.video_id === videoId) {
+          // Get the user information for the new comment
+          const user = pre_comment_profiles.find(
+            profile => profile.username === payload.new.Account.username
+          );
+
+          const processedComment = {
+            ...payload.new,
+            user: user
+          };
+
+          // Add to existing comments
+          setComments(prevComments => [processedComment, ...prevComments]);
+        }
+      }
+    )
+    .subscribe((status) => {
+      console.log("Current Status:", status)
+    });
+
+    return () => {
+      supabase.removeChannel(realtime_comments);
+    }
+
   }, [all_profile_fetched, pre_comment_profiles, supabase, videoId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (newComment.trim() === "") return;
-
-    // In a real app, you'd send this to your API
-    const comment = {
-      id: Date.now(), // This would normally be set by the backend
-      username: user_client.username, // In a real app, this would be the logged-in user
-      profilePic: user_client.avatar_url,
-      content: newComment,
-      created_at: new Date().toISOString(),
-    };
-
-    // Optimistically update the UI
-    setComments(prevComments => [comment, ...prevComments]);
-    setNewComment("");
-
-    // Here you would typically make an API call to save the comment
-    // If the API call fails, you might want to remove the comment from the state
+  
     try {
-      // await api.postComment(videoId, comment);
-      console.log("Comment posted successfully");
+      const { error } = await supabase
+        .from("VideoComments")
+        .insert({
+            video_id: videoId,
+            comment: newComment,
+            account_id: user_client.account_id, // Assuming you have the user's ID
+          })
+        .select('*, Account(username)');
+  
+      if (error) throw error;
+  
+      setNewComment("");
     } catch (error) {
       console.error("Failed to post comment:", error);
-      // Remove the optimistically added comment
-      setComments(prevComments => prevComments.filter(c => c.id !== comment.id));
-      // Here you might want to show an error message to the user
     }
   };
 
@@ -185,7 +212,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
           <p className="text-gray-400">No comments yet. Be the first to comment!</p>
         </div>
       ) : (
-        <div>
+        <div key="sayanora">
           {comments.map((comment) => (
             <Comment key={comment.id} {...comment} />
           ))}
