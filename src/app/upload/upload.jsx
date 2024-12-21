@@ -105,6 +105,7 @@ const VideoUploadPage = () => {
     e.preventDefault();
     setIsUploading(true);
     setUploadProgress(0);
+    console.log(msg);
 
     try {
 
@@ -121,7 +122,7 @@ const VideoUploadPage = () => {
       };
 
       const video_file_size = file.size / (1024 * 1024);
-      const thumbnail_file_size = thumbnail.size / (1024 * 1024);
+      const thumbnail_file_size = thumbnail ? thumbnail.size / (1024 * 1024) : 0;
 
       if (video_file_size > 50 ) {
         throw "Video file must be less than 50MB";
@@ -366,7 +367,7 @@ const VideoUploadPage = () => {
                 <Alert variant={msg.success ? "default" : "destructive"}>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    {typeof msg.message === "string" ? msg.message : "Server Error"}
+                    {typeof msg.message === "string" ? msg.message : `Server Error : ${msg.message}`}
                   </AlertDescription>
                 </Alert>
               )}

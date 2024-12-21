@@ -29,7 +29,7 @@ export async function POST(request) {
             age_18: video_data.age_18,
         }).select().single();
 
-        if (data_error) { throw "Server Error" }
+        if (data_error) { throw `Server Error : ${data_error}` }
         console.log("Video Info Uploaded!");
 
         if (final_video_data.video_id) {
