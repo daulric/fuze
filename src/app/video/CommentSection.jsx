@@ -203,11 +203,12 @@ const CommentSection = ({ videoId, setIsTyping }) => {
           <Textarea
             value={newComment}
             onChange={handleTyping}
+            onFocus={() => setIsTyping(true)}
             placeholder="Add a comment..."
             className="mb-2 resize-none bg-gray-800 text-gray-100 border-gray-700"
           />
           <div className="flex justify-end">
-            <Button type="submit" variant="secondary" className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
+            <Button type="submit" variant="secondary" onClick={() => setIsTyping(false)} className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
           </div>
         </form>
       </div>}

@@ -114,9 +114,6 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
 
   useEffect(() => {
     const handleKeyPress = (e) => {
-
-      if (isCommenting) return;
-
       switch (e.key.toLowerCase()) {
         case ' ':
         case 'k':
@@ -150,7 +147,9 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyPress);
+    if (!isCommenting) {
+      document.addEventListener('keydown', handleKeyPress);
+    }
 
     return () => {
       document.removeEventListener('keydown', handleKeyPress);

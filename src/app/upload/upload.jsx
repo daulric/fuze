@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import directUpload from "./directUpload";
 
 import store from "@/tools/cookieStore";
 const cookieStore = store();
@@ -131,9 +132,6 @@ const VideoUploadPage = () => {
       if (thumbnail_file_size > 50 ) {
         throw "Thumbnail file must be less than 50MB";
       }
-
-      if (file !== null) form_data.set("video_file", file);
-      if (thumbnail !== null) {form_data.set("video_thumbnail", thumbnail)};
     
       form_data.set("data", JSON.stringify(updatedVideoDetails));
 
@@ -180,9 +178,17 @@ const VideoUploadPage = () => {
       };
   
       // Handle successful response
-      xhr.onload = () => {
+      xhr.onload = async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(JSON.parse(xhr.responseText));
+          const data = JSON.parse(xhr.responseText);
+
+          if (!data.success) reject(data.message);
+          
+          if (data.video_id) {
+            const uploaded_content = await directUpload(data.video_id, file, thumbnail);
+            resolve(uploaded_content);
+          }
+          
         } else {
           reject(new Error(`Error: ${xhr.status} ${xhr.statusText}`));
         }

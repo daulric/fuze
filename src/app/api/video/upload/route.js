@@ -10,16 +10,12 @@ export async function POST(request) {
         const video_upload_data = await request.formData();
         const supa_client = SupabaseServer();
 
-        const video_file = video_upload_data.get("video_file");
-        const video_thumbnail = video_upload_data.get("video_thumbnail");
         const video_data = JSON.parse(video_upload_data.get("data"));
 
         if ( !video_data.account_id ) { throw "Account Needed!"; }
-        if ( !video_file || !video_thumbnail ) { throw "Missing Files"};
         if ( !video_data.title, !video_data.description || video_data.title === "" || video_data.description === "" ) { throw "Missing Fields Required"; }
 
         const video_db = supa_client.from("Video");
-        const Uploads_Storage = supa_client.storage.from("Uploads");
 
         const { data: final_video_data, error: data_error } = await video_db.insert({
             title: video_data.title,
@@ -32,38 +28,11 @@ export async function POST(request) {
         if (data_error) { throw `Server Error : ${data_error}` }
         console.log("Video Info Uploaded!");
 
-        if (final_video_data.video_id) {
-            const video_last_index =  video_file.name.lastIndexOf(".");
-            const video_file_extension = video_last_index !== -1 ? video_file.name.slice(video_last_index + 1) : '';
-
-            const img_last_index =  video_thumbnail.name.lastIndexOf(".");
-            const img_file_extension = img_last_index !== -1 ? video_thumbnail.name.slice(img_last_index + 1) : '';
-
-            const [{error: videoUploadError}, { error: ImageUploadError }] = await Promise.all([
-                Uploads_Storage.upload(
-                    `${final_video_data.video_id}/video.${video_file_extension}`, 
-                    video_file
-                ),
-
-                Uploads_Storage.upload(
-                    `${final_video_data.video_id}/thumbnail.${img_file_extension}`,
-                    video_thumbnail
-                ),
-            ]);
-
-            if (videoUploadError) { throw "Error Uploading Video" };
-            if (ImageUploadError) { throw "Error Uploading Thumbnail" };
-
-            console.log("Video Uploaded Successfully");
-
-            return NextResponse.json({
-                success: true,
-                message: "Video Uploaded Successfully",
-                video_id: final_video_data.video_id,
-            });
-        } else {
-            throw "Error Uploading Video";
-        }
+        return NextResponse.json({
+            success: true,
+            message: "Video Uploaded Successfully",
+            video_id: final_video_data.video_id,
+        });
 
     } catch (e) {
         return NextResponse.json({
