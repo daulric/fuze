@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { 
   Card, 
@@ -25,22 +25,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pencil, Upload } from 'lucide-react';
-
-// Mock data - replace with your actual image sources
-const initialVideos = [
-  { 
-    id: '1', 
-    title: 'My First Video', 
-    description: 'An exciting introduction to my content', 
-    thumbnail: '/placeholder-video-1.jpg' 
-  },
-  { 
-    id: '2', 
-    title: 'Tutorial Series Part 1', 
-    description: 'Learning something new', 
-    thumbnail: '/placeholder-video-2.jpg' 
-  }
-];
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const initialBlogs = [
   { 
@@ -58,17 +44,40 @@ const initialBlogs = [
 ];
 
 export default function CreatorDashboard() {
-  const [videos, setVideos] = useState(initialVideos);
+  const [videos, setVideos] = useState(null);
   const [blogs, setBlogs] = useState(initialBlogs);
-  const [userProfile, setUserProfile] = useState({
-    name: 'Creator Name',
-    email: 'creator@example.com',
-    bio: 'Content creator passionate about sharing knowledge'
-  });
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    let user_data = JSON.parse(localStorage.getItem("user"));
+    if (!user_data) return;
+    setUserProfile(user_data);
+
+    return () => {
+      setUserProfile(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    async function fetch_videos() {
+      if (!userProfile) return;
+      const response = await fetch(`/api/video?username=${userProfile.username}`);
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (data.success) {
+        setVideos(data.data);
+      }
+    }
+
+    fetch_videos();
+  }, [userProfile]);
 
   const handleVideoEdit = (id, updatedVideo) => {
+    console.log(id, updatedVideo);
     setVideos(videos.map(video => 
-      video.id === id ? { ...video, ...updatedVideo } : video
+      video.video_id === updatedVideo.video_id ? { ...video, ...updatedVideo } : video
     ));
   };
 
@@ -96,16 +105,18 @@ export default function CreatorDashboard() {
       </CardHeader>
       <CardContent className="bg-gray-800">
         <div className="relative w-full h-48">
-          <Image 
-            src={item.thumbnail} 
-            alt={`${item.title} thumbnail`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover rounded-md text-gray-100"
-            priority={false}
-          />
+          <Suspense>
+            <Image 
+              src={item.thumbnail} 
+              alt={`${item.title} thumbnail`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover rounded-md text-gray-100"
+              priority={false}
+            />
+          </Suspense>
         </div>
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-lg text-gray-400">
           {item.description}
         </p>
       </CardContent>
@@ -117,6 +128,7 @@ export default function CreatorDashboard() {
     const [thumbnailFile, setThumbnailFile] = useState(null);
 
     const handleChange = (field, value) => {
+      console.log(formData);
       setFormData({ ...formData, [field]: value });
     };
 
@@ -160,12 +172,19 @@ export default function CreatorDashboard() {
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
               onChange={(e) => handleChange('description', e.target.value)}
             />
+            <Switch
+              className="data-[state=checked]:bg-gray-600"
+              id="private"
+              checked={formData.is_private}
+              onCheckedChange={(checked) => handleChange('is_private', checked)}
+            />
+            <Label htmlFor="private" className="text-white align-text-top text-lg">Private Video</Label>
             <div>
               <label className="flex items-center justify-center w-full p-4 border-2 border-dashed border-gray-700 rounded-lg cursor-pointer text-gray-400 hover:bg-gray-800">
                 <Upload className="mr-2" />
                 Change Thumbnail
                 <input 
-                  type="file" 
+                  type="file"
                   className="hidden" 
                   accept="image/*"
                   onChange={handleFileChange}
@@ -220,13 +239,13 @@ export default function CreatorDashboard() {
           <div className="space-y-4">
             <Input 
               placeholder="Name"
-              value={profileData.name}
+              value={profileData?.username}
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
               onChange={(e) => handleChange('name', e.target.value)}
             />
             <Input 
               placeholder="Bio"
-              value={profileData.bio}
+              value={profileData?.aboutme}
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
               onChange={(e) => handleChange('bio', e.target.value)}
             />
@@ -248,9 +267,8 @@ export default function CreatorDashboard() {
         <Card className="mb-8 bg-gray-800 border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between border-b border-gray-800">
             <div>
-              <CardTitle className="text-white">{userProfile.name}</CardTitle>
-              <p className="text-gray-400">{userProfile.email}</p>
-              <p className="text-sm mt-2 text-gray-500">{userProfile.bio}</p>
+              <CardTitle className="text-white">{userProfile?.username}</CardTitle>
+              <p className="text-gray-400">{userProfile?.aboutme}</p>
             </div>
             <ProfileEditDialog />
           </CardHeader>
@@ -272,9 +290,9 @@ export default function CreatorDashboard() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="videos">
-            {videos.map(video => (
+            {videos && videos.map(video => (
               <ContentCard 
-                key={video.id} 
+                key={video.video_id} 
                 item={video} 
                 type="Video" 
                 onEdit={handleVideoEdit} 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Upload } from 'lucide-react';
+import { Home, Upload, LayoutDashboardIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
@@ -91,6 +91,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
           {user && (
             <>
               <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
+              <SidebarItem icon={LayoutDashboardIcon} label="Dashboard" collapsed={collapsed && !isMobile} href="/dashboard" />
             </>
           )}
           
