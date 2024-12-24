@@ -175,6 +175,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
         ref={videoRef}
         src={videoSrc}
         className="w-full h-full object-contain"
+        controlsList='nodownload'
         onClick={togglePlay}
         poster={poster}
         aria-label="Video player"
