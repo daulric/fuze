@@ -45,7 +45,7 @@ export default async function Home() {
 
   const url = await getURL();
 
-  const response = await fetch(`${url}/api/video?is_private=false`, {
+  const response = await fetch(`${url}/api/video`, {
     cache: "no-store",
   });
 

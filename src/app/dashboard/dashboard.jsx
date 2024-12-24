@@ -66,7 +66,7 @@ export default function CreatorDashboard() {
   useEffect(() => {
     async function fetch_videos() {
       if (!userProfile) return;
-      const response = await fetch(`/api/video?username=${userProfile.username}`);
+      const response = await fetch(`/api/video?all=true`);
 
       if (!response.ok) return;
 

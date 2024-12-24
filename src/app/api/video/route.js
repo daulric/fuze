@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import SupabaseServer from "@/supabase/server";
+import { cookies } from "next/headers";
 
 async function DatabaseQuery(supa_client, query) {
     const Data = await GetFullData(supa_client);
@@ -125,10 +126,25 @@ export async function GET(request) {
                 return GetSearchData(supa_client, queries.search);
             }
 
-            return DatabaseQuery(supa_client, queries);
+            if (queries.is_private) {
+                const is_user = (await cookies()).get("user");
+                if (is_user) {
+                    return DatabaseQuery(supa_client, queries)
+                } else throw "must be logged in to use this api query";
+            }
+            
+            if (queries.all) {
+                const is_user = (await cookies()).get("user");
+                if (is_user) {
+                    return DatabaseQuery(supa_client, {account_id: is_user.value});
+                } else throw "must be logged in to use this api query";
+            }
+
+            return DatabaseQuery(supa_client, {...queries, is_private: false});
+
         }
 
-        return DatabaseQuery(supa_client, {});
+        return DatabaseQuery(supa_client, {is_private: false});
     } catch(e) {
         return NextResponse.json({
             success: false,
