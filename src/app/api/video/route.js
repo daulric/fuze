@@ -137,3 +137,33 @@ export async function GET(request) {
     }
 
 }
+
+export async function PUT(request) {
+    try {
+        
+        const {video_id, ...data} = await request.json();
+
+        if (!video_id) throw "Video ID Not Provided";
+        console.log(video_id);
+
+        const supa_client = SupabaseServer();
+        const video_db = supa_client.from("Video");
+
+        await video_db.update({
+            title: data.title,
+            description: data.description,
+            is_private: data.is_private,
+        }).eq("video_id", video_id);
+
+        return NextResponse.json({
+            success: true,
+        });
+
+    } catch(e) {
+        return NextResponse.json({
+            success: false,
+            message: e
+        });
+    }
+
+}

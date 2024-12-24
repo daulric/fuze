@@ -79,11 +79,22 @@ export default function CreatorDashboard() {
     fetch_videos();
   }, [userProfile]);
 
-  const handleVideoEdit = (id, updatedVideo) => {
-    console.log(id, updatedVideo);
-    setVideos(videos.map(video => 
-      video.video_id === updatedVideo.video_id ? { ...video, ...updatedVideo } : video
-    ));
+  const handleVideoEdit = async (id, updatedVideo) => {
+
+    const response = await fetch("/api/video", {
+      method: "PUT",
+      body: JSON.stringify(updatedVideo),
+    });
+
+    if (!response.ok) return;
+    const {success} = await response.json();
+
+    if (success) {
+      setVideos(videos.map(video => 
+        video.video_id === updatedVideo.video_id ? { ...video, ...updatedVideo } : video
+      ));
+    }
+
   };
 
   const handleBlogEdit = (id, updatedBlog) => {
@@ -133,7 +144,6 @@ export default function CreatorDashboard() {
     const [thumbnailFile, setThumbnailFile] = useState(null);
 
     const handleChange = (field, value) => {
-      console.log(formData);
       setFormData({ ...formData, [field]: value });
     };
 
