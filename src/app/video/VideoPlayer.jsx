@@ -175,6 +175,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
         ref={videoRef}
         src={videoSrc}
         className="w-full h-full object-contain"
+        onContextMenu={(e) => e.preventDefault()}
         controlsList='nodownload'
         onClick={togglePlay}
         poster={poster}
