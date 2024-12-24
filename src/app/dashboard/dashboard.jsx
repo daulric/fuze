@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Upload } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import waitFor from '@/lib/waitFor';
 
 const initialBlogs = [
   { 
@@ -49,9 +50,13 @@ export default function CreatorDashboard() {
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
-    let user_data = JSON.parse(localStorage.getItem("user"));
-    if (!user_data) return;
-    setUserProfile(user_data);
+    waitFor(() => {
+      return localStorage.getItem("user") !== null;
+    }).then(() => {
+      let user_data = JSON.parse(localStorage.getItem("user"));
+      if (!user_data) return;
+      setUserProfile(user_data);
+    });
 
     return () => {
       setUserProfile(null);
