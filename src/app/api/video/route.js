@@ -129,7 +129,7 @@ export async function GET(request) {
             if (queries.is_private) {
                 const is_user = (await cookies()).get("user");
                 if (is_user) {
-                    return DatabaseQuery(supa_client, queries)
+                    return DatabaseQuery(supa_client, {...queries, account_id: is_user.value})
                 } else throw "must be logged in to use this api query";
             }
             
