@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
+import SupabaseServer from '@/supabase/server';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -23,6 +24,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
+  const supabase = SupabaseServer();
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
@@ -57,6 +59,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   };
 
   const handleDislike = () => {
+    //await fetch(`/api/video`)
     if (userDisliked) {
       setDislikes(dislikes - 1);
       setUserDisliked(false);
@@ -69,6 +72,115 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       }
     }
   };
+
+  //Fetch Video Likes
+  useEffect(() => {
+
+    async function getVideoLikes() {
+      const response = await fetch(`/api/video/likes?video_id=${VideoData.video_id}`);
+
+      if (!response.ok) return;
+
+      const {user_data, all_data} = await response.json();
+
+      if (all_data) {
+        const liked_data = all_data.filter((i) => i.is_like === true)
+        const disliked_data = all_data.filter((i) => i.is_like === false);
+
+        setLikes(liked_data.length);
+        setDislikes(disliked_data.length);
+      }
+
+      if (user_data) {
+        switch(user_data.is_like) {
+          case true:
+            setUserLiked(true);
+            break;
+          
+          case false:
+            setUserDisliked(true);
+
+          default:
+            break;
+        }
+      }
+    }
+
+    getVideoLikes();
+
+  }, [VideoData]);
+
+  // Realtime Database For Data
+  useEffect(() => {
+    const realtime_likes = supabase.channel(`VideoLikes-${VideoData.video_id}`)
+    .on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "VideoLikes"
+    }, async (payload) => {
+
+      switch(payload.eventType) {
+        case "INSERT":
+          if (payload.new.video_id === VideoData.video_id) {
+            let temp_data = payload.new;
+
+            if (temp_data.is_like === true) {
+              setUserLiked(() => {
+                setUserDisliked(false);
+                setLikes(likes + 1);
+                setDislikes(dislikes-1);
+                return true;
+              });
+            } else if (temp_data.is_like === false) {
+              setUserLiked(() => {
+                setUserDisliked(true);
+                setLikes(likes - 1);
+                setDislikes(dislikes+1);
+                return false;
+              });
+            }
+          }
+
+        case "UPDATE":
+          if (payload.new.video_id === VideoData.video_id) {
+            let temp_data = payload.new;
+
+            if (temp_data.is_like === true) {
+              setUserLiked(() => {
+                setUserDisliked(false);
+                setLikes(likes + 1);
+                setDislikes(dislikes-1);
+                return true;
+              });
+            } else if (temp_data.is_like === false) {
+              setUserLiked(() => {
+                setUserDisliked(true);
+                setLikes(likes - 1);
+                setDislikes(dislikes+1);
+                return false;
+              });
+            }
+          }
+
+        case "DELETE":
+          if (payload.old.video_id === VideoData.video_id) {
+            setUserLiked(() => {
+              setUserDisliked(false);
+              return false;
+            });
+          }
+
+        default:
+          break;
+      }
+    })
+    .subscribe((status) => console.log("Video Likes Status", status));
+
+    return () => {
+      supabase.removeChannel(realtime_likes);
+    }
+
+  }, [VideoData, dislikes, likes, supabase])
 
   useEffect(() => {
     const user_client = JSON.parse(localStorage.getItem("user"));
