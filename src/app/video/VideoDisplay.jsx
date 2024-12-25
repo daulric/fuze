@@ -24,6 +24,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
+  const [user, setUser] = useState(null);
   const supabase = SupabaseServer();
 
   const truncateDescription = (text, limit = 150) => {
@@ -44,32 +45,33 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     ));
   };
 
-  const handleLike = () => {
-    if (userLiked) {
-      setLikes(likes - 1);
-      setUserLiked(false);
-    } else {
-      setLikes(likes + 1);
-      setUserLiked(true);
-      if (userDisliked) {
-        setDislikes(dislikes - 1);
-        setUserDisliked(false);
+  async function sendLikes({liked, disliked}) {
+    await fetch(`/api/video/likes?video_id=${VideoData.video_id}`, {
+      method: "POST",
+      body: JSON.stringify({
+        video_id: VideoData.video_id,
+        liked: liked,
+        disliked: disliked,
+      }),
+      headers: {
+        "Content-Type": "application/json",
       }
+    });
+  }
+
+  const handleLike = async () => {
+    if (userLiked) {
+      await sendLikes({liked: true, disliked: true});
+    } else {
+      await sendLikes({liked: true, disliked: false});
     }
   };
 
-  const handleDislike = () => {
-    //await fetch(`/api/video`)
+  const handleDislike = async () => {
     if (userDisliked) {
-      setDislikes(dislikes - 1);
-      setUserDisliked(false);
+      await sendLikes({liked: true, disliked: true});
     } else {
-      setDislikes(dislikes + 1);
-      setUserDisliked(true);
-      if (userLiked) {
-        setLikes(likes - 1);
-        setUserLiked(false);
-      }
+      await sendLikes({liked: false, disliked: true});
     }
   };
 
@@ -106,6 +108,12 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       }
     }
 
+    let user_data = localStorage.getItem("user");
+    
+    if (user_data) {
+      setUser(JSON.parse(user_data));
+    }
+
     getVideoLikes();
 
   }, [VideoData]);
@@ -119,8 +127,12 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       table: "VideoLikes"
     }, async (payload) => {
 
+      console.log("new", payload.new, "old", payload.old);
+
       switch(payload.eventType) {
+        
         case "INSERT":
+          console.log("new data inserted")
           if (payload.new.video_id === VideoData.video_id) {
             let temp_data = payload.new;
 
@@ -128,52 +140,63 @@ const YouTubeStylePlayer = ({ VideoData }) => {
               setUserLiked(() => {
                 setUserDisliked(false);
                 setLikes(likes + 1);
-                setDislikes(dislikes-1);
                 return true;
               });
             } else if (temp_data.is_like === false) {
-              setUserLiked(() => {
-                setUserDisliked(true);
-                setLikes(likes - 1);
+              setUserDisliked(() => {
+                setUserLiked(false);
                 setDislikes(dislikes+1);
-                return false;
+                return true
               });
             }
           }
+
+          break;
 
         case "UPDATE":
+          console.log("data updating")
           if (payload.new.video_id === VideoData.video_id) {
             let temp_data = payload.new;
 
             if (temp_data.is_like === true) {
               setUserLiked(() => {
-                setUserDisliked(false);
                 setLikes(likes + 1);
-                setDislikes(dislikes-1);
+                setUserDisliked(false);
+                setDislikes(Math.max(0, dislikes - 1));
                 return true;
               });
             } else if (temp_data.is_like === false) {
-              setUserLiked(() => {
-                setUserDisliked(true);
-                setLikes(likes - 1);
+              setUserDisliked(() => {
                 setDislikes(dislikes+1);
-                return false;
+                setUserLiked(false);
+                setLikes(Math.max(0, likes - 1));
+                return true;
               });
             }
           }
 
+          break;
+
         case "DELETE":
+          console.log("deleted data")
           if (payload.old.video_id === VideoData.video_id) {
             setUserLiked(() => {
               setUserDisliked(false);
+
+              setLikes(Math.max(0, likes - 1));
+              setDislikes(Math.max(0, dislikes - 1));
+
               return false;
             });
           }
+
+          break;
 
         default:
           break;
       }
     })
+    
     .subscribe((status) => console.log("Video Likes Status", status));
 
     return () => {
@@ -259,6 +282,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                   <Button
                     variant="ghost"
                     size="sm"
+                    disabled={user === null ? true : false}
                     className={`flex items-center space-x-2 ${userLiked ? 'text-blue-500' : 'text-gray-400'}`}
                     onClick={handleLike}
                   >
@@ -276,6 +300,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
+                    disabled={user === null ? true : false}
                     size="sm"
                     className={`flex items-center space-x-2 ${userDisliked ? 'text-red-500' : 'text-gray-400'}`}
                     onClick={handleDislike}

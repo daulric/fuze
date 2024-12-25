@@ -8,9 +8,7 @@ export async function GET(request) {
         const video_id = request.nextUrl?.searchParams.get("video_id");
         const account_id = (await cookies()).get("user");
 
-        if (!account_id) throw "Account Needed";
         if (!video_id) throw "No Video ID Provided!";
-
 
         const supabase = SupabaseServer();
         const VideoLikesDB = supabase.from("VideoLikes");
@@ -19,8 +17,12 @@ export async function GET(request) {
         .eq("video_id", video_id);
 
         if (error) throw error;
+        let user_data;
 
-        const user_data = data.filter(i => i.account_id === account_id.value)[0];
+        if (account_id) {
+            user_data = data.filter(i => i.account_id === account_id.value)[0];
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const all_data = data.map(({account_id, ...rest}) => rest);
 
@@ -39,6 +41,22 @@ export async function GET(request) {
 
 }
 
+async function insert_new_record(db, video_id, account_id, {liked, disliked}) {
+    let is_like;
+
+    if (liked === true && disliked === false) {
+        is_like = true;
+    } else if (liked === false && disliked === true) {
+        is_like = false;
+    }
+
+    await db.insert({
+        is_like: is_like,
+        account_id,
+        video_id,
+    });
+}
+
 export async function POST(request) {
     try {
         const {video_id, liked, disliked} = await request.json();
@@ -50,22 +68,39 @@ export async function POST(request) {
         const supabase = SupabaseServer();
         const VideoLikesDB = supabase.from("VideoLikes");
 
-        if (liked === disliked) {
-            const {error} = await VideoLikesDB.delete()
+        const {data: record_exisit, error: record_notfound} = await VideoLikesDB.select("*")
+            .eq("video_id", video_id)
+            .eq("account_id", account_id.value)
+            .single();
+
+        if (record_notfound) {
+            insert_new_record(VideoLikesDB, video_id, account_id.value, {liked, disliked});
+        } else if (record_exisit) {
+            if (liked === disliked) {
+                const {error} = await VideoLikesDB.delete()
+                    .eq("video_id", video_id)
+                    .eq("account_id", account_id.value);
+    
+                if (error) throw error.message;
+            } else if (liked === true && disliked === false) {
+                await VideoLikesDB.update({
+                    is_like: true,
+                })
                 .eq("video_id", video_id)
                 .eq("account_id", account_id.value);
+            } else if (liked === false && disliked === true) {
+                await VideoLikesDB.update({
+                    is_like: false,
+                })
+                .eq("video_id", video_id)
+                .eq("account_id", account_id.value);
+            }
 
-            if (error) throw error.message;
         }
 
-        if (liked === true && disliked === false) {
-            const {error} = await VideoLikesDB.update({
-                is_like: true,
-            })
-            .eq("video_id", video_id)
-            .eq("account_id", account_id.value);
-        }
-
+        return NextResponse.json({
+            success: true,
+        });
     
     } catch(e) {
         return NextResponse.json({
