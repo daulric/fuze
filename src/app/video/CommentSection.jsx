@@ -51,17 +51,18 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   const [all_profile_fetched, setAllProfilesFetched] = useState(false);
 
   const supabase = SupabaseClient();
-  
 
-  async function getProfiles() {
-    const response = await fetch("/api/profile?all=true");
-    if (!response.ok) return;
-
-    const data = await response.json();
-    return data.profiles;
-  }
 
   useEffect(() => {
+
+    async function getProfiles() {
+      const response = await fetch("/api/profile?all=true");
+      if (!response.ok) return;
+  
+      const data = await response.json();
+      return data.profiles;
+    }
+
     async function getProfilesForComments() {
       if (all_profile_fetched) return;
       const profiles = await getProfiles();

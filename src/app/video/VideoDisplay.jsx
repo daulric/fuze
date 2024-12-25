@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, Suspense, useEffect, Fragment, useRef } from 'react';
-import { User, ChevronDown, ChevronUp, Calendar, Eye } from 'lucide-react';
+import { User, ChevronDown, ChevronUp, Calendar, Eye, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import VideoPlayer from "./VideoPlayer";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -14,6 +15,10 @@ import CommentSection from './CommentSection';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
+  const [likes, setLikes] = useState(VideoData?.likes || 0);
+  const [dislikes, setDislikes] = useState(VideoData?.dislikes || 0);
+  const [userLiked, setUserLiked] = useState(false);
+  const [userDisliked, setUserDisliked] = useState(false);
   const videoContainerRef = useRef(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
@@ -35,6 +40,34 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         <br />
       </Fragment>
     ));
+  };
+
+  const handleLike = () => {
+    if (userLiked) {
+      setLikes(likes - 1);
+      setUserLiked(false);
+    } else {
+      setLikes(likes + 1);
+      setUserLiked(true);
+      if (userDisliked) {
+        setDislikes(dislikes - 1);
+        setUserDisliked(false);
+      }
+    }
+  };
+
+  const handleDislike = () => {
+    if (userDisliked) {
+      setDislikes(dislikes - 1);
+      setUserDisliked(false);
+    } else {
+      setDislikes(dislikes + 1);
+      setUserDisliked(true);
+      if (userLiked) {
+        setLikes(likes - 1);
+        setUserLiked(false);
+      }
+    }
   };
 
   useEffect(() => {
@@ -103,9 +136,47 @@ const YouTubeStylePlayer = ({ VideoData }) => {
               </div>
             </Link>
           </div>
-          <div className="flex items-center space-x-2 text-gray-400">
-            <Eye className="h-5 w-5" />
-            <span>{VideoData?.views || 0} views</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 text-gray-400">
+              <Eye className="h-5 w-5" />
+              <span>{VideoData?.views || 0} views</span>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex items-center space-x-2 ${userLiked ? 'text-blue-500' : 'text-gray-400'}`}
+                    onClick={handleLike}
+                  >
+                    <ThumbsUp className="h-5 w-5" />
+                    <span>{likes}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Like</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex items-center space-x-2 ${userDisliked ? 'text-red-500' : 'text-gray-400'}`}
+                    onClick={handleDislike}
+                  >
+                    <ThumbsDown className="h-5 w-5" />
+                    <span>{dislikes}</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Dislike</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
