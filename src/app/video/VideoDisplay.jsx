@@ -272,6 +272,10 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                   videoSrc={videoSrc} 
                   poster={thumbSrc}
                   isCommenting={isCommenting}
+                  onVideoLoaded={() => {
+                    URL.revokeObjectURL(videoSrc);
+                    URL.revokeObjectURL(thumbSrc);
+                  }}
                 />
               </div>
             </Suspense>

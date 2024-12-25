@@ -3,7 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Rewind, FastForward 
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
-const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
+const VideoPlayer = ({ videoSrc, poster, isCommenting, onVideoLoaded }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -180,6 +180,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting }) => {
         onClick={togglePlay}
         poster={poster}
         aria-label="Video player"
+        onLoadedData={onVideoLoaded}
       />
       <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute bottom-0 left-0 right-0 p-4">
