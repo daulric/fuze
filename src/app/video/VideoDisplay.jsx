@@ -25,6 +25,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
   const [user, setUser] = useState(null);
+  const [videoSrc, setVideoSrc] = useState(null);
+  const [thumbSrc, setThumbSrc] = useState(null);
   const supabase = SupabaseServer();
 
   const truncateDescription = (text, limit = 150) => {
@@ -74,6 +76,40 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       await sendLikes({liked: false, disliked: true});
     }
   };
+
+  // Getting Temp URL For Video and Thumbnail
+  useEffect(() => {
+    let videoUrl = null;
+    let thumbUrl = null;
+  
+    async function GetBlob() {
+      if (!VideoData.video || !VideoData.thumbnail) return;
+  
+      try {
+        const response = await fetch(VideoData.video);
+        const responseThumb = await fetch(VideoData.thumbnail);
+  
+        const blob = await response.blob();
+        const blobThumb = await responseThumb.blob();
+  
+        videoUrl = URL.createObjectURL(blob);
+        thumbUrl = URL.createObjectURL(blobThumb);
+  
+        setVideoSrc(videoUrl);
+        setThumbSrc(thumbUrl);
+      } catch (error) {
+        console.error('Error fetching video or thumbnail:', error);
+      }
+    }
+  
+    GetBlob();
+  
+    return () => {
+      // Cleanup previous blob URLs
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
+      if (thumbUrl) URL.revokeObjectURL(thumbUrl);
+    };
+  }, [VideoData]);
 
   //Fetch Video Likes
   useEffect(() => {
@@ -215,6 +251,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
   }, [VideoData]);
 
+
   if (!video_id) {
     return notFound();
   }
@@ -232,8 +269,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
             }>
               <div className="absolute inset-0">
                 <VideoPlayer 
-                  videoSrc={VideoData.video} 
-                  poster={VideoData.thumbnail}
+                  videoSrc={videoSrc} 
+                  poster={thumbSrc}
                   isCommenting={isCommenting}
                 />
               </div>
