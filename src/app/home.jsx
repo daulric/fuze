@@ -3,17 +3,16 @@
 import { useState, Suspense } from 'react';
 import { Play } from 'lucide-react';
 import Image from "next/image";
-import Link from "next/link";
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Link
-      href={link} 
+    <div
       className="block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => window.location.href = link}
     >
       <div className="relative">
         <Image src={thumbnail} alt={title} className="w-full h-40 object-cover" width={150} height={100} />
@@ -26,7 +25,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
         <p className="text-sm text-gray-400">{channel}</p>
         <p className="text-xs text-gray-500">{views} views • {uploadTime}</p>
       </div>
-    </Link>
+    </div>
   );
 };
 
