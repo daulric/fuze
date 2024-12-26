@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, useEffect, Fragment, useRef } from 'react';
+import { useState, Suspense, useEffect, Fragment, useRef, useCallback } from 'react';
 import { User, ChevronDown, ChevronUp, Calendar, Eye, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,8 +25,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
   const [user, setUser] = useState(null);
-  const [videoSrc, setVideoSrc] = useState(null);
-  const [thumbSrc, setThumbSrc] = useState(null);
   const supabase = SupabaseServer();
 
   const truncateDescription = (text, limit = 150) => {
@@ -77,44 +75,17 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
   };
 
-  // Getting Temp URL For Video and Thumbnail
-  useEffect(() => {
-    let videoUrl = null;
-    let thumbUrl = null;
-  
-    async function GetBlob() {
-      if (!VideoData.video || !VideoData.thumbnail) return;
-  
-      try {
+  const is_private_video = useCallback(() => {
+    const user_client = JSON.parse(localStorage.getItem("user"));
 
-        const [response, responseThumb] = await Promise.all([
-          fetch(VideoData.video),
-          fetch(VideoData.thumbnail)
-        ]);
-  
-        const blob = await response.blob();
-        const blobThumb = await responseThumb.blob();
-  
-        videoUrl = URL.createObjectURL(blob);
-        thumbUrl = URL.createObjectURL(blobThumb);
-  
-        setVideoSrc(videoUrl);
-        setThumbSrc(thumbUrl);
-      } catch (error) {
-        console.error('Error fetching video or thumbnail:', error);
+    if (VideoData.is_private === true) {
+      if (user_client.username !== VideoData.Account.username) {
+        notFound();
       }
     }
-  
-    GetBlob();
-  
-    return () => {
-      // Cleanup previous blob URLs
-      if (videoUrl) URL.revokeObjectURL(videoUrl);
-      if (thumbUrl) URL.revokeObjectURL(thumbUrl);
-    };
   }, [VideoData]);
 
-  //Fetch Video Likes
+  //Fetch Video
   useEffect(() => {
 
     async function getVideoLikes() {
@@ -159,6 +130,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
   // Realtime Database For Data
   useEffect(() => {
+    is_private_video();
+
     const realtime_likes = supabase.channel(`VideoLikes-${VideoData.video_id}`)
     .on("postgres_changes", {
       event: "*",
@@ -242,18 +215,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       supabase.removeChannel(realtime_likes);
     }
 
-  }, [VideoData, dislikes, likes, supabase])
-
-  useEffect(() => {
-    const user_client = JSON.parse(localStorage.getItem("user"));
-
-    if (VideoData.is_private === true) {
-      if (user_client.username !== VideoData.Account.username) {
-        notFound();
-      }
-    }
-  }, [VideoData]);
-
+  }, [VideoData, dislikes, is_private_video, likes, supabase]);
 
   if (!video_id) {
     return notFound();
@@ -272,13 +234,9 @@ const YouTubeStylePlayer = ({ VideoData }) => {
             }>
               <div className="absolute inset-0">
                 <VideoPlayer 
-                  videoSrc={videoSrc} 
-                  poster={thumbSrc}
+                  videoSrc={VideoData.video} 
+                  poster={VideoData.thumbnail}
                   isCommenting={isCommenting}
-                  onVideoLoaded={() => {
-                    URL.revokeObjectURL(videoSrc);
-                    URL.revokeObjectURL(thumbSrc);
-                  }}
                 />
               </div>
             </Suspense>

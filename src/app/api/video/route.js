@@ -70,8 +70,8 @@ async function GetFullData(supa_client) {
             
             // Getting Signed Url for these data;
             const [signed_video, signed_thumbnail] = await Promise.all([
-                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 20),
-                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 20),
+                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 30),
+                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 30),
             ]);
 
             const videoUrl = videoFile ? signed_video.data.signedUrl : null;
