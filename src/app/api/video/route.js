@@ -67,10 +67,15 @@ async function GetFullData(supa_client) {
             // Assuming you're getting file names or paths for video and thumbnail
             const videoFile = data.find(file => file.name.includes("video")); // Adjust this according to your file structure
             const thumbnailFile = data.find(file => file.name.includes("thumbnail")); // Adjust this as well
-        
-            // Get public URLs
-            const videoUrl = videoFile ? Uploads_Storage.getPublicUrl(`${videoData.video_id}/${videoFile.name}`).data?.publicUrl : null;
-            const thumbnailUrl = thumbnailFile ? Uploads_Storage.getPublicUrl(`${videoData.video_id}/${thumbnailFile.name}`).data?.publicUrl : "/logo.svg";
+            
+            // Getting Signed Url for these data;
+            const [signed_video, signed_thumbnail] = await Promise.all([
+                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 20),
+                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 20),
+            ]);
+
+            const videoUrl = videoFile ? signed_video.data.signedUrl : null;
+            const thumbnailUrl = thumbnailFile ? signed_thumbnail.data.signedUrl : "/logo.svg";
         
             return {
                 ...videoData,

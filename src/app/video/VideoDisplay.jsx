@@ -86,8 +86,11 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       if (!VideoData.video || !VideoData.thumbnail) return;
   
       try {
-        const response = await fetch(VideoData.video);
-        const responseThumb = await fetch(VideoData.thumbnail);
+
+        const [response, responseThumb] = await Promise.all([
+          fetch(VideoData.video),
+          fetch(VideoData.thumbnail)
+        ]);
   
         const blob = await response.blob();
         const blobThumb = await responseThumb.blob();
