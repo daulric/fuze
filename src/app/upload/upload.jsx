@@ -304,6 +304,7 @@ const VideoUploadPage = () => {
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 50vw"
+                        loading='eager'
                       />
                       <button 
                         onClick={removeThumbnail}

@@ -129,6 +129,7 @@ export default function CreatorDashboard() {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover rounded-md text-gray-100"
               priority={false}
+              loading='eager'
             />
           </Suspense>
         </div>
@@ -213,6 +214,7 @@ export default function CreatorDashboard() {
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover rounded-md"
+                    loading='eager'
                   />
                 </div>
               )}

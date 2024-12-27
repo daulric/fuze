@@ -132,7 +132,7 @@ const AccountProfileContent = ({
         )}
         
         <Link href={"#"} onClick={() => window.location.href = "/"} className="flex items-center space-x-2">
-          <Image src="/logo.svg" priority alt="Logo" className="h-5 w-5" width={20} height={20} />
+          <Image loading='eager' src="/logo.svg" priority alt="Logo" className="h-5 w-5" width={20} height={20} />
           <span className="text-white text-lg font-semibold">zTube</span>
         </Link>
       </div>

@@ -41,7 +41,7 @@ const VideoCard = ({ title, Account, views, upload_at, thumbnail, video_id, desc
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative w-full md:w-64 h-48 md:h-36">
-        <Image src={thumbnail} alt={title} className="w-full h-full object-cover" height={100} width={100}/>
+        <Image loading='eager' src={thumbnail} alt={title} className="w-full h-full object-cover" height={100} width={100}/>
         <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <Play className="text-white" size={48} />
         </div>
