@@ -212,7 +212,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       switch(payload.eventType) {
         case "UPDATE":
           if  (payload.new.video_id === VideoData.video_id) {
-            if (payload.new.is_private === true) {
+            if (payload.new.is_private === true && user.username !== VideoData.Account.username) {
               window.location.reload();
             }
           }
