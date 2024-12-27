@@ -182,7 +182,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
         poster={poster}
         aria-label="Video player"
         onLoadedData={() => {
-          console.log("Video is Loaded into memory");
+          console.log("Video is Loaded");
         }}
       />
       <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>

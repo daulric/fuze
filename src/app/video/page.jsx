@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import MainVideoPage from './Main';
 import getUrl from "@/lib/geturl";
+import { notFound } from 'next/navigation';
 
 async function getVideoData(url, video_id) {
   if (!url || !video_id) return null;
@@ -9,7 +10,7 @@ async function getVideoData(url, video_id) {
   if (!response.ok) return null;
 
   const data = await response.json();
-  if (!data || data.length <= 0) return null;
+  if (!data || data.data.length === 0) return null;
 
   return data.data;
 }
@@ -66,6 +67,8 @@ export default async function PAGE({searchParams}) {
         uploaderPic: user_profile.profile.avatar_url,
       }
     }
+  } else {
+    notFound();
   }
 
   return (

@@ -20,6 +20,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [dislikes, setDislikes] = useState(VideoData?.dislikes || 0);
   const [userLiked, setUserLiked] = useState(false);
   const [userDisliked, setUserDisliked] = useState(false);
+  const [viewCount, setViewCount] = useState(VideoData?.views || 0);
   const videoContainerRef = useRef(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
@@ -139,12 +140,9 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       table: "VideoLikes"
     }, async (payload) => {
 
-      console.log("new", payload.new, "old", payload.old);
-
       switch(payload.eventType) {
         
         case "INSERT":
-          console.log("new data inserted")
           if (payload.new.video_id === VideoData.video_id) {
             let temp_data = payload.new;
 
@@ -166,7 +164,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           break;
 
         case "UPDATE":
-          console.log("data updating")
           if (payload.new.video_id === VideoData.video_id) {
             let temp_data = payload.new;
 
@@ -190,7 +187,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           break;
 
         case "DELETE":
-          console.log("deleted data")
           if (payload.old.video_id === VideoData.video_id) {
             setUserLiked(() => {
               setUserDisliked(false);
@@ -208,14 +204,51 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           break;
       }
     })
-    
-    .subscribe((status) => console.log("Video Likes Status", status));
+    .on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "Video"
+    }, async (payload) => {
+      switch(payload.eventType) {
+        case "UPDATE":
+          if  (payload.new.video_id === VideoData.video_id) {
+            if (payload.new.is_private === true) {
+              window.location.reload();
+            }
+          }
+
+          break;
+        default: 
+          break;
+      }
+    })
+    .on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "Video"
+    }, async (payload) => {
+      switch(payload.eventType) {
+
+        case "UPDATE":
+          if (payload.new.video_id === VideoData.video_id) {
+            if (payload.new.views > viewCount) {
+              setViewCount(payload.new.views);
+            }
+          }
+          
+          break;
+
+        default:
+          break;
+      }
+    })
+    .subscribe();
 
     return () => {
       supabase.removeChannel(realtime_likes);
     }
 
-  }, [VideoData, dislikes, is_private_video, likes, supabase]);
+  }, [VideoData, dislikes, is_private_video, likes, supabase, user, viewCount]);
 
   if (!video_id) {
     return notFound();
@@ -276,7 +309,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-gray-400">
               <Eye className="h-5 w-5" />
-              <span>{VideoData?.views || 0} views</span>
+              <span>{viewCount || 0} views</span>
             </div>
             <TooltipProvider>
               <Tooltip>

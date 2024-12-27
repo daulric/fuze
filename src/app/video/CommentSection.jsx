@@ -149,9 +149,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
         }
       }
     )
-    .subscribe((status) => {
-      console.log("Comment Section Live Connection", status)
-    });
+    .subscribe();
 
     return () => {
       supabase.removeChannel(realtime_comments);
