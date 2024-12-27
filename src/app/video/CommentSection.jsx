@@ -5,7 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { User } from 'lucide-react';
+import { User, ChevronDown, ChevronUp } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 import SupabaseClient from "@/supabase/server";
 
@@ -49,12 +50,11 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   const [user_client, setUserClient] = useState(null);
   const [pre_comment_profiles, setPreCommentProfiles] = useState(null);
   const [all_profile_fetched, setAllProfilesFetched] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const supabase = SupabaseClient();
 
-
   useEffect(() => {
-
     async function getProfiles() {
       const response = await fetch("/api/profile?all=true");
       if (!response.ok) return;
@@ -116,7 +116,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     getProfilesForComments();
     loadComments();
 
-    // Modify your realtime subscription code:
     const realtime_comments = supabase.channel(videoId)
     .on(
       "postgres_changes",
@@ -127,8 +126,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
       },
       async (payload) => {
         if (payload.new?.video_id === videoId) {
-          // Get the user information for the new comment
-
           const {data: payload_user_comment} = await supabase.from("VideoComments")
           .select("id, comment, created_at, Account(username)")
           .eq("video_id", videoId)
@@ -144,7 +141,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
             user: user
           };
 
-          // Add to existing comments
           setComments(prevComments => [processedComment, ...prevComments]);
         }
       }
@@ -167,7 +163,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
         .insert({
             video_id: videoId,
             comment: newComment,
-            account_id: user_client.account_id, // Assuming you have the user's ID
+            account_id: user_client.account_id,
           })
         .select('*, Account(username)');
   
@@ -186,43 +182,73 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     window.typingTimeout = setTimeout(() => setIsTyping(false), 1000);
   }
 
+  const getRecentComments = () => {
+    return comments.slice(0, 3);
+  };
+
   if (isLoading) {
     return <div className="mt-8 text-gray-300">Loading comments...</div>;
   }
 
   return (
     <div className="mt-8 bg-gray-900 text-gray-100">
-      <h2 className="text-lg font-semibold mb-4 text-gray-100">{comments.length} Comments</h2>
-      {user_client && <div className="flex space-x-4 mb-6">
-        <Avatar className="w-10 h-10">
-          <AvatarImage src={user_client.avatar_url} alt="Current User" />
-          <AvatarFallback className='bg-gray-600'><User /></AvatarFallback>
-        </Avatar>
-        <form onSubmit={handleSubmit} className="flex-1">
-          <Textarea
-            value={newComment}
-            onChange={handleTyping}
-            onFocus={() => setIsTyping(true)}
-            placeholder="Add a comment..."
-            className="mb-2 resize-none bg-gray-800 text-gray-100 border-gray-700"
-          />
-          <div className="flex justify-end">
-            <Button type="submit" variant="secondary" onClick={() => setIsTyping(false)} className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-100">{comments.length} Comments</h2>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="p-0 w-11 h-11">
+              {isOpen ? <ChevronUp className="h-9 w-9" /> : <ChevronDown className="h-9 w-9" />}
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+
+        {user_client && (
+          <div className="flex space-x-4 mb-6">
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={user_client.avatar_url} alt="Current User" />
+              <AvatarFallback className='bg-gray-600'><User /></AvatarFallback>
+            </Avatar>
+            <form onSubmit={handleSubmit} className="flex-1">
+              <Textarea
+                value={newComment}
+                onChange={handleTyping}
+                onFocus={() => setIsTyping(true)}
+                placeholder="Add a comment..."
+                className="mb-2 resize-none bg-gray-800 text-gray-100 border-gray-700"
+              />
+              <div className="flex justify-end">
+                <Button type="submit" variant="secondary" onClick={() => setIsTyping(false)} className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>}
-      <Separator className="my-4 bg-gray-700" />
-      {comments.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-400">No comments yet. Be the first to comment!</p>
-        </div>
-      ) : (
-        <div key="sayanora">
-          {comments.map((comment) => (
-            <Comment key={comment.id} {...comment} />
-          ))}
-        </div>
-      )}
+        )}
+
+        {!isOpen && (
+          <>
+            <Separator className="my-4 bg-gray-700" />
+            <div className="mb-4">
+              {getRecentComments().map((comment) => (
+                <Comment key={comment.id} {...comment} />
+              ))}
+            </div>
+          </>
+        )}
+
+        <CollapsibleContent>
+          <Separator className="my-4 bg-gray-700" />
+          {comments.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-400">No comments yet. Be the first to comment!</p>
+            </div>
+          ) : (
+            <div>
+              {comments.map((comment) => (
+                <Comment key={comment.id} {...comment} />
+              ))}
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };
