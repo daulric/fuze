@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import store from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import SearchBar from './Searchbar';
 
 const cookieStore = store();
@@ -131,10 +130,10 @@ const AccountProfileContent = ({
           </Button>
         )}
         
-        <Link href={"#"} onClick={() => window.location.href = "/"} className="flex items-center space-x-2">
+        <Button onClick={() => window.location.href = "/"} className="bg-transparent flex items-center space-x-2">
           <Image loading='eager' src="/logo.svg" priority alt="Logo" className="h-5 w-5" width={20} height={20} />
           <span className="text-white text-lg font-semibold">zTube</span>
-        </Link>
+        </Button>
       </div>
       
       {/* Centered search bar */}

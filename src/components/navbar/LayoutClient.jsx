@@ -3,21 +3,34 @@
 import { useState, useEffect } from 'react';
 import ProfileBar from "@/components/navbar/Profilebar";
 import Sidebar from "@/components/navbar/Sidebar";
+import { usePathname } from 'next/navigation';
 
 const ClientWrapper = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const pathName = usePathname();
+  
 
   useEffect(() => {
+    const PathNameList = ["/video"];
+
     const checkMobile = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      setIsHidden(mobile);
+      const pathExcluded = getPathName();
+      console.log(pathExcluded);
+      const mobile = window.innerWidth < 1080;
+      setIsMobile(pathExcluded ? true : mobile);
+      setIsHidden(pathExcluded ? true : mobile);
     };
+
+    function getPathName() {
+      console.log(pathName);
+      return PathNameList.includes(pathName);
+    }
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [pathName]);
 
   const toggleSidebar = (newState) => {
     if (isMobile) {
