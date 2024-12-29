@@ -16,14 +16,12 @@ const ClientWrapper = ({ children }) => {
 
     const checkMobile = () => {
       const pathExcluded = getPathName();
-      console.log(pathExcluded);
       const mobile = window.innerWidth < 1080;
       setIsMobile(pathExcluded ? true : mobile);
       setIsHidden(pathExcluded ? true : mobile);
     };
 
     function getPathName() {
-      console.log(pathName);
       return PathNameList.includes(pathName);
     }
 
