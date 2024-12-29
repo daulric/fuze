@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import SupabaseServer from "@/supabase/server";
 import { encrypt } from "@/tools/encryption"
 
-export async function GET() {
+export function GET() {
     return new NextResponse("ok");
 }
 

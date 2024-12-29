@@ -4,7 +4,7 @@ import { decrypt } from "@/tools/encryption"
 
 import { cookies } from "next/headers";
 
-export async function GET() {
+export function GET() {
     return new NextResponse("ok");
 }
 

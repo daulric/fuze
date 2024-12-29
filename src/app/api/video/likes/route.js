@@ -23,8 +23,9 @@ export async function GET(request) {
             user_data = data.filter(i => i.account_id === account_id.value)[0];
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const all_data = data.map(({account_id, ...rest}) => rest);
+        const all_data = data.map(({account_id, ...rest}) => {
+            if (account_id) return rest
+        });
 
         return NextResponse.json({
             success: true,

@@ -53,7 +53,7 @@ export default function CreatorDashboard() {
     waitFor(() => {
       return localStorage.getItem("user") !== null;
     }).then(() => {
-      let user_data = JSON.parse(localStorage.getItem("user"));
+      const user_data = JSON.parse(localStorage.getItem("user"));
       if (!user_data) return;
       setUserProfile(user_data);
     });
@@ -79,7 +79,7 @@ export default function CreatorDashboard() {
     fetch_videos();
   }, [userProfile]);
 
-  const handleVideoEdit = async (id, updatedVideo) => {
+  const handleVideoEdit = async (_, updatedVideo) => {
 
     const response = await fetch("/api/video", {
       method: "PUT",

@@ -159,7 +159,7 @@ const VideoUploadPage = () => {
     }
   };
 
-  const uploadWithProgress = async (url, formData, onUploadProgress) => {
+  const uploadWithProgress = (url, formData, onUploadProgress) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
   

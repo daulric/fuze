@@ -72,14 +72,14 @@ const CommentSection = ({ videoId, setIsTyping }) => {
       });
     }
 
-    async function process_comments(comments) {
+    function process_comments(comments) {
       if (comments.length === 0) return;
   
       const processed = comments.map((comment) => {
-        let user_vid_comment = comment.Account.username;
-        let found = pre_comment_profiles.find(user => user.username === user_vid_comment) || null;
+        const user_vid_comment = comment.Account.username;
+        const found = pre_comment_profiles.find(user => user.username === user_vid_comment) || null;
 
-        let comment_proccessed = { ...comment };
+        const comment_proccessed = { ...comment };
         delete comment_proccessed.Account;
   
         return {

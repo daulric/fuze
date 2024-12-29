@@ -33,8 +33,7 @@ async function DatabaseQuery(supa_client, query) {
     });
 
     const Public_Data = Filtered_Data.map(({account_id, ...rest}) => {
-        if (account_id) {} // Omit account_id for security purposes
-        return rest;
+        if (account_id) return rest;
     });
 
     return NextResponse.json({

@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 
-async function Logout() {
+function Logout() {
   const user_token = cookieStore.get("user");
   const user_data = localStorage.getItem("user");
 

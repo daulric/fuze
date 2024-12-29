@@ -22,7 +22,7 @@ const UserProfilePage = ({username}) => {
         const item = localStorage.getItem("user");
 
         if (item !== null) {
-            let temp_profile = JSON.parse(item);
+            const temp_profile = JSON.parse(item);
             setProfileInfo(temp_profile);
         } else {
           setTimeout(checkStorage, 3);

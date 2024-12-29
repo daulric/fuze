@@ -112,6 +112,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           
           case false:
             setUserDisliked(true);
+            break;
 
           default:
             break;
@@ -119,7 +120,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       }
     }
 
-    let user_data = localStorage.getItem("user");
+    const user_data = localStorage.getItem("user");
     
     if (user_data) {
       setUser(JSON.parse(user_data));
@@ -138,13 +139,13 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       event: "*",
       schema: "public",
       table: "VideoLikes"
-    }, async (payload) => {
+    }, (payload) => {
 
       switch(payload.eventType) {
         
         case "INSERT":
           if (payload.new.video_id === VideoData.video_id) {
-            let temp_data = payload.new;
+            const temp_data = payload.new;
 
             if (temp_data.is_like === true) {
               setUserLiked(() => {
@@ -165,7 +166,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
         case "UPDATE":
           if (payload.new.video_id === VideoData.video_id) {
-            let temp_data = payload.new;
+            const temp_data = payload.new;
 
             if (temp_data.is_like === true) {
               setUserLiked(() => {
@@ -208,7 +209,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       event: "*",
       schema: "public",
       table: "Video"
-    }, async (payload) => {
+    }, (payload) => {
       switch(payload.eventType) {
         case "UPDATE":
           if  (payload.new.video_id === VideoData.video_id) {
@@ -226,7 +227,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       event: "*",
       schema: "public",
       table: "Video"
-    }, async (payload) => {
+    }, (payload) => {
       switch(payload.eventType) {
 
         case "UPDATE":

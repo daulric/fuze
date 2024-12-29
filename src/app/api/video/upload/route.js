@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import SupabaseServer from "@/supabase/server";
 
-export async function GET() {
+export function GET() {
     return new NextResponse("ok");
 }
 
