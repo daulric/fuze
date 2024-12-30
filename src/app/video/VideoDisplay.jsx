@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import VideoPlayer from "./VideoPlayer";
+import RecommendedVideos from './RecommendedSection';
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { notFound } from 'next/navigation';
@@ -26,6 +27,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
   const [user, setUser] = useState(null);
+  const [recommendedVideos, setRecommendedVideos] = useState([]);
   const supabase = SupabaseServer();
 
   const truncateDescription = (text, limit = 150) => {
@@ -86,6 +88,22 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
   }, [VideoData]);
 
+  const fetchRecommendedVids = useCallback(async () => {
+
+    function getRandomItems(array, count) {
+      const shuffled = array.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    const response = await fetch("/api/video");
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    const filter_recommended = data.data.filter((i) => i.video_id !== VideoData.video_id);
+    const recommended = getRandomItems(filter_recommended, 4);
+    setRecommendedVideos(recommended);
+  }, [VideoData.video_id]);
+
   //Fetch Video
   useEffect(() => {
 
@@ -127,8 +145,9 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
 
     getVideoLikes();
+    fetchRecommendedVids();
 
-  }, [VideoData]);
+  }, [VideoData, fetchRecommendedVids]);
 
   // Realtime Database For Data
   useEffect(() => {
@@ -390,6 +409,14 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         <Suspense fallback={<div>loading comments...</div>} >
           <CommentSection videoId={VideoData.video_id} setIsTyping={setIsCommenting} />
         </Suspense>
+
+        <div className="bg-gray-900 min-h-screen p-4">
+          <div className="sticky top-4">
+            <Suspense fallback={<div>loading recommended videos...</div>} >
+              <RecommendedVideos videos={recommendedVideos} />
+            </Suspense>
+          </div>
+        </div>
       </div>
     </div>
   );
