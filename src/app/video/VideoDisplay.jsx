@@ -95,7 +95,11 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       return shuffled.slice(0, count);
     }
 
-    const response = await fetch("/api/video");
+    const response = await fetch("/api/video/recommend", {
+      method: "POST", 
+      body: JSON.stringify({limit: 5})
+    });
+    
     if (!response.ok) return [];
 
     const data = await response.json();
