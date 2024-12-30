@@ -170,6 +170,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
+      onClick={() => togglePlay()}
     >
       <video
         ref={videoRef}
@@ -181,6 +182,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
         onClick={togglePlay}
         poster={poster}
         aria-label="Video player"
+        onEnded={() => togglePlay()}
         onLoadedData={() => {
           console.log("Video is Loaded");
         }}
