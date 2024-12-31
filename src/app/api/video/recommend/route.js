@@ -13,7 +13,7 @@ export async function POST(request) {
         const VideoDB = supabase.from("Video");
         const VideoStorage = supabase.storage.from("Uploads");
 
-        const {data, error} = await VideoDB.select("*, Account(username)")
+        const {data, error} = await VideoDB.select("*, Account(username, is_verified)")
         .then(({data, error}) => {
             if (error) return { data: null, error };
 

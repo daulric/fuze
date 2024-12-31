@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Play } from 'lucide-react'
 
-const RecommendedVideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
+const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -19,9 +19,10 @@ const RecommendedVideoCard = ({ title, channel, views, uploadTime, thumbnail, li
             src={thumbnail} 
             alt={title} 
             className="w-full h-24 sm:h-32 object-cover" 
-            width={320} 
-            height={180}
+            width={100} 
+            height={100}
             loading='eager'
+            quality={100}
           />
           <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <Play className="text-white" size={32} />
@@ -29,8 +30,8 @@ const RecommendedVideoCard = ({ title, channel, views, uploadTime, thumbnail, li
         </div>
         <div className="p-2 sm:p-3">
           <h3 className="font-bold text-sm sm:text-base mb-1 line-clamp-2 text-white">{title}</h3>
-          <p className="text-xs sm:text-sm text-gray-400">{channel}</p>
-          <p className="text-xs text-gray-500">{views} views • {uploadTime}</p>
+          <p className="text-xs sm:text-sm text-gray-400">{otherData.Account.username}</p>
+          <p className="text-xs text-gray-500">{views} views</p>
         </div>
       </div>
     </div>

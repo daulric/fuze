@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, Suspense, useEffect, Fragment, useRef, useCallback } from 'react';
-import { User, ChevronDown, ChevronUp, Calendar, Eye, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { User, ChevronDown, ChevronUp, Calendar, Eye, ThumbsUp, ThumbsDown, BadgeCheck } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -316,7 +316,10 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold text-lg">{VideoData?.Account?.username || <Skeleton className="h-6 w-24" />}</p>
+                <p className="font-semibold text-lg flex items-center">
+                  {VideoData?.Account?.username  || <Skeleton className="h-6 w-24" />}
+                  {VideoData.Account.is_verified && (<BadgeCheck className="ml-1 h-5 w-5 text-blue-400" />)} 
+                </p>
                 <p className="text-sm text-gray-400">
                   {VideoData?.upload_at ? (
                     <span className="flex items-center">

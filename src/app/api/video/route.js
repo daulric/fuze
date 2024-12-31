@@ -47,7 +47,7 @@ async function GetFullData(supa_client) {
         const videos_db = supa_client.from("Video");
         const Uploads_Storage = supa_client.storage.from("Uploads");
 
-        const {data: Vid_Data} = await videos_db.select("*, Account(username)");
+        const {data: Vid_Data} = await videos_db.select("*, Account(username, is_verified)");
 
         const handler_data = await Promise.all(Vid_Data.map(async (videoData) => {
 
