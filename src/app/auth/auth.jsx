@@ -122,6 +122,26 @@ const AuthPage = () => {
     return true;
   };
 
+  function isValidEmail(email) {
+    // Split the email into local and domain parts
+    const [localPart, domain] = email.split("@");
+  
+    // Check if both parts exist
+    if (!localPart || !domain) return false;
+  
+    // Domain must contain at least one dot
+    if (!domain.includes(".")) return false;
+  
+    // Ensure the domain has characters before and after the dot
+    const domainParts = domain.split(".");
+    if (domainParts.some((part) => part.length === 0)) return false;
+  
+    // Basic local part validation (optional, but ensures no invalid characters)
+    if (localPart.length === 0 || /\s/.test(localPart)) return false;
+  
+    return true;
+  }  
+
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     if (isLogining === true) return;
@@ -172,6 +192,7 @@ const AuthPage = () => {
             {isLogin ? 'Login' : 'Sign Up'}
           </h2>
           <form
+            autoComplete='on'
             onSubmit={(e) => {
               if (e.target.checkValidity() && (!isLogin || validateDateOfBirth(user_info.dob))) {
                 handleSubmit(e);
@@ -199,6 +220,7 @@ const AuthPage = () => {
                     placeholder="example123"
                     className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
                     onChange={(e) => { setUserInfo((state) => ({ ...state, username: e.target.value })) }}
+                    onFocus={(e) => { setUserInfo((state) => ({ ...state, username: e.target.value })) }}
                   />
                 </div>
               </div>
@@ -214,10 +236,22 @@ const AuthPage = () => {
                   required
                   type="email"
                   id="email"
-                  pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                   placeholder="you@example.com"
                   className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
-                  onChange={(e) => { setUserInfo((state) => ({ ...state, email: e.target.value })) }}
+                  value={user_info.email}
+                  onChange={(e) => { 
+                    const email = e.target.value;
+                    if (isValidEmail(email)) {
+                      setUserInfo((state) => ({ ...state, email: email }));
+                    }
+                   }}
+
+                   onFocus={(e) => { 
+                    const email = e.target.value;
+                    if (isValidEmail(email)) {
+                      setUserInfo((state) => ({ ...state, email: email }));
+                    }
+                   }}
                 />
               </div>
             </div>
@@ -240,6 +274,11 @@ const AuthPage = () => {
                       setUserInfo((state) => ({ ...state, dob: selectedDate }));
                       validateDateOfBirth(selectedDate);
                     }}
+                    onFocus={(e) => {
+                      const selectedDate = e.target.value;
+                      setUserInfo((state) => ({ ...state, dob: selectedDate }));
+                      validateDateOfBirth(selectedDate);
+                    }}
                   />
                 </div>
                 {dobError && <p className="text-red-500 text-sm mt-1">{dobError}</p>}
@@ -258,7 +297,9 @@ const AuthPage = () => {
                   id="password"
                   placeholder="••••••••"
                   className="pl-10 pr-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
-                  onChange={(e) => { setUserInfo((state) => ({ ...state, password: e.target.value })) }}
+                  value={user_info.password}
+                  onChange={(e) => setUserInfo((state) => ({ ...state, password: e.target.value })) }
+                  onFocus={(e) => setUserInfo((state) => ({ ...state, password: e.target.value })) }
                 />
                 <button
                   type="button"
