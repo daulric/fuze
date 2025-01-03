@@ -91,7 +91,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
           <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
 
           {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
-          <SidebarItem icon={History} label="Watch History" collapsed={collapsed && !isMobile} href="/upload" />
+          <SidebarItem icon={History} label="Watch History" collapsed={collapsed && !isMobile} href="/feed/history" />
   
           {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
           {user && (
