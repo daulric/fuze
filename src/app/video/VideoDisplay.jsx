@@ -142,6 +142,27 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       }
     }
 
+    function moveToTop(array, item) {
+      const index = array.indexOf(item);
+
+      if (index !== -1) {
+        array.splice(index, 1);
+      }
+
+      array.unshift(item);
+      return;
+    }
+
+    async function addWatchList() {
+      let watchHistory = [];
+
+      if (localStorage.getItem("watchHistory") !== null) {
+        watchHistory = JSON.parse(localStorage.getItem("watchHistory"));
+      }
+
+      moveToTop(watchHistory, VideoData.video_id);
+      localStorage.setItem("watchHistory", JSON.stringify(watchHistory));
+    }
     const user_data = localStorage.getItem("user");
     
     if (user_data) {
@@ -150,6 +171,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
     getVideoLikes();
     fetchRecommendedVids();
+    addWatchList();
 
   }, [VideoData, fetchRecommendedVids]);
 
