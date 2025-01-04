@@ -1,6 +1,6 @@
 # zTube
 
-Welcome to zTube, where creativity meets community! This platform allows users to upload videos, make posts, and interact with content through comments. Our goal is to provide a vibrant space for content creators and consumers to connect, share ideas, and inspire one another.
+Welcome to zTube, where creativity meets community! This platform allows users to upload videos, make posts, and interact with content through likes and comments. Our goal is to provide a vibrant space for content creators and consumers to connect, share ideas, and inspire one another.
 
 This is apart of our College Capstone Project. We hope this project make an impact on society.
 
@@ -16,7 +16,7 @@ This is apart of our College Capstone Project. We hope this project make an impa
 - **Video Upload**: Users can easily upload videos and share their creativity with the community.
 - **Posts Creation**: Create text-based posts to share thoughts, stories, or tutorials.
 - **User Profiles**: Build a personal profile to showcase your content and interact with others.
-- **Community Interaction**: Comment on posts and videos to foster discussions and feedback.
+- **Community Interaction**: Likes and comments on posts and videos to foster discussions and feedback.
 
 ## Getting Started
 To get started with the platform, follow these simple steps:
@@ -58,7 +58,7 @@ Once you have the platform running, you can:
 1. **Create an Account**: Sign up for a new account to start sharing your content.
 2. **Upload Videos**: Use the upload feature to share your videos with the community.
 3. **Create Posts**: Write and publish posts that others can read, like, and share.
-4. **Engage with Content**: Comment on videos and posts to participate in the community.
+4. **Engage with Content**: Like and comment on videos and posts to participate in the community.
 
 ## Contributing
 We welcome contributions from the community! If you have suggestions or want to help improve the platform, please follow these steps:
