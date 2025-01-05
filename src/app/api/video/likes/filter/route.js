@@ -17,11 +17,12 @@ export async function POST(request) {
       const data = await supa_client.from("VideoLikes")
         .select(filter)
         .eq("account_id", AccountID.value)
+        .eq("is_like", true)
         .order("id", {ascending: false})
         .then(({data, error}) => {
           if (error) throw error;
-          return data.map(({account_id, is_like, ...rest}) => {
-            if (account_id && is_like === true) return {is_like, ...rest};
+          return data.map(({account_id, ...rest}) => {
+            if (account_id) return rest;
           });
       });
       

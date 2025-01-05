@@ -74,7 +74,7 @@ export default function LikedVideosPage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {likedVideos.map((video) => (
-          <LikedVideoCard key={video.id} link={`/video?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video} />
+          <LikedVideoCard key={video.video_id} link={`/video?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video} />
         ))}
       </div>
     </div>
