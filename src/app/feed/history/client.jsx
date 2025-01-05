@@ -36,7 +36,6 @@ export default function HistoryPage({history}) {
 
   useEffect(() => {
     const history_data = JSON.parse(localStorage.getItem('watchHistory'));
-    console.log(history_data);
     
     async function fetchHistory() {
       if (history_data) {
@@ -51,9 +50,16 @@ export default function HistoryPage({history}) {
         if (!response.ok) return;
         
         const { success, data } = await response.json();
+        
         if (success === true) {
-          setHistory(data);
-          console.log(data);
+          const perma_data = data.sort((a, b) => {
+            const indexA = history_data.indexOf(a.video_id);
+            const indexB = history_data.indexOf(b.video_id);
+            
+            return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
+          });
+          
+          setHistory(perma_data);
           return;
         }
       }
@@ -72,12 +78,13 @@ export default function HistoryPage({history}) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Watch History {"(in the making)"}</h1>
+        <h1 className="text-2xl font-bold text-white">Wah You Was Watching??</h1>
         <Button onClick={clearHistory} variant="destructive" size="sm" className="flex items-center">
           <Trash2 size={16} className="mr-2" />
           Clear All History
         </Button>
       </div>
+      <br/>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {histories ? histories.map((video) => (
           <HistoryVideoCard key={video.id} link={`/video?id=${video.video_id}`} {...video} />

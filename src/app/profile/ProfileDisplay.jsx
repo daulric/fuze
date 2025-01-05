@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Video, FileText, Eye, User, BadgeCheck } from 'lucide-react';
 import Image from "next/image";
-import Link from "next/link";
 
 const UserProfilePage = ({username}) => {
   const [activeTab, setActiveTab] = useState('videos');
@@ -118,15 +117,16 @@ const UserProfilePage = ({username}) => {
         <TabsContent value="videos">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {videos.map((video) => (
-              <Link href={`/video?id=${video.video_id}`} key={video.video_id} className="block">
+              <button onClick={() => window.location.href = `/video?id=${video.video_id}`} key={video.video_id} className="block">
                 <Card className="overflow-hidden bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader className="p-0">
-                    <Image 
+                    <Image
                       src={video.thumbnail} 
                       alt={video.title} 
                       width={300} 
                       height={200} 
                       className="w-full h-40 object-cover"
+                      loading='eager'
                     />
                   </CardHeader>
                   <CardContent className="p-4">
@@ -141,14 +141,14 @@ const UserProfilePage = ({username}) => {
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
+              </button>
             ))}
           </div>
         </TabsContent>
         <TabsContent value="blogs">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[/* Blog Feature didn't come yet so this is blank for now */ ].map((blog) => (
-              <Link href={blog.url} key={blog.id} className="block">
+              <button onClick={() => window.location.href = blog.url} key={blog.id} className="block">
                 <Card className="bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader>
                     <CardTitle className="flex items-center text-white">
@@ -161,7 +161,7 @@ const UserProfilePage = ({username}) => {
                     <p className="text-gray-400">Read time: {blog.readTime}</p>
                   </CardContent>
                 </Card>
-              </Link>
+              </button>
             ))}
           </div>
         </TabsContent>

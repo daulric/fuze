@@ -10,7 +10,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import VideoPlayer from "./VideoPlayer";
 import RecommendedVideos from './RecommendedSection';
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
@@ -30,7 +29,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [recommendedVideos, setRecommendedVideos] = useState([]);
   const supabase = SupabaseServer();
 
-  const truncateDescription = (text, limit = 150) => {
+  const truncateDescription = (text, limit = 100) => {
     if (!text) return "No description available.";
     const flatText = text.replace(/(\r\n|\n|\r)/gm, " ");
     if (flatText.length <= limit) return text;
@@ -332,7 +331,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <Link href={`/profile/${VideoData?.Account?.username}`} className="flex items-center space-x-3">
+            <button onClick={() => window.location.href = `/profile/${VideoData?.Account?.username}`} className="flex items-center space-x-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={VideoData?.uploaderPic} alt={VideoData?.Account?.username} />
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
@@ -353,7 +352,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                   )}
                 </p>
               </div>
-            </Link>
+            </button>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-gray-400">
@@ -403,7 +402,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
         <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-4">
-            <div className="text-sm text-gray-300 whitespace-pre-wrap">
+            <div className="text-lg text-gray-300 whitespace-pre-wrap">
               {VideoData?.description ? (
                 <>
                   {expanded 
@@ -413,16 +412,16 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                   {VideoData.description.length > 150 && (
                     <Button 
                       variant="ghost" 
-                      className="mt-2 text-blue-400 hover:text-blue-300 p-0"
+                      className="mt-2 text-blue-400 hover:text-blue-500 bg-transparent hover:bg-transparent p-0"
                       onClick={() => setExpanded(!expanded)}
                     >
                       {expanded ? (
                         <>
-                          Show less <ChevronUp className="ml-1 h-4 w-4" />
+                          show less <ChevronUp className="ml-1 h-4 w-4" />
                         </>
                       ) : (
                         <>
-                          Show more <ChevronDown className="ml-1 h-4 w-4" />
+                          show more <ChevronDown className="ml-1 h-4 w-4" />
                         </>
                       )}
                     </Button>
