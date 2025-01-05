@@ -14,9 +14,12 @@ export async function POST(request) {
     const supa_client = SupabaseServer();
     const VideoStorage = supa_client.storage.from("Uploads");
     
-    const data = await supa_client.from("Video").select("*").then(({data, error}) => {
+    const data = await supa_client.from("Video").select("*, Account(username)").then(({data, error}) => {
       if (error) throw error;
-      const filteredData = data.filter((video) =>  group.includes(video.video_id));
+      const filteredData = data.map(({account_id, ...rest}) => {
+        if (account_id) return rest;
+      }).filter((video) =>  group.includes(video.video_id));
+
       return filteredData;
     });
 

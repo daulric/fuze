@@ -5,7 +5,7 @@ import { Play, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from 'react'
 
-const HistoryVideoCard = ({ title, channel, views, thumbnail, duration, link, Account }) => {
+const HistoryVideoCard = ({ title, views, thumbnail, duration, link, ...otherData }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
       <div onClick={() => window.location.href = link} className="block">
@@ -26,7 +26,7 @@ const HistoryVideoCard = ({ title, channel, views, thumbnail, duration, link, Ac
         </div>
         <div className="p-4">
           <h3 className="font-bold text-lg mb-1 line-clamp-2 text-white">{title}</h3>
-          <p className="text-sm text-gray-400">{Account.username}</p>
+          <p className="text-sm text-gray-400">{otherData.Account.username}</p>
           <p className="text-xs text-gray-500">{views} views</p>
         </div>
       </div>
