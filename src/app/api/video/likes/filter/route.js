@@ -17,6 +17,7 @@ export async function POST(request) {
       const data = await supa_client.from("VideoLikes")
         .select(filter)
         .eq("account_id", AccountID.value)
+        .order("id", {ascending: false})
         .then(({data, error}) => {
           if (error) throw error;
           return data.map(({account_id, is_like, ...rest}) => {

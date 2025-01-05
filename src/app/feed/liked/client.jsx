@@ -2,21 +2,20 @@
 
 import Image from 'next/image';
 import { Play, ThumbsUp } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from 'react';
 
-const LikedVideoCard = ({ title, views, likedAt, thumbnail, link, Account }) => {
+const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
       <div onClick={() => window.location.href = link} className="block">
         <div className="relative">
-          <Image 
+          <Image
             src={thumbnail} 
             alt={title} 
             className="w-full h-48 object-cover" 
             width={320} 
             height={180}
-           loading='eager' 
+            loading='eager'
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Play className="text-white" size={48} />
@@ -68,14 +67,14 @@ export default function LikedVideosPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-white">Liked Videos</h1>
-        <Button variant="outline" size="sm" className="flex items-center">
+        <div variant="outline" size="sm" className="flex items-center bg-transparent">
           <ThumbsUp size={16} className="mr-2" />
           {likedVideos.length} videos
-        </Button>
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {likedVideos.map((video) => (
-          <LikedVideoCard key={video.id} thumbnail={video.thumbnail} {...video.Video} />
+          <LikedVideoCard key={video.id} link={`/video?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video} />
         ))}
       </div>
     </div>
