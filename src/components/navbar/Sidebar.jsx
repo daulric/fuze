@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Upload, LayoutDashboardIcon, History } from 'lucide-react';
+import { Home, Upload, LayoutDashboardIcon, History, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
-import { unstable_noStore as noStore } from 'next/cache';
 import { Separator } from "@/components/ui/separator"
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
@@ -20,7 +19,6 @@ const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
 );
 
 const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) => {
-  noStore();
   const [collapsed] = useState(defaultCollapsed);
   const [user, setUser] = useState(null);
   const sidebarRef = useRef(null);
@@ -91,6 +89,10 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
           <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
 
           {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
+          {user && (
+            <SidebarItem icon={Heart} label="Liked Videos" collapsed={collapsed && !isMobile} href="/#" />
+          )}
+          
           <SidebarItem icon={History} label="Watch History" collapsed={collapsed && !isMobile} href="/feed/history" />
   
           {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}

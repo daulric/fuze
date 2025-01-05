@@ -5,7 +5,7 @@ import { Play, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from 'react'
 
-const HistoryVideoCard = ({ title, views, thumbnail, duration, link, ...otherData }) => {
+const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
       <div onClick={() => window.location.href = link} className="block">
@@ -17,9 +17,6 @@ const HistoryVideoCard = ({ title, views, thumbnail, duration, link, ...otherDat
             width={320} 
             height={180} 
           />
-          <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-            {duration}
-          </div>
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Play className="text-white" size={48} />
           </div>
@@ -83,7 +80,7 @@ export default function HistoryPage({history}) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {histories ? histories.map((video) => (
-          <HistoryVideoCard key={video.id} {...video} />
+          <HistoryVideoCard key={video.id} link={`/video?id=${video.video_id}`} {...video} />
         )) : 
         (<div>No history found</div>)
         }
