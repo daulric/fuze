@@ -90,7 +90,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
 
           {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
           {user && (
-            <SidebarItem icon={Heart} label="Liked Videos" collapsed={collapsed && !isMobile} href="/#" />
+            <SidebarItem icon={Heart} label="Liked Videos" collapsed={collapsed && !isMobile} href="/feed/liked" />
           )}
           
           <SidebarItem icon={History} label="Watch History" collapsed={collapsed && !isMobile} href="/feed/history" />
