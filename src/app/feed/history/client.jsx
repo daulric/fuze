@@ -1,11 +1,11 @@
 "use client"
 
 import Image from 'next/image'
-import { Play, Clock, Trash2 } from 'lucide-react'
+import { Play, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from 'react'
 
-const HistoryVideoCard = ({ title, channel, views, watchedAt, thumbnail, duration, link }) => {
+const HistoryVideoCard = ({ title, channel, views, thumbnail, duration, link, Account }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
       <div onClick={() => window.location.href = link} className="block">
@@ -26,12 +26,8 @@ const HistoryVideoCard = ({ title, channel, views, watchedAt, thumbnail, duratio
         </div>
         <div className="p-4">
           <h3 className="font-bold text-lg mb-1 line-clamp-2 text-white">{title}</h3>
-          <p className="text-sm text-gray-400">{channel}</p>
+          <p className="text-sm text-gray-400">{Account.username}</p>
           <p className="text-xs text-gray-500">{views} views</p>
-          <div className="flex items-center mt-2 text-xs text-gray-500">
-            <Clock size={14} className="mr-1" />
-            <span>Watched {watchedAt}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -43,11 +39,30 @@ export default function HistoryPage({history}) {
 
   useEffect(() => {
     const history_data = JSON.parse(localStorage.getItem('watchHistory'));
-
-    if (history_data) {
-      setHistory(history_data);
-      return;
+    console.log(history_data);
+    
+    async function fetchHistory() {
+      if (history_data) {
+        const response = await fetch("/api/video/group", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({group: history_data}),
+        });
+        
+        if (!response.ok) return;
+        
+        const { success, data } = await response.json();
+        if (success === true) {
+          setHistory(data);
+          console.log(data);
+          return;
+        }
+      }
     }
+    
+    fetchHistory();
 
   }, [history]);
 

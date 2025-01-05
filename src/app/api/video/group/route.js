@@ -8,20 +8,51 @@ export async function POST(request) {
     const user_token = (await cookies()).get("user");
     if (!user_token) throw "Account is Needed";
     
-    const { group as groupData } = await request.json();
+    const { group } = await request.json();
+    if (!group ||  group.length === 0) throw "Group Data is Needed";
     
     const supa_client = SupabaseServer();
-    const data = await supa_client.from("Video").select("*").then((data, error) => {
-      if (error) throw error;
-      
-      return data.map((video) => groupData.includes(video.video_id));
-    });
+    const VideoStorage = supa_client.storage.from("Uploads");
     
+    const data = await supa_client.from("Video").select("*").then(({data, error}) => {
+      if (error) throw error;
+      const filteredData = data.filter((video) =>  group.includes(video.video_id));
+      return filteredData;
+    });
+
     if (data.length === 0) throw "No Group Data to Display";
+    
+    const handler_data = await Promise.all(data.map(async (videoData) => {
+      try {
+        const { data, error } = await VideoStorage.list(videoData.video_id);
+        if (error) throw error;
+    
+        const videoFile = data.find((file) => file.name.includes("video"));
+        const thumbnailFile = data.find((file) => file.name.includes("thumbnail"));
+    
+        const [signed_video, signed_thumbnail] = await Promise.all([
+          videoFile ? VideoStorage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 30) : null,
+          thumbnailFile ? VideoStorage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 30) : null,
+        ]);
+    
+        return {
+          ...videoData,
+          video: signed_video?.data?.signedUrl || null,
+          thumbnail: signed_thumbnail?.data?.signedUrl || "/logo.svg",
+        };
+      } catch (err) {
+        console.error("Error processing videoData:", err);
+        return {
+          ...videoData,
+          video: null,
+          thumbnail: "/logo.svg",
+        };
+      }
+    }));
     
     return NextResponse.json({
       success: true,
-      data,
+      data: handler_data,
     });
     
   } catch (e) {
