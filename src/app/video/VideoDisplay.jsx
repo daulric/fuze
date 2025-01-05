@@ -29,7 +29,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [recommendedVideos, setRecommendedVideos] = useState([]);
   const supabase = SupabaseServer();
 
-  const truncateDescription = (text, limit = 100) => {
+  const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
     const flatText = text.replace(/(\r\n|\n|\r)/gm, " ");
     if (flatText.length <= limit) return text;
@@ -402,7 +402,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
         <Card className="bg-gray-800 border-gray-700">
           <CardContent className="p-4">
-            <div className="text-lg text-gray-300 whitespace-pre-wrap">
+            <div className="text-sm text-gray-300 whitespace-pre-wrap">
               {VideoData?.description ? (
                 <>
                   {expanded 
