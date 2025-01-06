@@ -46,7 +46,7 @@ export default async function Home() {
   const url = await getURL();
 
   const response = await fetch(`${url}/api/video/recommend`, {
-    next: { revalidate: 0 }
+    next: { revalidate: 0 },
     body: JSON.stringify({limit: 16}),
     method: "POST",
   });
