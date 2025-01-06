@@ -74,10 +74,19 @@ const CommentSection = ({ videoId, setIsTyping }) => {
 
     function process_comments(comments) {
       if (comments.length === 0) return;
-  
+      if (!pre_comment_profiles) return;
+      
       const processed = comments.map((comment) => {
         const user_vid_comment = comment.Account.username;
-        const found = pre_comment_profiles.find(user => user.username === user_vid_comment) || null;
+        
+        let found = pre_comment_profiles.find(user => user.username === user_vid_comment);
+        
+        if (!found) {
+          found = {
+            username: "Deleted User",
+            avatar_url: null,
+          }
+        }
 
         const comment_proccessed = { ...comment };
         delete comment_proccessed.Account;

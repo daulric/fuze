@@ -366,7 +366,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                     variant="ghost"
                     size="sm"
                     disabled={user === null ? true : false}
-                    className={`flex items-center space-x-2 ${userLiked ? 'text-blue-500' : 'text-gray-400'}`}
+                    className={`flex items-center space-x-2 ${userLiked ? 'hover:bg-red-300' :'hover:bg-blue-100' } ${userLiked ? 'text-blue-500' : 'text-gray-400'}`}
                     onClick={handleLike}
                   >
                     <ThumbsUp className="h-5 w-5" />
@@ -385,7 +385,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                     variant="ghost"
                     disabled={user === null ? true : false}
                     size="sm"
-                    className={`flex items-center space-x-2 ${userDisliked ? 'text-red-500' : 'text-gray-400'}`}
+                    className={`flex items-center space-x-2 hover:bg-blue-100 ${userDisliked ? 'hover:bg-red-300' :'hover:bg-blue-100' } ${userDisliked ? 'text-red-500' : 'text-gray-400'}`}
                     onClick={handleDislike}
                   >
                     <ThumbsDown className="h-5 w-5" />

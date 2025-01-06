@@ -16,26 +16,6 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
   const containerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const updateTime = () => setCurrentTime(video.currentTime);
-    
-    const handleLoadedMetadata = () => {
-      setDuration(video.duration);
-      setIsLoaded(true);
-    };
-
-    video.addEventListener('timeupdate', updateTime);
-    video.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-    return () => {
-      video.removeEventListener('timeupdate', updateTime);
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, []);
-
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -154,7 +134,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute, isCommenting, videoSrc, poster]);
+  }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute, isCommenting]);
 
   const formatTime = (time) => {
     if (!isFinite(time)) return '0:00';
@@ -183,8 +163,20 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
         poster={poster}
         aria-label="Video player"
         onEnded={() => togglePlay()}
-        onLoadedData={() => {
-          console.log("Video is Loaded");
+        onPlaying={(e) => {
+          if (!isLoaded) {
+            setDuration(e.target.duration);
+            setIsLoaded(true);
+          }
+        }}
+        onTimeUpdate={(e) => {
+          setCurrentTime(e.target.currentTime)
+        }}
+        onLoadedData={(e) => {
+          if (!isLoaded) {
+            setDuration(e.target.duration);
+            setIsLoaded(true);
+          }
         }}
       />
       <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>

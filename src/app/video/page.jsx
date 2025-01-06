@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import MainVideoPage from './Main';
+import MainVideoPage from './VideoDisplay';
 import getUrl from "@/lib/geturl";
 import { notFound } from 'next/navigation';
 
@@ -72,7 +72,7 @@ export default async function PAGE({searchParams}) {
   }
 
   return (
-    <Suspense fallback={<div>loading video display...</div>}>
+    <Suspense fallback={<div>wait ah lil while...</div>}>
       <MainVideoPage VideoData={data} />
     </Suspense>
   );
