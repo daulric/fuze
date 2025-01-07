@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import Supabase from "@/supabase/server";
-import { unstable_noStore } from "next/cache";
 
 async function GetUserProfiles() {
     const supa_client = Supabase();
@@ -38,7 +37,6 @@ async function GetUserProfiles() {
 
 export async function GET(request) {
     try {
-        unstable_noStore();
         const username = request.nextUrl?.searchParams.get("username");
         const account_id = request.nextUrl?.searchParams.get("account_id");
         const allowId = request.nextUrl?.searchParams.get("allowId");
