@@ -20,7 +20,7 @@ async function handleSignupForm({email, password, username, dob}, setMsg) {
   }
 
   const response = await fetch("/api/auth", { 
-    method: "post",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -35,7 +35,6 @@ async function handleSignupForm({email, password, username, dob}, setMsg) {
 
   if (data) {
     setMsg(data);
-    console.log(data);
     return data.success;
   }
 }
@@ -91,10 +90,12 @@ const AuthPage = () => {
   const toggleForm = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setIsLogin(!isLogin);
-      setIsAnimating(false);
-      setDobError('');
-      setUserInfo({});
+      setIsLogin((state) => {
+        setIsAnimating(false);
+        setDobError('');
+        setUserInfo({});
+        return !state;
+      });
     }, 300); // Half of the animation duration
   };
 

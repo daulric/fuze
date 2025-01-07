@@ -10,63 +10,63 @@ export function GET() {
 
 export async function POST(request) {
     // Sign up
-    try {
-        const { loginType, username, email, password, dob } = await request.json();
+  try {
+    const { loginType, username, email, password, dob } = await request.json();
 
-        if (!loginType || !username || !email || !password || !dob) {
-            throw "Missing Fields Required!";
-        }
-
-        const supabase_client = SupabaseServer();
-        const accounts_db = supabase_client.from("Account")
-        const cookieStore = await cookies();
-
-        if (loginType !== "signup") { throw "Invalid Login Type!"; }
-        const { data: exsisting_accounts, error: checkError } = await accounts_db.select().or(`username.eq.${username},email.eq.${email}`);
-
-        if (checkError) { throw "Server Error" }
-
-        if (exsisting_accounts && exsisting_accounts.length > 0) {
-            console.log("idk probally here!")
-            const isDuplicateUsername = exsisting_accounts.some(account => account.username === username);
-            const isDuplicateEmail = exsisting_accounts.some(account => account.email === email);
-
-            let message;
-
-            if (isDuplicateUsername && isDuplicateEmail) {
-                message = "Username and Email already exsists";
-            } else if (isDuplicateUsername) {
-                message = "Username already exists";
-            } else if (isDuplicateEmail) {
-                message = "Email already exists";
-            }
-
-            throw message;
-        }
-
-        const { data: account_data, error: insertError } = await accounts_db.insert({
-            username: username,
-            email: email,
-            password:  password,
-            dob: dob,
-        }).select().single();
-
-        if (insertError) { throw "Server Error"; }
-        cookieStore.set("user", account_data.account_id, {
-            maxAge: 2592000
-        });
-
-        return NextResponse.json({
-            success: true,
-            message: "Success",
-            user_data: account_data,
-        }, { status: 200})
-    } catch (err) {
-        return NextResponse.json({
-            success: false,
-            message: err,
-        }, { status: 200 })
+    if (!loginType || !username || !email || !password || !dob) {
+      throw "Missing Fields Required!";
     }
+
+    const supabase_client = SupabaseServer();
+    const accounts_db = supabase_client.from("Account")
+    const cookieStore = await cookies();
+
+    if (loginType !== "signup") { throw "Invalid Login Type!"; }
+    const { data: exsisting_accounts, error: checkError } = await accounts_db.select().or(`username.eq.${username},email.eq.${email}`);
+    
+    if (checkError) { throw "Server Error" }
+
+    if (exsisting_accounts && exsisting_accounts.length > 0) {
+      const isDuplicateUsername = exsisting_accounts.some(account => account.username === username);
+      const isDuplicateEmail = exsisting_accounts.some(account => account.email === email);
+
+      let message;
+
+      if (isDuplicateUsername && isDuplicateEmail) {
+          message = "Username and Email already exsists";
+      } else if (isDuplicateUsername) {
+          message = "Username already exists";
+      } else if (isDuplicateEmail) {
+          message = "Email already exists";
+      }
+
+      throw message;
+    }
+    
+    const { data: account_data, error: insertError } = await accounts_db.insert({
+      username: username,
+      email: email,
+      password:  password,
+      dob: dob,
+    }).select().single();
+
+    if (insertError) { throw "Server Error"; }
+
+    cookieStore.set("user", account_data.account_id, {
+      maxAge: 2592000
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Success",
+      user_data: account_data,
+    }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({
+        success: false,
+        message: err,
+    }, { status: 200 })
+  }
 
 }
 
