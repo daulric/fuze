@@ -15,7 +15,7 @@ async function handleSignupForm({email, password, username, dob}, setMsg) {
     loginType: "signup",
     email: email,
     password: encrypt(password, "passcode"),
-    username: username,
+    username: username.trimEnd(),
     dob: dob,
   }
 
