@@ -67,6 +67,26 @@ async function handleLoginForm({email, password}, setMsg) {
   }
 }
 
+function isValidEmail(email) {
+  // Split the email into local and domain parts
+  const [localPart, domain] = email.split("@");
+
+  // Check if both parts exist
+  if (!localPart || !domain) return false;
+
+  // Domain must contain at least one dot
+  if (!domain.includes(".")) return false;
+
+  // Ensure the domain has characters before and after the dot
+  const domainParts = domain.split(".");
+  if (domainParts.some((part) => part.length === 0)) return false;
+
+  // Basic local part validation (optional, but ensures no invalid characters)
+  if (localPart.length === 0 || /\s/.test(localPart)) return false;
+
+  return true;
+}  
+
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -123,31 +143,16 @@ const AuthPage = () => {
     return true;
   };
 
-  function isValidEmail(email) {
-    // Split the email into local and domain parts
-    const [localPart, domain] = email.split("@");
-  
-    // Check if both parts exist
-    if (!localPart || !domain) return false;
-  
-    // Domain must contain at least one dot
-    if (!domain.includes(".")) return false;
-  
-    // Ensure the domain has characters before and after the dot
-    const domainParts = domain.split(".");
-    if (domainParts.some((part) => part.length === 0)) return false;
-  
-    // Basic local part validation (optional, but ensures no invalid characters)
-    if (localPart.length === 0 || /\s/.test(localPart)) return false;
-  
-    return true;
-  }  
-
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     if (isLogining === true) return;
 
     if (!isLogin && !validateDateOfBirth(user_info.dob)) {
+      return;
+    }
+    
+    if (!isValidEmail(user_info.email)) {
+      setMsg({success: false, message: "Invalid Email Format"});
       return;
     }
 
@@ -242,16 +247,12 @@ const AuthPage = () => {
                   value={user_info.email}
                   onChange={(e) => { 
                     const email = e.target.value;
-                    if (isValidEmail(email)) {
-                      setUserInfo((state) => ({ ...state, email: email }));
-                    }
+                    setUserInfo((state) => ({ ...state, email: email }));
                    }}
 
                    onFocus={(e) => { 
                     const email = e.target.value;
-                    if (isValidEmail(email)) {
-                      setUserInfo((state) => ({ ...state, email: email }));
-                    }
+                    setUserInfo((state) => ({ ...state, email: email }));
                    }}
                 />
               </div>
