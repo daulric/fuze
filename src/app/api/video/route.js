@@ -80,6 +80,10 @@ async function GetFullData(supa_client) {
                 ...videoData,
                 video: videoUrl,
                 thumbnail: thumbnailUrl,
+                meta: {
+                  video: videoFile,
+                  thumbnail: thumbnailFile,
+                }
             };
         }));
 

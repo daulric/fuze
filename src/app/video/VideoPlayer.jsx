@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Rewind, FastForward } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
+import getBlob from '@/lib/getBlob';
 
-const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
+const VideoPlayer = ({ isCommenting, videoData}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -15,6 +16,7 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
+  const [tempUrls, setTempUrls] = useState(null);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
@@ -136,6 +138,15 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
     };
   }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute, isCommenting]);
 
+  useEffect(() => {
+    async function getBlobData() {
+      const data = await getBlob(videoData);
+      setTempUrls(data);
+    }
+    
+    getBlobData();
+  }, [videoData]);
+  
   const formatTime = (time) => {
     if (!isFinite(time)) return '0:00';
     const minutes = Math.floor(time / 60);
@@ -154,14 +165,14 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
     >
       <video
         ref={videoRef}
-        src={videoSrc}
         preload='auto'       
         className="w-full h-full object-contain"
         onContextMenu={(e) => e.preventDefault()}
         controlsList='nodownload'
         onClick={togglePlay}
-        poster={poster}
+        poster={tempUrls?.thumb_url}
         aria-label="Video player"
+        src={tempUrls?.video_url}
         onEnded={() => togglePlay()}
         onPlaying={(e) => {
           if (!isLoaded) {
@@ -177,8 +188,17 @@ const VideoPlayer = ({ videoSrc, poster, isCommenting}) => {
             setDuration(e.target.duration);
             setIsLoaded(true);
           }
+          
+          if (tempUrls) {
+            URL.revokeObjectURL(tempUrls.video_url);
+            URL.revokeObjectURL(tempUrls.thumb_url);
+          }
         }}
-      />
+      >
+        <source  type={videoData.meta.video.metadata.mimetype} />
+        unable to play video lol ;)
+      
+      </video>
       <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <Slider

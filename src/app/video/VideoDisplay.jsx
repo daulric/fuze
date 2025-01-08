@@ -311,10 +311,9 @@ const YouTubeStylePlayer = ({ VideoData }) => {
               </div>
             }>
               <div className="absolute inset-0">
-                <VideoPlayer 
-                  videoSrc={VideoData.video} 
-                  poster={VideoData.thumbnail}
+                <VideoPlayer
                   isCommenting={isCommenting}
+                  videoData={VideoData}
                 />
               </div>
             </Suspense>
