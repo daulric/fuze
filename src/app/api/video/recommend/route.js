@@ -35,7 +35,7 @@ export async function POST(request) {
         const handler_data = await Promise.all(data.map(async (videoData) => {
 
             // List files asynchronously
-            const { data, error } = await VideoStorage.list(videoData.video_id, { limit: 1000 });
+            const { data, error } = await VideoStorage.list(videoData.video_id);
         
             if (error) {
                 console.error("Error fetching files:", error);
@@ -63,6 +63,11 @@ export async function POST(request) {
                 ...videoData,
                 video: videoUrl,
                 thumbnail: thumbnailUrl,
+                
+                meta: {
+                  video: videoFile,
+                  thumbnail: thumbnailFile,
+                }
             };
         }));
 

@@ -52,7 +52,7 @@ async function GetFullData(supa_client) {
         const handler_data = await Promise.all(Vid_Data.map(async (videoData) => {
 
             // List files asynchronously
-            const { data, error } = await Uploads_Storage.list(videoData.video_id, { limit: 1000 });
+            const { data, error } = await Uploads_Storage.list(videoData.video_id);
         
             if (error) {
                 console.error("Error fetching files:", error);
