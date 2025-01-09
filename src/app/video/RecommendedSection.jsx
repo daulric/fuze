@@ -40,14 +40,14 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
 
 const RecommendedVideos = ({ videos }) => {
     return (
-        <div className="space-y-4">
+      <div className="space-y-4">
         <h2 className="text-lg font-semibold text-gray-100 mb-2">Recommended Videos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
             {videos.map((video, index) => (
             <RecommendedVideoCard key={index} link={`/video?id=${video.video_id}`} { ...video} />
             ))}
         </div>
-        </div>
+      </div>
     );
 };
 
