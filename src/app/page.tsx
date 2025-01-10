@@ -42,11 +42,10 @@ function format_views(views: number) {
 
 export default async function Home() {
   const data: unknown[] = [];
-
   const url = await getURL();
 
   const response = await fetch(`${url}/api/video/recommend`, {
-    cache: "no-cache",
+    next: { revalidate: 20 },
     body: JSON.stringify({limit: 16}),
     method: "POST",
   });

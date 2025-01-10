@@ -7,7 +7,7 @@ async function getVideoData(url, video_id) {
   if (!url || !video_id) return null;
 
   const response = await fetch(`${url}/api/video?video_id=${video_id}`, {
-    cache: "no-store",
+    next: { revalidate: 4 },
   });
 
   if (!response.ok) return null;
@@ -15,26 +15,25 @@ async function getVideoData(url, video_id) {
   const data = await response.json();
   if (!data || data.data.length === 0) return null;
 
-  return data.data;
+  return data.data[0];
 }
 
 export async function generateMetadata({ searchParams }) {
+  const start = performance.now();
   const videoId = (await searchParams).id;
 
   const baseUrl = await getUrl();
   const canonicalUrl = `${baseUrl}/video?id=${videoId}`;
+  const videoData = await getVideoData(baseUrl, videoId);
 
-  const temp_data = await getVideoData(baseUrl, videoId);
-
-  if (temp_data === null) {
+  if (videoData === null) {
     return {
     title: "Video Not Found",
     description: "Video not found",
     }
   }
 
-  const videoData = temp_data[0];
-
+  console.log("Ended in:", performance.now() - start)
   return {
     title: videoData.title || 'Video',
     description: videoData.description || 'No description available',
@@ -48,7 +47,7 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default async function PAGE({searchParams}) {
-
+  const start = performance.now();
   const url = await getUrl();
   const id = (await searchParams).id;
   const video_data = await getVideoData(url, id);
@@ -57,26 +56,28 @@ export default async function PAGE({searchParams}) {
     await fetch(`${url}/api/video/views?id=${id}`, { method: "post" });
   }
 
-  let data = {};
+  const data = [];
 
   if (video_data !== null) {
-    const temp_data = video_data[0];
-    const res = await fetch(`${url}/api/profile?username=${temp_data.Account.username}`);
+    const res = await fetch(`${url}/api/profile?username=${video_data.Account.username}`, {
+      next: { revalidate: 4 }
+    });
     
     if (res.ok) {
       const user_profile = await res.json();
-      data = {
-        ...temp_data,
+      data.push({
+        ...video_data,
         uploaderPic: user_profile.profile.avatar_url || "/logo.svg",
-      }
+      })
     }
   } else {
     notFound();
   }
 
+  console.log("Ended in:", performance.now() - start)
   return (
     <Suspense fallback={<div>wait ah lil while...</div>}>
-      <MainVideoPage VideoData={data} />
+      <MainVideoPage VideoData={data[data.length - 1]} />
     </Suspense>
   );
 }
