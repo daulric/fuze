@@ -6,95 +6,97 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Video, FileText, Eye, User, BadgeCheck } from 'lucide-react';
 import Image from "next/image";
+import Link from "next/link";
 
-const UserProfilePage = ({username}) => {
+const CardMark = ({message}) => {
+  return (
+    <Card className="bg-gray-800 shadow-lg border border-gray-700">
+      <CardContent className="p-6 flex items-center justify-center h-40">
+        <p className="text-gray-400 text-center">{message}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+const UserProfilePage = ({ username }) => {
   const [activeTab, setActiveTab] = useState('videos');
   const [videos, setVideos] = useState([]);
-  //const [blogs, setBlogs] = useState([]);
   const [profile, setProfileInfo] = useState(null);
 
-  const GetProfile = useCallback(async () => {
-
+  const getProfile = useCallback(async () => {
     if (!username) {
       const checkStorage = () => {
-
         const item = localStorage.getItem("user");
-
         if (item !== null) {
-            const temp_profile = JSON.parse(item);
-            setProfileInfo(temp_profile);
+          const temp_profile = JSON.parse(item);
+          setProfileInfo(temp_profile);
         } else {
           setTimeout(checkStorage, 3);
         }
-
       };
-
-      checkStorage()
+      checkStorage();
     } else {
-
-      const response = await fetch(`/api/profile?username=${username}`);
-
-      if (!response.ok) {
-        return;
+      try {
+        const response = await fetch(`/api/profile?username=${username}`);
+        if (!response.ok) throw new Error('Failed to fetch profile');
+        const data = await response.json();
+        if (data.success) {
+          setProfileInfo(data.profile);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
       }
-
-      const data = await response.json();
-    
-      if (data.success) {
-        setProfileInfo(data.profile);
-      }
-
     }
-    
   }, [username]);
   
-  const GetVideos = useCallback(async () => {
+  const getVideos = useCallback(async () => {
+    if (!profile) return;
 
     const query = new URLSearchParams({
-      username: profile?.username,
-      is_private: false,
+      username: profile.username,
     });
 
-    const response = await fetch(`/api/video?${query.toString()}`);
-    if (!response.ok) return;
-
-    const data = await response.json();
-
-    if (data.success) {
-      setVideos(data.data);
+    try {
+      const response = await fetch(`/api/video?${query.toString()}`);
+      if (!response.ok) throw new Error('Failed to fetch videos');
+      const data = await response.json();
+      if (data.success) {
+        setVideos(data.data);
+        console.log(data);
+      }
+    } catch (error) {
+      console.error('Error fetching videos:', error);
     }
   }, [profile]);
   
   useEffect(() => {
-    if (!profile) {
-      GetProfile();  // Fetch profile only once
-    }
-  }, [GetProfile, profile]);
+    getProfile();
+  }, [getProfile]);
   
   useEffect(() => {
     if (profile) {
-      GetVideos();  // Fetch videos only when profile is fetched
+      getVideos();
     }
-  }, [GetVideos, profile]);
+  }, [getVideos, profile]);
 
   return (
     <div className="container mx-auto p-4 bg-gray-900 text-gray-100 min-h-screen">
       <Card className="mb-6 bg-gray-800 shadow-md border border-gray-700">
-        <CardContent className="flex items-center space-x-4 pt-6">
+        <CardContent className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
           <Avatar className="h-24 w-24 ring-2 ring-gray-700">
             <AvatarImage src={profile?.avatar_url} alt={profile?.username} />
             <AvatarFallback className="bg-gray-700 text-gray-300">
               <User className="h-20 w-20"/>
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h1 className="text-2xl font-bold text-white flex items-center">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl font-bold text-white flex items-center justify-center sm:justify-start">
               {profile?.username}
-              { profile?.is_verified === true && (
+              {profile?.is_verified && (
                 <BadgeCheck className="ml-2 h-5 w-5 text-blue-400" />
               )}
             </h1>
-            <p className="text-gray-400">{profile?.aboutme}</p>
+            <p className="text-gray-400 mt-2">{profile?.aboutme}</p>
           </div>
         </CardContent>
       </Card>
@@ -116,8 +118,8 @@ const UserProfilePage = ({username}) => {
         </TabsList>
         <TabsContent value="videos">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {videos.map((video) => (
-              <button onClick={() => window.location.href = `/video?id=${video.video_id}`} key={video.video_id} className="block">
+            {videos.length !== 0 ? videos.map((video) => (
+              <Link href={`/video?id=${video.video_id}`} key={video.video_id} className="block">
                 <Card className="overflow-hidden bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader className="p-0">
                     <Image
@@ -141,13 +143,15 @@ const UserProfilePage = ({username}) => {
                     </div>
                   </CardContent>
                 </Card>
-              </button>
-            ))}
+              </Link>
+            )) : (
+              <CardMark message={`no videos from ${profile ? profile?.username : ""}`}/>
+            )}
           </div>
         </TabsContent>
         <TabsContent value="blogs">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[/* Blog Feature didn't come yet so this is blank for now */ ].map((blog) => (
+            {[/* Blog Feature didn't come yet so this is blank for now */ ].length !== 0 ? [].map((blog) => (
               <button onClick={() => window.location.href = blog.url} key={blog.id} className="block">
                 <Card className="bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader>
@@ -162,7 +166,9 @@ const UserProfilePage = ({username}) => {
                   </CardContent>
                 </Card>
               </button>
-            ))}
+            )) : (
+              <CardMark message={"blog feature not available at this moment"} />
+            )}
           </div>
         </TabsContent>
       </Tabs>
