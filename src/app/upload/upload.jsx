@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import directUpload from "./directUpload";
+import { redirect } from 'next/navigation';
 
 import store from "@/tools/cookieStore";
 const cookieStore = store();
@@ -144,7 +145,7 @@ const VideoUploadPage = () => {
 
       if (data.success === true) {
         console.log("Video Uploaded Successfully!", data.video_id);
-        window.location.href = `/video?id=${data.video_id}`;
+        redirect(`/video?id=${data.video_id}`);
       } else {
         setMsg(data);
       }

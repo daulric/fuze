@@ -3,11 +3,12 @@
 import Image from 'next/image';
 import { Play, ThumbsUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Link from "next/link";
 
 const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
-      <div onClick={() => window.location.href = link} className="block">
+      <Link href={link} className="block">
         <div className="relative">
           <Image
             src={thumbnail} 
@@ -29,7 +30,7 @@ const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
             <ThumbsUp size={14} className="mr-1" />
           </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };

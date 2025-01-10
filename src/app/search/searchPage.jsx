@@ -6,6 +6,7 @@ import Image from "next/image"
 import { notFound } from 'next/navigation';
 
 import { useSearchParams } from "next/navigation"
+import Link from "next/link";
 
 function timeAgo(dateStr) {
   const dateObj = new Date(dateStr);
@@ -33,11 +34,11 @@ const VideoCard = ({ title, Account, views, upload_at, thumbnail, video_id, desc
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div
+    <Link
       className="flex flex-col md:flex-row gap-4 bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 w-full mb-4"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => window.location.href = `/video?id=${video_id}`}
+      href={{pathname: "/video", query:{ id: video_id }}}
     >
       <div className="relative w-full md:w-64 h-48 md:h-36">
         <Image loading='eager' src={thumbnail} alt={title} className="w-full h-full object-cover" height={100} width={100} quality={100}/>
@@ -51,7 +52,7 @@ const VideoCard = ({ title, Account, views, upload_at, thumbnail, video_id, desc
         <p className="text-sm text-gray-400 mb-2">{Account.username}</p>
         <p className="text-sm text-gray-500 line-clamp-2">{description}</p>
       </div>
-    </div>
+    </Link>
   );
 };
 

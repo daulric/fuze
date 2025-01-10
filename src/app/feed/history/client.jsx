@@ -4,11 +4,12 @@ import Image from 'next/image'
 import { Play, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from 'react'
+import Link from "next/link";
 
 const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
-      <div onClick={() => window.location.href = link} className="block">
+      <Link href={link} className="block">
         <div className="relative">
           <Image 
             src={thumbnail} 
@@ -26,7 +27,7 @@ const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
           <p className="text-sm text-gray-400">{otherData.Account.username}</p>
           <p className="text-xs text-gray-500">{views} views</p>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };

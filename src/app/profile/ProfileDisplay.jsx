@@ -152,7 +152,7 @@ const UserProfilePage = ({ username }) => {
         <TabsContent value="blogs">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[/* Blog Feature didn't come yet so this is blank for now */ ].length !== 0 ? [].map((blog) => (
-              <button onClick={() => window.location.href = blog.url} key={blog.id} className="block">
+              <Link href={blog.url} key={blog.id} className="block">
                 <Card className="bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader>
                     <CardTitle className="flex items-center text-white">
@@ -165,7 +165,7 @@ const UserProfilePage = ({ username }) => {
                     <p className="text-gray-400">Read time: {blog.readTime}</p>
                   </CardContent>
                 </Card>
-              </button>
+              </Link>
             )) : (
               <CardMark message={"blog feature not available at this moment"} />
             )}

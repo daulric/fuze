@@ -178,20 +178,33 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
           if (!isLoaded) {
             setDuration(e.target.duration);
             setIsLoaded(true);
+            return;
           }
+          
+          if (e.target.duration !== duration) {
+            setDuration(e.target.duration);
+            return
+          }
+          
         }}
         onTimeUpdate={(e) => {
           setCurrentTime(e.target.currentTime)
         }}
         onLoadedData={(e) => {
-          if (!isLoaded) {
-            setDuration(e.target.duration);
-            setIsLoaded(true);
-          }
-          
           if (tempUrls) {
             URL.revokeObjectURL(tempUrls.video_url);
             URL.revokeObjectURL(tempUrls.thumb_url);
+          }
+          
+          if (!isLoaded) {
+            setDuration(e.target.duration);
+            setIsLoaded(true);
+            return;
+          }
+          
+          if (e.target.duration !== duration) {
+            setDuration(e.target.duration);
+            return
           }
         }}
       >
