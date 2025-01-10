@@ -56,7 +56,6 @@ export default function LikedVideosPage() {
         const {success, data} = await response.json();
         
         if (success) {
-          console.log(data);
           setLikedVideos(data);
         }
     }

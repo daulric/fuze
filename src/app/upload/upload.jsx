@@ -12,9 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import directUpload from "./directUpload";
-import { redirect } from 'next/navigation';
-
 import store from "@/tools/cookieStore";
+
 const cookieStore = store();
 
 const VideoUploadPage = () => {
@@ -107,7 +106,6 @@ const VideoUploadPage = () => {
     e.preventDefault();
     setIsUploading(true);
     setUploadProgress(0);
-    console.log(msg);
 
     try {
 
@@ -144,13 +142,11 @@ const VideoUploadPage = () => {
       });
 
       if (data.success === true) {
-        console.log("Video Uploaded Successfully!", data.video_id);
-        redirect(`/video?id=${data.video_id}`);
+        window.location.href = `/video?id=${data.video_id}`;
       } else {
         setMsg(data);
       }
     } catch (error) {
-      console.log(error);
       setMsg({ 
         success: false,
         message: error.response?.data?.message || error || "Error uploading video",
@@ -197,7 +193,6 @@ const VideoUploadPage = () => {
   
       // Handle network errors
       xhr.onerror = () => reject(new Error("Network error"));
-  
       // Send the request with formData
       xhr.send(formData);
     });
@@ -386,7 +381,7 @@ const VideoUploadPage = () => {
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600"
                 onClick={handleSubmit}
               >
-                {isUploading ? 'Uploading...' : 'Upload Video'}
+                {isUploading ? 'Processing...' : 'Upload Video'}
               </Button>
             </div>
           </div>

@@ -168,7 +168,6 @@ export async function PUT(request) {
         const {video_id, ...data} = await request.json();
 
         if (!video_id) throw "Video ID Not Provided";
-        console.log(video_id);
 
         const supa_client = SupabaseServer();
         const video_db = supa_client.from("Video");

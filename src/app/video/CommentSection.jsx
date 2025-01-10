@@ -109,7 +109,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
           .order("created_at", {ascending: false});
           
         if (error) {
-          console.log(error);
+          throw error;
         }
 
         process_comments(Comments);

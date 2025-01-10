@@ -19,7 +19,6 @@ async function getVideoData(url, video_id) {
 }
 
 export async function generateMetadata({ searchParams }) {
-  const start = performance.now();
   const videoId = (await searchParams).id;
 
   const baseUrl = await getUrl();
@@ -33,7 +32,6 @@ export async function generateMetadata({ searchParams }) {
     }
   }
 
-  console.log("Ended in:", performance.now() - start)
   return {
     title: videoData.title || 'Video',
     description: videoData.description || 'No description available',
@@ -47,7 +45,6 @@ export async function generateMetadata({ searchParams }) {
 }
 
 export default async function PAGE({searchParams}) {
-  const start = performance.now();
   const url = await getUrl();
   const id = (await searchParams).id;
   const video_data = await getVideoData(url, id);
@@ -74,7 +71,6 @@ export default async function PAGE({searchParams}) {
     notFound();
   }
 
-  console.log("Ended in:", performance.now() - start)
   return (
     <Suspense fallback={<div>wait ah lil while...</div>}>
       <MainVideoPage VideoData={data[data.length - 1]} />

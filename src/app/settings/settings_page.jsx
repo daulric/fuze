@@ -88,12 +88,10 @@ const SettingsPage = () => {
     });
 
     if (!response.ok) {
-      console.log("no response from server");
       return;
     };
 
     const data = await response.json();
-    console.log(data);
 
     if (data.success === false) { setProfileSaving(false); return;}
     return window.location.reload();

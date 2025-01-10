@@ -31,8 +31,6 @@ export default async function directUpload(video_id, video_file, video_thumbnail
             if (videoUploadError) { throw "Error Uploading Video" };
             if (ImageUploadError) { throw "Error Uploading Thumbnail" };
 
-            console.log("Video Uploaded Successfully");
-
             return {
                 success: true,
                 message: "Video Uploaded Successfully",

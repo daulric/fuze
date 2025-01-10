@@ -62,7 +62,6 @@ const UserProfilePage = ({ username }) => {
       const data = await response.json();
       if (data.success) {
         setVideos(data.data);
-        console.log(data);
       }
     } catch (error) {
       console.error('Error fetching videos:', error);

@@ -153,6 +153,21 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
+  
+  function handleLoadedData(e) {
+    if (!isLoaded) {
+      setDuration(e.target.duration);
+      setIsLoaded(true);
+    }
+    
+    if (e.target.duration !== duration) {
+      setDuration(e.target.duration);
+    }
+    
+    if (isPlaying) {
+      togglePlay()
+    }
+  }
 
   return (
     <div 
@@ -174,19 +189,6 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
         aria-label="Video player"
         src={tempUrls?.video_url}
         onEnded={() => togglePlay()}
-        onPlaying={(e) => {
-          if (!isLoaded) {
-            setDuration(e.target.duration);
-            setIsLoaded(true);
-            return;
-          }
-          
-          if (e.target.duration !== duration) {
-            setDuration(e.target.duration);
-            return
-          }
-          
-        }}
         onTimeUpdate={(e) => {
           setCurrentTime(e.target.currentTime)
         }}
@@ -196,16 +198,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
             URL.revokeObjectURL(tempUrls.thumb_url);
           }
           
-          if (!isLoaded) {
-            setDuration(e.target.duration);
-            setIsLoaded(true);
-            return;
-          }
-          
-          if (e.target.duration !== duration) {
-            setDuration(e.target.duration);
-            return
-          }
+          handleLoadedData(e);
         }}
       >
         <source  type={videoData.meta.video.metadata.mimetype} />

@@ -26,7 +26,6 @@ export async function POST(request) {
         }).select().single();
 
         if (data_error) { throw `Server Error : ${data_error}` }
-        console.log("Video Info Uploaded!");
 
         return NextResponse.json({
             success: true,
