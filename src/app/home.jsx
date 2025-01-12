@@ -32,9 +32,11 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
 
 const VideoGrid = ({ videos }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    {videos.map((video, index) => (
+    {videos.length !== 0 ? videos.map((video, index) => (
       <VideoCard key={index} {...video} />
-    ))}
+    )) : (
+      <div>wait im loading my ram</div>
+    )}
   </div>
 );
 
