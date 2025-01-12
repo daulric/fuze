@@ -14,7 +14,7 @@ export const metadata = {
 const RootLayout = ({ children }) => {
   return (
     <html lang="en">
-      <body className="overflow-y-hidden">
+      <body>
         <LayoutProvider>
           {children}
         </LayoutProvider>
