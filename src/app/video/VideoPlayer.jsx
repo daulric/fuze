@@ -145,6 +145,10 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     }
     
     getBlobData();
+    
+    return () => {
+      setTempUrls(null);
+    }
   }, [videoData]);
   
   const formatTime = (time) => {
