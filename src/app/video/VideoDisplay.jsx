@@ -16,11 +16,11 @@ import SupabaseServer from '@/supabase/server';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
-  const [likes, setLikes] = useState(VideoData?.likes || 0);
-  const [dislikes, setDislikes] = useState(VideoData?.dislikes || 0);
-  const [userLiked, setUserLiked] = useState(false);
-  const [userDisliked, setUserDisliked] = useState(false);
-  const [viewCount, setViewCount] = useState(VideoData?.views || 0);
+  const [likes, setLikes] = useState(null);
+  const [dislikes, setDislikes] = useState(null);
+  const [userLiked, setUserLiked] = useState(null);
+  const [userDisliked, setUserDisliked] = useState(null);
+  const [viewCount, setViewCount] = useState(null);
   const videoContainerRef = useRef(null);
   const searchParams = useSearchParams();
   const video_id = searchParams.get("id");
@@ -109,7 +109,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
   //Fetch Video
   useEffect(() => {
-
+    
     async function getVideoLikes() {
       const response = await fetch(`/api/video/likes?video_id=${VideoData.video_id}`);
 
@@ -120,24 +120,28 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       if (all_data) {
         const liked_data = all_data.filter((i) => i.is_like === true)
         const disliked_data = all_data.filter((i) => i.is_like === false);
-
-        setLikes(liked_data.length);
-        setDislikes(disliked_data.length);
-      }
-
-      if (user_data) {
-        switch(user_data.is_like) {
-          case true:
-            setUserLiked(true);
-            break;
+        
+        setLikes(() => {
+          setDislikes(disliked_data.length);
           
-          case false:
-            setUserDisliked(true);
-            break;
+          if (user_data) {
+            switch(user_data.is_like) {
+              case true:
+                setUserLiked(true);
+                break;
+              
+              case false:
+                setUserDisliked(true);
+                break;
 
-          default:
-            break;
-        }
+              default:
+                break;
+            }
+          }
+          
+          return liked_data.length
+        });
+        
       }
     }
 
@@ -171,6 +175,13 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     getVideoLikes();
     fetchRecommendedVids();
     addWatchList();
+    
+    return () => {
+      setLikes(null);
+      setDislikes(null);
+      setUserLiked(null);
+      setUserDisliked(null)
+    }
 
   }, [VideoData, fetchRecommendedVids]);
 
@@ -356,7 +367,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-gray-400">
               <Eye className="h-5 w-5" />
-              <span>{viewCount || 0} views</span>
+              <span>{viewCount ? viewCount : VideoData.views} views</span>
             </div>
             <TooltipProvider>
               <Tooltip>

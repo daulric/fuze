@@ -16,7 +16,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
       href={link}
     >
       <div className="relative">
-        <Image loading='eager' src={thumbnail} alt={title} className="w-full h-40 object-cover" width={150} height={100}/>
+        <Image loading='eager' src={thumbnail} alt={title} className="w-full h-40 object-cover" width={150} height={100} priority/>
         <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <Play className="text-white" size={48} />
         </div>

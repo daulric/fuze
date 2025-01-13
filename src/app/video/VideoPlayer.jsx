@@ -201,9 +201,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
           handleLoadedData(e);
         }}
       >
-        <source  type={videoData.meta.video.metadata.mimetype} />
-        unable to play video lol ;)
-      
+      unable to play video lol ;)
       </video>
       <div className={`absolute inset-0 bg-gradient-to-t from-black/50 to-transparent transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute bottom-0 left-0 right-0 p-4">

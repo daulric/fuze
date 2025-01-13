@@ -66,11 +66,11 @@ export default function Home() {
         setData(cached_videos.data);
         
       } catch (e) {
-        
+
         switch (e) {
+
           case "new":
             const response = await fetch(`/api/video/recommend`, {
-              next: { revalidate: 20 },
               body: JSON.stringify({ limit: 16 }),
               method: "POST",
             });
@@ -78,6 +78,8 @@ export default function Home() {
             if (response.ok) {
               const res = await response.json();
               const temp_data: unknown[] = [];
+              
+              if (!res.success) return;
               
               res.data.map((i: VideoItem) => {
                 temp_data.push({
