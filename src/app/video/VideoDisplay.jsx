@@ -180,7 +180,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       setLikes(null);
       setDislikes(null);
       setUserLiked(null);
-      setUserDisliked(null)
+      setUserDisliked(null);
+      setUser(null);
     }
 
   }, [VideoData, fetchRecommendedVids]);

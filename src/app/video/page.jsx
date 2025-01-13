@@ -64,7 +64,7 @@ export default async function PAGE({searchParams}) {
       const user_profile = await res.json();
       data.push({
         ...video_data,
-        uploaderPic: user_profile.profile.avatar_url || "/logo.svg",
+        uploaderPic: user_profile.profile.avatar_url,
       })
     }
   } else {

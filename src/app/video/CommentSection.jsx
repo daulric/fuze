@@ -158,6 +158,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
 
     return () => {
       supabase.removeChannel(realtime_comments);
+      setComments([]);
     }
 
   }, [all_profile_fetched, pre_comment_profiles, supabase, videoId]);
