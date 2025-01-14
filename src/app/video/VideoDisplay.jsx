@@ -182,6 +182,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       setUserLiked(null);
       setUserDisliked(null);
       setUser(null);
+      setRecommendedVideos([]);
     }
 
   }, [VideoData, fetchRecommendedVids]);
