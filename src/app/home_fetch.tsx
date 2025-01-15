@@ -53,18 +53,17 @@ export default function Home() {
   useEffect(() => {
     async function getRandomVideos() {
       try {
-        if (!localStorage.getItem("home_page_video_cache")) throw "new"
+        if (!sessionStorage.getItem("home_page_video_cache")) throw "new"
   
-        const store: string = localStorage.getItem("home_page_video_cache") || "{}";
+        const store: string = sessionStorage.getItem("home_page_video_cache") || "{}";
         const cached_videos: CachedVideos = JSON.parse(store);
         
         if (!cached_videos.expires || !cached_videos.data) throw "new";
       
-        const if_20_secs = Date.now() - cached_videos.expires;
-        if (if_20_secs > (20 * 1000)) throw "new";
+        const expired_time = (Date.now() - cached_videos.expires) / 1000;
+        if (expired_time > 15) throw "new";
         
         setData(cached_videos.data);
-        
       } catch (e) {
 
         switch (e) {
@@ -97,7 +96,7 @@ export default function Home() {
                 expires: Date.now(),
               }
               
-              localStorage.setItem("home_page_video_cache", JSON.stringify(new_cached_data))
+              sessionStorage.setItem("home_page_video_cache", JSON.stringify(new_cached_data))
               setData(temp_data);
             }
             

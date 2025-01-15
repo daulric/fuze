@@ -26,7 +26,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
   const [user, setUser] = useState(null);
-  const [recommendedVideos, setRecommendedVideos] = useState([]);
+  const [recommendedVideos, setRecommendedVideos] = useState(null);
   const supabase = SupabaseServer();
 
   const truncateDescription = (text, limit = 150) => {
@@ -182,7 +182,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       setUserLiked(null);
       setUserDisliked(null);
       setUser(null);
-      setRecommendedVideos([]);
+      setRecommendedVideos(null);
     }
 
   }, [VideoData, fetchRecommendedVids]);
