@@ -14,6 +14,8 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       href={link}
+      scroll={false}
+      shallow={false}
     >
       <div className="relative">
         <Image loading='eager' src={thumbnail} alt={title} className="w-full h-40 object-cover" width={150} height={100} priority/>

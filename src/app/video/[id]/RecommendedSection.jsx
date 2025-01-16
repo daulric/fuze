@@ -9,7 +9,7 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Link href={link} className="block">
+    <Link href={link} scroll={false} shallow={false} className="block">
       <div
         className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
         onMouseEnter={() => setIsHovered(true)}
