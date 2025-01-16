@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import VideoPlayer from "./VideoPlayer";
 import RecommendedVideos from './RecommendedSection';
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
@@ -22,8 +22,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [userDisliked, setUserDisliked] = useState(null);
   const [viewCount, setViewCount] = useState(null);
   const videoContainerRef = useRef(null);
-  const searchParams = useSearchParams();
-  const video_id = searchParams.get("id");
   const [isCommenting, setIsCommenting] = useState(false);
   const [user, setUser] = useState(null);
   const [recommendedVideos, setRecommendedVideos] = useState(null);
@@ -307,10 +305,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
 
   }, [VideoData, dislikes, is_private_video, likes, supabase, user, viewCount]);
-
-  if (!video_id) {
-    return notFound();
-  }
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-900 text-white">

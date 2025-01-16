@@ -11,7 +11,7 @@ export default function NotFound() {
           <div className="w-24 h-24 rounded-full bg-gray-800 mx-auto flex items-center justify-center mb-6">
             <span className="text-4xl">❌</span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">nah g. you too fasss. go home</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">No Video To Display</h1>
         </div>
         <Link 
           href="/" 
