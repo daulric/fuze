@@ -10,6 +10,7 @@ interface VideoItem {
   upload_at: string;
   Account: { username: string };
   thumbnail: string;
+  video: string;
 }
 
 type CachedVideos = {
@@ -88,6 +89,7 @@ export default function Home() {
                   uploadTime: timeAgo(i.upload_at),
                   channel: i.Account.username,
                   thumbnail: i.thumbnail,
+                  video: i.video
                 });
               });
               

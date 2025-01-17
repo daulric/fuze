@@ -1,32 +1,99 @@
 "use client"
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useRef, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 
-const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link }) => {
+const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const videoRef = useRef();
+  const timeoutRef = useRef();
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    setIsHovered(true);
+    if (videoRef.current) {
+      videoRef.current.muted = true; // Ensure the video is muted for autoplay
+      videoRef.current.play().catch((error) => {
+        console.log("Autoplay prevented:", error);
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (videoRef.current) {
+      timeoutRef.current = setTimeout(() => {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }, 100);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Link
-      className="block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       href={link}
       scroll={false}
       shallow={false}
     >
       <div className="relative">
-        <Image loading='eager' src={thumbnail} alt={title} className="w-full h-40 object-cover" width={150} height={100} priority/>
-        <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <Play className="text-white" size={48} />
+        <div
+          className="aspect-video w-full relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Transparent background */}
+          <div
+            className="absolute inset-0 bg-cover bg-center z-0 opacity-20"
+            style={{
+              backgroundImage: `url(${thumbnail})`,
+            }}
+          ></div>
+
+          {/* Main Image */}
+          <img
+            src={thumbnail}
+            alt="Video thumbnail"
+            className={`absolute inset-0 w-full h-full object-contain z-10 transition-opacity duration-500 ${
+              isHovered ? "opacity-20" : "opacity-100"
+            }`}
+          />
+
+          {/* Video Element */}
+          <video
+            ref={videoRef}
+            src={video}
+            className={`absolute inset-0 w-full h-full object-contain z-20 transition-opacity duration-500 ${
+              isHovered ? "opacity-100" : "opacity-0"
+            }`}
+            preload="auto"
+            muted
+            playsInline
+            crossOrigin="anonymous"
+            controlsList="nodownload"
+          />
         </div>
       </div>
+
       <div className="p-4">
         <h3 className="font-bold text-lg mb-1 truncate text-white">{title}</h3>
         <p className="text-sm text-gray-400">{channel}</p>
-        <p className="text-xs text-gray-500">{views} views • {uploadTime}</p>
+        <p className="text-xs text-gray-500">
+          {views} views • {uploadTime}
+        </p>
       </div>
     </Link>
   );
