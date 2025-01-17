@@ -9,7 +9,7 @@ import Link from "next/link";
 const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
-      <Link scroll={false} shallow={false} href={link} className="block">
+      <Link href={link} className="block">
         <div className="relative">
           <Image 
             src={thumbnail} 

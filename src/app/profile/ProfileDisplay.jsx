@@ -126,7 +126,7 @@ const UserProfilePage = ({ username }) => {
         <TabsContent value="videos">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {videos.length !== 0 ? videos.map((video) => (
-              <Link scroll={false} shallow={false} href={`/video?id=${video.video_id}`} key={video.video_id} className="block">
+              <Link href={`/video?id=${video.video_id}`} key={video.video_id} className="block">
                 <Card className="overflow-hidden bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
                   <CardHeader className="p-0">
                     <Image
