@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator"
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
-  <Link href={href} onClick={() => window.location.href = href} >
+  <Link href={href} >
     <Button variant="ghost" className={`w-full justify-start ${collapsed ? 'px-2' : ''}`} asChild>
       <span className="flex items-center">
         <Icon className={`h-5 w-5 ${collapsed ? '' : 'mr-2'}`} />

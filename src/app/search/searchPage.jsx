@@ -39,7 +39,6 @@ const VideoCard = ({ title, Account, views, upload_at, thumbnail, video_id, desc
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       href={{pathname: "/video", query:{ id: video_id }}}
-      onClick={() => window.location.href = `/video?id=${video_id}`}
       scroll={false}
       shallow={false}
     >

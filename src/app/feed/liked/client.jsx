@@ -8,7 +8,7 @@ import Link from "next/link";
 const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 group">
-      <Link scroll={false} shallow={false} href={link} onClick={() => window.location.href = link} className="block">
+      <Link scroll={false} shallow={false} href={link} className="block">
         <div className="relative">
           <Image
             src={thumbnail} 
