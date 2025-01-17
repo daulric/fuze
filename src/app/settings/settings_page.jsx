@@ -27,7 +27,7 @@ const SettingsPage = () => {
 
   const fetchUser = useCallback(() => {
     if (user) return;
-    const temp_user = JSON.parse(localStorage.getItem('user'));
+    const temp_user = JSON.parse(sessionStorage.getItem('user'));
     if (!temp_user) return;
 
     setUser(temp_user);

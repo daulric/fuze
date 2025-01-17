@@ -21,11 +21,11 @@ import {
 
 function Logout() {
   const user_token = cookieStore.get("user");
-  const user_data = localStorage.getItem("user");
+  const user_data = sessionStorage.getItem("user");
 
   if (user_token !== null || user_data !== null) {
     cookieStore.remove("user");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user")
   }
 
   window.location.reload();
@@ -81,8 +81,7 @@ const AccountProfileContent = ({
       const user_token = cookieStore.get("user");
 
       if (!user_token) {
-        localStorage.removeItem("user");
-
+        sessionStorage.removeItem("user");
         if (currentPathName === "/auth" && allQueryParams) return;
         return; //(window.location.href = `/auth?p=${currentPathName}${queryParams}`);
       }
@@ -105,7 +104,7 @@ const AccountProfileContent = ({
         delete account_data.profile.Blogs;
 
         const string_data = JSON.stringify(account_data.profile);
-        localStorage.setItem("user", string_data);
+        sessionStorage.setItem("user", string_data);
         setUser(account_data.profile);
       }
     };

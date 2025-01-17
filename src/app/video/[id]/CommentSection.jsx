@@ -120,7 +120,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
       }
     };
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(sessionStorage.getItem("user"));
     setUserClient(user);
     getProfilesForComments();
     loadComments();

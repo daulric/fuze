@@ -51,9 +51,9 @@ export default function CreatorDashboard() {
 
   useEffect(() => {
     waitFor(() => {
-      return localStorage.getItem("user") !== null;
+      return sessionStorage.getItem("user") !== null;
     }).then(() => {
-      const user_data = JSON.parse(localStorage.getItem("user"));
+      const user_data = JSON.parse(sessionStorage.getItem("user"));
       if (!user_data) return;
       setUserProfile(user_data);
     });

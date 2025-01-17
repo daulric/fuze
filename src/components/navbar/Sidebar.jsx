@@ -28,7 +28,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
 
   useEffect(() => {
     const checkStorage = () => {
-      const item = localStorage.getItem("user");
+      const item = sessionStorage.getItem("user");
       if (item !== null) {
           setUser(JSON.parse(item));
       } else {

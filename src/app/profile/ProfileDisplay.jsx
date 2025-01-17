@@ -26,7 +26,7 @@ const UserProfilePage = ({ username }) => {
   const getProfile = useCallback(async () => {
     if (!username) {
       const checkStorage = () => {
-        const item = localStorage.getItem("user");
+        const item = sessionStorage.getItem("user");
         if (item !== null) {
           const temp_profile = JSON.parse(item);
           setProfileInfo(temp_profile);

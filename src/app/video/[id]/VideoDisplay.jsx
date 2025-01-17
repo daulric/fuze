@@ -76,7 +76,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   };
 
   const is_private_video = useCallback(() => {
-    const user_client = JSON.parse(localStorage.getItem("user"));
+    const user_client = JSON.parse(sessionStorage.getItem("user"));
 
     if (VideoData.is_private === true) {
       if (user_client.username !== VideoData.Account.username) {
@@ -164,7 +164,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       moveToTop(watchHistory, VideoData.video_id);
       localStorage.setItem("watchHistory", JSON.stringify(watchHistory));
     }
-    const user_data = localStorage.getItem("user");
+    const user_data = sessionStorage.getItem("user");
     
     if (user_data) {
       setUser(JSON.parse(user_data));

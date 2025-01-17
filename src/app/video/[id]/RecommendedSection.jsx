@@ -9,21 +9,18 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Link href={link} scroll={false} shallow={false} className="block">
+    <Link href={link} onClick={() => window.location.href = link} scroll={false} shallow={false} className="block">
       <div
         className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative">
-          <Image 
+          <img
             src={thumbnail} 
             alt={title} 
             className="w-full h-24 sm:h-32 object-cover" 
-            width={100} 
-            height={100}
             loading='eager'
-            quality={100}
           />
           <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <Play className="text-white" size={32} />

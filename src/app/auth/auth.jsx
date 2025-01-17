@@ -9,7 +9,6 @@ import { encrypt } from "@/tools/encryption";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import cookieStore from "@/tools/cookieStore";
-import { redirect } from 'next/navigation';
 
 async function handleSignupForm({email, password, username, dob}, setMsg) {
   const user_info = {
@@ -163,7 +162,7 @@ const AuthPage = () => {
       handleLoginForm(user_info, setMsg).then((success) => {
         if (success === true) {
           setTimeout(() => {
-            redirect(`${redirected_path || "/"}?${path_to_redirect}`)
+            window.location.href = `${redirected_path || "/"}?${path_to_redirect}`
           }, 1000);
         } else if (success === false) {
           setIsLogining(false);
@@ -173,7 +172,7 @@ const AuthPage = () => {
       handleSignupForm(user_info, setMsg).then((success) => {
         if (success === true) {
           setTimeout(() => {
-            redirect(`${redirected_path || "/"}?${path_to_redirect}`);
+            window.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
           }, 1000);
         } else if (success === false) {
           setIsLogining(false);
