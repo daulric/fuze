@@ -70,11 +70,19 @@ const UserProfilePage = ({ username }) => {
   
   useEffect(() => {
     getProfile();
+    
+    return () => {
+      setProfileInfo(null);
+    }
   }, [getProfile]);
   
   useEffect(() => {
     if (profile) {
       getVideos();
+    }
+    
+    return () => {
+      setVideos([]);
     }
   }, [getVideos, profile]);
 
