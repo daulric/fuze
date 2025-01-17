@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint",
     "shadcn": "npx shadcn@latest",
-    "deploy": "next build && next start"
+    "deploy": "rm -rf .next && next build && next start"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
