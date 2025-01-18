@@ -62,8 +62,10 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
           ></div>
 
           {/* Main Image */}
-          <img
+          <Image
             src={thumbnail}
+            height={100}
+            width={300}
             alt="Video thumbnail"
             className={`absolute inset-0 w-full h-full object-contain z-10 transition-opacity duration-500 ${
               isHovered ? "opacity-20" : "opacity-100"
