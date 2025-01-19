@@ -49,7 +49,7 @@ function format_views(views: number) {
 }
 
 export default function Home() {
-  const [data, setData] = useState<unknown>([]);
+  const [data, setData] = useState<unknown >([]);
 
   useEffect(() => {
     async function getRandomVideos() {
@@ -70,6 +70,7 @@ export default function Home() {
         switch (e) {
 
           case "new":
+            if ((data as Array<any>).length > 0) return;
             const response = await fetch(`/api/video/recommend`, {
               body: JSON.stringify({ limit: 16 }),
               method: "POST",

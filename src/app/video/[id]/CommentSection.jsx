@@ -65,11 +65,9 @@ const CommentSection = ({ videoId, setIsTyping }) => {
 
     async function getProfilesForComments() {
       if (all_profile_fetched) return;
+      if (pre_comment_profiles) return;
       const profiles = await getProfiles();
-      setPreCommentProfiles(() => {
-        setAllProfilesFetched(true);
-        return profiles;
-      });
+      setPreCommentProfiles(profiles);
     }
 
     function process_comments(comments) {

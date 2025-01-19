@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Rewind, FastForward } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import getBlob from '@/lib/getBlob';
 
 const VideoPlayer = ({ isCommenting, videoData}) => {
+  console.log(videoData);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -16,7 +16,6 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
-  const [tempUrls, setTempUrls] = useState(null);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
@@ -153,19 +152,6 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute, isCommenting]);
-
-  useEffect(() => {
-    async function getBlobData() {
-      const data = await getBlob(videoData);
-      setTempUrls(data);
-    }
-    
-    getBlobData();
-    
-    return () => {
-      setTempUrls(null);
-    }
-  }, [videoData]);
   
   const formatTime = (time) => {
     if (!isFinite(time)) return '0:00';
@@ -206,21 +192,14 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
         onContextMenu={(e) => e.preventDefault()}
         controlsList='nodownload'
         onClick={togglePlay}
-        poster={tempUrls?.thumb_url}
+        poster={videoData.thumbnail}
         aria-label="Video player"
-        src={tempUrls?.video_url}
+        src={videoData.video}
         onEnded={() => togglePlay()}
         onTimeUpdate={(e) => {
           setCurrentTime(e.target.currentTime)
         }}
-        onLoadedData={(e) => {
-          if (tempUrls) {
-            URL.revokeObjectURL(tempUrls.video_url);
-            URL.revokeObjectURL(tempUrls.thumb_url);
-          }
-          
-          handleLoadedData(e);
-        }}
+        onLoadedData={(e) => handleLoadedData(e)}
       >
       unable to play video lol ;)
       </video>

@@ -86,6 +86,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   }, [VideoData]);
 
   const fetchRecommendedVids = useCallback(async () => {
+    if (recommendedVideos) return;
 
     function getRandomItems(array, count) {
       const shuffled = array.sort(() => 0.5 - Math.random());
