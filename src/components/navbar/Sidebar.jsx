@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, Upload, LayoutDashboardIcon, History, Heart } from 'lucide-react';
+import { Home, Upload, LayoutDashboardIcon, History, Heart, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
@@ -87,6 +87,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
       <ScrollArea className="h-full">
         <div className={`p-4 space-y-4 ${collapsed && !isMobile ? 'items-center' : ''}`}>
           <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
+          <SidebarItem icon={Video} label="Pulse" collapsed={collapsed && !isMobile} href='/pulse' />
 
           {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
           {user && (
