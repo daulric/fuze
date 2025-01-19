@@ -100,10 +100,12 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     
     if (!response.ok) return [];
 
-    const data = await response.json();
-    const filter_recommended = data.data.filter((i) => i.video_id !== VideoData.video_id);
-    const recommended = getRandomItems(filter_recommended, 4);
-    setRecommendedVideos(recommended);
+    const { data } = await response.json();
+    if (data) {
+      const filter_recommended = data.filter((i) => i.video_id !== VideoData.video_id);
+      const recommended = getRandomItems(filter_recommended, 4);
+      setRecommendedVideos(recommended); 
+    }
   }, [VideoData.video_id]);
 
   //Fetch Video

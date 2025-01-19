@@ -4,7 +4,6 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
 const VideoPlayer = ({ isCommenting, videoData}) => {
-  console.log(videoData);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -147,6 +146,14 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     if (!isCommenting) {
       document.addEventListener('keydown', handleKeyPress);
     }
+    
+    const video_player = videoRef.current;
+
+    if (video_player.src) {
+      if (isLoaded) return;
+      video_player.load();
+      setIsLoaded(true);
+    }
 
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
@@ -163,7 +170,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   function handleLoadedData(e) {
     if (!isLoaded) {
       setDuration(e.target.duration);
-      setIsLoaded(true);
+      //setIsLoaded(true);
     }
     
     if (e.target.duration !== duration) {
@@ -171,7 +178,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     }
     
     if (isPlaying) {
-      togglePlay()
+      setIsPlaying(false)
     }
   }
 
