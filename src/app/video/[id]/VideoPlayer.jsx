@@ -61,13 +61,29 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
 
   const toggleFullscreen = useCallback(() => {
     const container = containerRef.current;
-    if (!container) return;
-    if (!document.fullscreenElement) {
-      container.requestFullscreen();
-      setIsFullscreen(true);
+    const video_player = videoRef.current;
+    
+    if (!container || !video_player) return;
+    
+    if (container.requestFullscreen) {
+      if (!document.fullscreenElement) {
+        container.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } else if (video_player.webkitEnterFullscreen) {
+      // iOS Safari specific fullscreen API
+      if (!isFullscreen) {
+        video_player.webkitEnterFullscreen();
+        setIsFullscreen(true);
+      } else {
+        video_player.webkitExitFullscreen();
+        setIsFullscreen(false);
+      }
     } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
+      console.warn("Fullscreen is not supported in this browser.");
     }
   }, []);
 
@@ -184,7 +200,8 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     >
       <video
         ref={videoRef}
-        preload='auto'       
+        playsInline
+        preload='auto'
         className="w-full h-full object-contain"
         onContextMenu={(e) => e.preventDefault()}
         controlsList='nodownload'
