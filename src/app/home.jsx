@@ -43,7 +43,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
   }, []);
 
   return (
-    <Link
+    <a
       className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       href={link}
     >
@@ -95,7 +95,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
           {views} views • {uploadTime}
         </p>
       </div>
-    </Link>
+    </a>
   );
 };
 

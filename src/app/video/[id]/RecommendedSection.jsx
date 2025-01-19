@@ -9,7 +9,7 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <Link href={link} className="block">
+    <a href={link} className="block">
       <div
         className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
         onMouseEnter={() => setIsHovered(true)}
@@ -32,7 +32,7 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
           <p className="text-xs text-gray-500">{views} views</p>
         </div>
       </div>
-    </Link>
+    </a>
   );
 };
 

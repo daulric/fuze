@@ -47,50 +47,85 @@ async function GetFullData(supa_client) {
         const videos_db = supa_client.from("Video");
         const Uploads_Storage = supa_client.storage.from("Uploads");
 
-        const {data: Vid_Data} = await videos_db.select("*, Account(username, is_verified)");
+        const {data: Vid_Data, error: dbError} = await videos_db.select("*, Account(username, is_verified)");
+        
+        if (dbError) throw dbError;
 
         const handler_data = await Promise.all(Vid_Data.map(async (videoData) => {
+            // Add retry logic for file listing
+            const getFilesList = async (retries = 3) => {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const { data, error } = await Uploads_Storage.list(videoData.video_id);
+                        if (error) throw error;
+                        return data;
+                    } catch (error) {
+                        if (i === retries - 1) throw error;
+                        // Exponential backoff
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                    }
+                }
+            };
 
-            // List files asynchronously
-            const { data, error } = await Uploads_Storage.list(videoData.video_id);
-        
-            if (error) {
-                console.error("Error fetching files:", error);
+            // Add retry logic for signed URLs
+            const getSignedUrl = async (path, retries = 3) => {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const { data, error } = await Uploads_Storage.createSignedUrl(path, 30);
+                        if (error) throw error;
+                        return data.signedUrl;
+                    } catch (error) {
+                        if (i === retries - 1) throw error;
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                    }
+                }
+            };
+
+            try {
+                const files = await getFilesList();
+                
+                if (!files || files.length === 0) {
+                    return {
+                        ...videoData,
+                        video: null,
+                        thumbnail: "/logo.svg",
+                        error: "No files found"
+                    };
+                }
+
+                const videoFile = files.find(file => file.name.includes("video"));
+                const thumbnailFile = files.find(file => file.name.includes("thumbnail"));
+
+                const [videoUrl, thumbnailUrl] = await Promise.all([
+                    videoFile ? getSignedUrl(`${videoData.video_id}/${videoFile.name}`) : Promise.resolve(null),
+                    thumbnailFile ? getSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`) : Promise.resolve("/logo.svg")
+                ]);
+
+                return {
+                    ...videoData,
+                    video: videoUrl,
+                    thumbnail: thumbnailUrl,
+                    meta: {
+                        video: videoFile,
+                        thumbnail: thumbnailFile,
+                    }
+                };
+            } catch (error) {
+                console.error(`Error processing video ${videoData.video_id}:`, error);
                 return {
                     ...videoData,
                     video: null,
-                    thumbnail: "/logo.svg", // Default fallback in case of an error
+                    thumbnail: "/logo.svg",
+                    error: error.message
                 };
             }
-        
-            // Assuming you're getting file names or paths for video and thumbnail
-            const videoFile = data.find(file => file.name.includes("video")); // Adjust this according to your file structure
-            const thumbnailFile = data.find(file => file.name.includes("thumbnail")); // Adjust this as well
-            
-            // Getting Signed Url for these data;
-            const [signed_video, signed_thumbnail] = await Promise.all([
-                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 30),
-                Uploads_Storage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 30),
-            ]);
-
-            const videoUrl = videoFile ? signed_video.data.signedUrl : null;
-            const thumbnailUrl = thumbnailFile ? signed_thumbnail.data.signedUrl : "/logo.svg";
-        
-            return {
-                ...videoData,
-                video: videoUrl,
-                thumbnail: thumbnailUrl,
-                meta: {
-                  video: videoFile,
-                  thumbnail: thumbnailFile,
-                }
-            };
         }));
 
-        return handler_data;
+        // Filter out failed items if needed
+        return handler_data.filter(item => item.video !== null);
     } catch (error) {
         console.error('Error processing video data:', error);
-        return []
+        throw error; // Propagate error for proper handling in GET route
     }
 }
 
@@ -120,46 +155,52 @@ async function GetSearchData(supa_client, search_query) {
 
 export async function GET(request) {
     const searchParams = request.nextUrl.searchParams;
-
-    const queries = {
-        ...Object.fromEntries(searchParams.entries()),
-    }
+    const queries = Object.fromEntries(searchParams.entries());
 
     try {
         const supa_client = SupabaseServer();
 
         if (Object.keys(queries).length !== 0) {
-
             if (queries.search) {
                 return GetSearchData(supa_client, queries.search);
             }
 
             if (queries.is_private) {
                 const is_user = (await cookies()).get("user");
-                if (is_user) {
-                    return DatabaseQuery(supa_client, {...queries, account_id: is_user.value})
-                } else throw "must be logged in to use this api query";
+                if (!is_user) {
+                    return NextResponse.json({
+                        success: false,
+                        message: "Authentication required"
+                    }, { status: 401 });
+                }
+                return DatabaseQuery(supa_client, {...queries, account_id: is_user.value});
             }
             
             if (queries.all) {
                 const is_user = (await cookies()).get("user");
-                if (is_user) {
-                    return DatabaseQuery(supa_client, {account_id: is_user.value});
-                } else throw "must be logged in to use this api query";
+                if (!is_user) {
+                    return NextResponse.json({
+                        success: false,
+                        message: "Authentication required"
+                    }, { status: 401 });
+                }
+                return DatabaseQuery(supa_client, {account_id: is_user.value});
             }
 
             return DatabaseQuery(supa_client, {...queries, is_private: false});
-
         }
 
         return DatabaseQuery(supa_client, {is_private: false});
-    } catch(e) {
+    } catch(error) {
+        console.error('API Error:', error);
         return NextResponse.json({
             success: false,
-            message: e,
-        })
+            message: error.message || "Internal server error",
+            code: error.code || 'UNKNOWN_ERROR'
+        }, { 
+            status: error.status || 500 
+        });
     }
-
 }
 
 export async function PUT(request) {

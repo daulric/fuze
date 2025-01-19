@@ -168,14 +168,12 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   };
   
   function handleLoadedData(e) {
-    if (!isLoaded) {
-      setDuration(e.target.duration);
-      //setIsLoaded(true);
-    }
     
-    if (e.target.duration !== duration) {
+    setDuration(e.target.duration)
+    
+    /*if (e.target.duration !== duration) {
       setDuration(e.target.duration);
-    }
+      }*/
     
     if (isPlaying) {
       setIsPlaying(false)

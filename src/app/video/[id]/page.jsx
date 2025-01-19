@@ -7,7 +7,7 @@ async function getVideoData(url, video_id) {
   if (!url || !video_id) return null;
 
   const response = await fetch(`${url}/api/video?video_id=${video_id}`, {
-    next: { revalidate: 4 },
+    cache: "no-store"
   });
 
   if (!response.ok) return null;
