@@ -9,7 +9,7 @@ export const CommentsSection = ({ video, toggleComments, newComment, setNewComme
       <div className="h-full flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h2 className="text-white text-lg font-semibold">
-            Comments ({video.comments.length})
+            Comments ({video.comments.length || 0})
           </h2>
           <button 
             onClick={() => toggleComments(false)}
@@ -20,7 +20,7 @@ export const CommentsSection = ({ video, toggleComments, newComment, setNewComme
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {video.comments.map(comment => (
+          { video.comments && video.comments.map(comment => (
             <div key={comment.id} className="p-4 border-b border-gray-800">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-gray-600 rounded-full" />

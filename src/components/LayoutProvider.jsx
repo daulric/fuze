@@ -15,7 +15,7 @@ export default function LayoutProvider({children}) {
 
     return (
         <NavbarLayout>
-            {children}
+          {children}
         </NavbarLayout>
     )
 }

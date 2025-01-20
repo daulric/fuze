@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Heart, MessageCircle, Share2, Volume2, VolumeX } from 'lucide-react'
 
 export const VideoContainer = ({ video, index, currentVideoIndex, videoRef, isMuted, toggleMute, handleLike, toggleComments }) => {
@@ -45,16 +45,14 @@ export const VideoContainer = ({ video, index, currentVideoIndex, videoRef, isMu
         onClick={handleVideoClick}
       >
         <video
+          src={video.video}
           ref={videoRef}
           className="h-full w-full object-cover"
           playsInline
           loop
           muted={isMuted}
-          poster="/logo.svg"
-        >
-          <source src={video.videoUrl} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+          poster={video.thumbnail}
+          />
 
         {/* Double Tap Like Animation */}
         {showLikeAnimation && (
@@ -84,7 +82,7 @@ export const VideoContainer = ({ video, index, currentVideoIndex, videoRef, isMu
         {/* Video Info */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="text-white">
-            <p className="font-bold text-lg">{video.username}</p>
+            <p className="font-bold text-lg">@{video.Account.username}</p>
             <p className="text-sm mt-1">{video.description}</p>
           </div>
         </div>
@@ -114,7 +112,7 @@ export const VideoContainer = ({ video, index, currentVideoIndex, videoRef, isMu
             <div className="bg-black/50 p-2 rounded-full">
               <MessageCircle className="w-6 h-6" />
             </div>
-            <span className="text-sm mt-1">{video.comments.length}</span>
+            <span className="text-sm mt-1">{video.comments ? video.comments.length : 0}</span>
           </button>
 
           <button 

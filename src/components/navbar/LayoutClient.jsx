@@ -10,20 +10,20 @@ const ClientWrapper = ({ children }) => {
   const [isHidden, setIsHidden] = useState(false);
   const pathName = usePathname();
   
+  const PathNameList = ["video", "pulse"];
+  
+  function getPathName() {
+    const splited = pathName.split("/")[1];
+    return PathNameList.includes(splited);
+  }
 
   useEffect(() => {
-    const PathNameList = ["/video"];
-
     const checkMobile = () => {
       const pathExcluded = getPathName();
       const mobile = window.innerWidth < 1080;
       setIsMobile(pathExcluded ? true : mobile);
       setIsHidden(pathExcluded ? true : mobile);
     };
-
-    function getPathName() {
-      return PathNameList.includes(pathName);
-    }
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -53,7 +53,7 @@ const ClientWrapper = ({ children }) => {
           setIsHidden={setIsHidden}
           isMobile={isMobile}
         />
-        <main className="flex-1 h-[calc(100vh-64px)] mt-16 overflow-auto">
+        <main className={`flex-1 h-[calc(100vh-64px)] mt-16 ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"}`}>
           {children}
         </main>
       </div>

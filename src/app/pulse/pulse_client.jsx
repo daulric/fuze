@@ -1,70 +1,65 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { ChevronUp, ChevronDown, Heart, MessageCircle, Share2, X, Send, Volume2, VolumeX } from 'lucide-react'
 import { VideoContainer } from './VideoContainer'
 import { CommentsSection } from './CommentSection'
+import waitFor from "@/lib/waitFor"
 
 const PulseShorts = () => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
   const [showComments, setShowComments] = useState(false)
-  const [isMuted, setIsMuted] = useState(true)
-  const [newComment, setNewComment] = useState('')
-  const [touchStart, setTouchStart] = useState(0)
-  const [touchEnd, setTouchEnd] = useState(0)
+  const [isMuted, setIsMuted] = useState(true);
+  const [newComment, setNewComment] = useState('');
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const [showLikeAnimation, setShowLikeAnimation] = useState(false);
   const [likePosition, setLikePosition] = useState({ x: 0, y: 0 });
   const lastTapTime = useRef(0);
   const doubleTapDelay = 300; // milliseconds
-  const videoRefs = useRef([])
-
-  const videos = [
-    {
-      id: 1,
-      username: "@creator1",
-      description: "Amazing sunset timelapse #nature #sunset",
-      videoUrl: "/videos/sunset.mp4",
-      likes: 1234,
-      comments: [
-        { id: 1, username: "@user1", text: "This is beautiful!", timestamp: "2h ago" },
-        { id: 2, username: "@user2", text: "Perfect lighting!", timestamp: "1h ago" }
-      ],
-      shares: 45,
-      isLiked: false
-    },
-    {
-      id: 2,
-      username: "@creator2",
-      description: "Quick recipe tutorial #cooking #food",
-      videoUrl: "/videos/recipe.mp4",
-      likes: 2345,
-      comments: [
-        { id: 3, username: "@user3", text: "Trying this tonight!", timestamp: "30m ago" },
-        { id: 4, username: "@user4", text: "Love this recipe!", timestamp: "15m ago" }
-      ],
-      shares: 89,
-      isLiked: false
-    },
-    {
-      id: 3,
-      username: "@creator3",
-      description: "Dance challenge #trending #dance",
-      videoUrl: "/videos/dance.mp4",
-      likes: 5678,
-      comments: [
-        { id: 5, username: "@user5", text: "Nailed it! 🔥", timestamp: "5m ago" },
-        { id: 6, username: "@user6", text: "Great moves!", timestamp: "1m ago" }
-      ],
-      shares: 167,
-      isLiked: false
-    }
-  ];
-
+  const videoRefs = useRef([]);
+  const [videos, setVideos] = useState(null);
+  
   useEffect(() => {
-    const currentVideo = videoRefs.current[currentVideoIndex]
-    if (currentVideo) {
-      currentVideo.play()
+    const shuffleArrayAsync = async (array) => {
+      return array.map((value) => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }, index) => ({ id: index, ...value }));
+    };
+
+    async function getVideosFromSrc() {
+      if (videos) return;
+      const res = await fetch(`/api/video`);
+      if (!res.ok) return;
+      
+      const { data } = await res.json();
+
+      if (data) {
+        const temp_data = await shuffleArrayAsync([...data]);
+        setVideos(temp_data);
+      }
+    
     }
+    
+    getVideosFromSrc();
+  }, [])
+  
+  useEffect(() => {
+    
+    let currentVideo;
+    
+    waitFor(() => videoRefs.current.length !== 0).then(() => {
+      if (videoRefs.current.length === 0) return;
+      currentVideo = videoRefs.current[currentVideoIndex];
+  
+      if (currentVideo) {
+        if (currentVideo.paused) {
+          currentVideo.play();
+        }
+      }
+    });
+    
+    
     return () => {
       if (currentVideo) {
         currentVideo.pause()
@@ -204,13 +199,22 @@ const PulseShorts = () => {
         onTouchEnd={handleTouchEnd}
       >
         <div className="h-full w-full relative">
-          {videos.map((video, index) => (
+          {videos ? videos.map((video, index) => (
             <VideoContainer
-              key={video.id}
+              key={video.video_id}
               video={video}
               index={index}
               currentVideoIndex={currentVideoIndex}
-              videoRef={el => videoRefs.current[index] = el}
+              videoRef={(el) => {
+                if (el) {
+                  videoRefs.current[video.id] = el;
+                  
+                  if (currentVideoIndex !== video.id && el.readyState < 3) {
+                    el.load();
+                  }
+                  
+                }
+              }}
               isMuted={isMuted}
               toggleMute={toggleMute}
               handleLike={handleLike}
@@ -220,13 +224,13 @@ const PulseShorts = () => {
               likePosition={likePosition}
               setShowLikeAnimation={setShowLikeAnimation}
             />
-          ))}
+          )): (<div>pulses are loading</div>)}
         </div>
 
         {/* Navigation Indicators */}
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 flex flex-col gap-4">
-          <ChevronUp className={`w-6 h-6 ${currentVideoIndex === 0 ? 'opacity-30' : 'opacity-100'}`} />
-          <ChevronDown className={`w-6 h-6 ${currentVideoIndex === videos.length - 1 ? 'opacity-30' : 'opacity-100'}`} />
+          <ChevronUp className={`w-6 h-6 ${currentVideoIndex === 0 ? 'opacity-30' : 'opacity-40'}`} />
+          <ChevronDown className={`w-6 h-6 ${currentVideoIndex === (videos && videos.length - 1) ? 'opacity-30' : 'opacity-40'}`} />
         </div>
 
         {/* Comments Section */}
