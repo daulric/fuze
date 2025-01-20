@@ -1,4 +1,4 @@
-import PulseClient from "./pulse_client"
+import PulseClientPWA from "./PWAController"
 import { Suspense } from "react"
 
 export const metadata = {
@@ -7,11 +7,5 @@ export const metadata = {
 }
 
 export default function PAGE() {
-  return (
-    <div className="overscroll-none" >
-      <Suspense fallback={<div>loading pulses</div>} >
-        <PulseClient />
-      </Suspense>
-    </div>
-  )
+  return <><PulseClientPWA /></>
 }

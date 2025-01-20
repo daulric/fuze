@@ -54,6 +54,7 @@ const PulseShorts = () => {
   
       if (currentVideo) {
         if (currentVideo.paused) {
+          currentVideo.currentTime = 0;
           currentVideo.play();
         }
       }

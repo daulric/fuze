@@ -49,12 +49,13 @@ function format_views(views: number) {
 }
 
 export default function Home() {
-  const [data, setData] = useState<unknown >([]);
+  const [data, setData] = useState<unknown>([]);
 
   useEffect(() => {
     async function getRandomVideos() {
       try {
-        if (!sessionStorage.getItem("home_page_video_cache")) throw "new"
+        if ((data as Array<any>).length !== 0) return;
+        if (!sessionStorage.getItem("home_page_video_cache")) throw "new";
   
         const store: string = sessionStorage.getItem("home_page_video_cache") || "{}";
         const cached_videos: CachedVideos = JSON.parse(store);
@@ -70,7 +71,7 @@ export default function Home() {
         switch (e) {
 
           case "new":
-            if ((data as Array<any>).length > 0) return;
+            if ((data as Array<any>).length !== 0) return;
             const response = await fetch(`/api/video/recommend`, {
               body: JSON.stringify({ limit: 16 }),
               method: "POST",
