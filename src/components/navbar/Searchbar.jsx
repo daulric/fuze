@@ -80,6 +80,8 @@ const SearchBar = () => {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     const handleClickOutside = (event) => {
       if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
         setIsActive(false);
@@ -88,8 +90,8 @@ const SearchBar = () => {
         if (isMobileSearchOpen) setIsMobileSearchOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside, { signal: controller.signal });
+    return () => controller.abort();
   }, [isMobileSearchOpen]);
 
   const toggleSearch = () => {

@@ -18,6 +18,8 @@ const ClientWrapper = ({ children }) => {
   }
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     const checkMobile = () => {
       const pathExcluded = getPathName();
       const mobile = window.innerWidth < 1080;
@@ -26,8 +28,8 @@ const ClientWrapper = ({ children }) => {
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener('resize', checkMobile, { signal: controller.signal });
+    return () => controller.abort();
   }, [pathName]);
 
   const toggleSidebar = (newState) => {

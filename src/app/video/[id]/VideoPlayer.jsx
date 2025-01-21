@@ -109,6 +109,8 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     const handleKeyPress = (e) => {
       switch (e.key.toLowerCase()) {
         case ' ':
@@ -144,7 +146,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     };
     
     if (!isCommenting) {
-      document.addEventListener('keydown', handleKeyPress);
+      document.addEventListener('keydown', handleKeyPress, { signal: controller.signal });
     }
     
     const video_player = videoRef.current;
@@ -156,7 +158,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyPress);
+      controller.abort();
     };
   }, [togglePlay, toggleFullscreen, handleSeek, currentTime, duration, handleVolumeChange, volume, toggleMute, isCommenting]);
   

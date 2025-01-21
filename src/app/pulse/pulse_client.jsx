@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { ChevronUp, ChevronDown, Heart, MessageCircle, Share2, X, Send, Volume2, VolumeX } from 'lucide-react'
 import { VideoContainer } from './VideoContainer'
 import { CommentsSection } from './CommentSection'
@@ -236,13 +236,15 @@ const PulseShorts = () => {
 
         {/* Comments Section */}
         {showComments && (
-          <CommentsSection
-            video={videos[currentVideoIndex]}
-            toggleComments={toggleComments}
-            newComment={newComment}
-            setNewComment={setNewComment}
-            handleCommentSubmit={handleCommentSubmit}
-          />
+          <Suspense fallback={<div>loading comments</div>} >
+            <CommentsSection
+              video={videos[currentVideoIndex]}
+              toggleComments={toggleComments}
+              newComment={newComment}
+              setNewComment={setNewComment}
+              handleCommentSubmit={handleCommentSubmit}
+            />
+          </Suspense>
         )}
       </div>
     </div>

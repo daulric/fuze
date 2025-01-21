@@ -40,18 +40,19 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
   }, [setUser]);
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     const handleOutsideClick = (event) => {
       if (isMobile && !isHidden && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         setIsHidden(prev => !prev);
       }
     };
 
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('touchstart', handleOutsideClick);
+    document.addEventListener('mousedown', handleOutsideClick, { signal: controller.signal });
+    document.addEventListener('touchstart', handleOutsideClick, { signal: controller.signal });
 
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('touchstart', handleOutsideClick);
+      controller.abort();
     };
   }, [isMobile, isHidden, setIsHidden]);
 
