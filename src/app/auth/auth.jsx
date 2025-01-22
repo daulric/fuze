@@ -29,12 +29,15 @@ async function handleSignupForm({email, password, username, dob}, setMsg) {
 
   if (!response.ok) {
     setMsg({message: "Server Error!"});
+    setTimeout(() => setMsg(null), 2000)
+    return
   }
 
   const data = await response.json();
 
   if (data) {
     setMsg(data);
+    setTimeout(() => setMsg(null), 2000)
     return data.success;
   }
 }
@@ -56,6 +59,7 @@ async function handleLoginForm({email, password}, setMsg) {
 
   if (!response.ok) {
     setMsg({message: "Server Error"});
+    setTimeout(() => setMsg(null), 2000)
     return;
   };
 
@@ -63,6 +67,7 @@ async function handleLoginForm({email, password}, setMsg) {
 
   if (data) {
     setMsg(data);
+    setTimeout(() => setMsg(null), 2000)
     return data.success;
   }
 }
@@ -154,6 +159,7 @@ const AuthPage = () => {
     
     if (!isValidEmail(user_info.email)) {
       setMsg({success: false, message: "Invalid Email Format"});
+      setTimeout(() => setMsg(null), 2000)
       return;
     }
 
@@ -209,6 +215,7 @@ const AuthPage = () => {
                   success: false,
                   message: "Invalid Field Format"
                 });
+                setTimeout(() => setMsg(null), 2000)
               }
             }}
             className="space-y-6"

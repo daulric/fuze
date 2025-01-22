@@ -153,6 +153,7 @@ const VideoUploadPage = () => {
       });
     } finally {
       setIsUploading(false);
+      setTimeout(() => setMsg(null), 2000);
     }
   };
 

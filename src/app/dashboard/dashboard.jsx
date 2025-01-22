@@ -8,7 +8,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { 
+import {
   Tabs, 
   TabsContent, 
   TabsList, 
