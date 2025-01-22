@@ -71,7 +71,7 @@ export default function Home() {
         switch (e) {
 
           case "new":
-            if ((data as Array<any>).length !== 0) return;
+            if ((data as Array<any>).length > 0) break;
             const response = await fetch(`/api/video/recommend`, {
               body: JSON.stringify({ limit: 16 }),
               method: "POST",
@@ -81,7 +81,7 @@ export default function Home() {
               const res = await response.json();
               const temp_data: unknown[] = [];
               
-              if (!res.success) return;
+              if (!res.success) break;
               
               res.data.map((i: VideoItem) => {
                 temp_data.push({
