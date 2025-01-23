@@ -66,6 +66,7 @@ export default function CreatorDashboard() {
   useEffect(() => {
     async function fetch_videos() {
       if (!userProfile) return;
+      if (videos) return;
       const response = await fetch(`/api/video?all=true`);
 
       if (!response.ok) return;
@@ -238,8 +239,23 @@ export default function CreatorDashboard() {
       setProfileData({ ...profileData, [field]: value });
     };
 
-    const handleSubmit = () => {
-      handleProfileUpdate(profileData);
+    const handleSubmit = async () => {
+      const res = await fetch("api/account", {
+        method: "POST",
+        body: JSON.stringify(profileData),
+      })
+
+      if (!res.ok) return;
+
+      const { success, message } = await res.json();
+
+      if (success) {
+        window.location.reload();
+      } else {
+        console.log(message)
+      }
+
+      //handleProfileUpdate(profileData);
     };
 
     return (
@@ -258,13 +274,13 @@ export default function CreatorDashboard() {
               placeholder="Name"
               value={profileData?.username}
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
-              onChange={(e) => handleChange('name', e.target.value)}
+              onChange={(e) => handleChange('username', e.target.value)}
             />
             <Input 
               placeholder="Bio"
               value={profileData?.aboutme}
               className="bg-gray-800 border-gray-700 text-white placeholder-gray-500"
-              onChange={(e) => handleChange('bio', e.target.value)}
+              onChange={(e) => handleChange('aboutme', e.target.value)}
             />
             <Button 
               onClick={handleSubmit} 
