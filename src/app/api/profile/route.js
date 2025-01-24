@@ -16,7 +16,7 @@ async function GetUserProfiles() {
     `);
 
     if (error) {
-        return `Error Fetching Profiles : ${error}`
+      return `Error Fetching Profiles : ${error}`
     }
 
     const all_users = await Promise.all(

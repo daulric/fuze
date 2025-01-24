@@ -52,7 +52,7 @@ export default function CreatorDashboard() {
   useEffect(() => {
     waitFor(() => {
       return sessionStorage.getItem("user") !== null;
-    }).then(() => {
+    }, 1000).then(() => {
       const user_data = JSON.parse(sessionStorage.getItem("user"));
       if (!user_data) return;
       setUserProfile(user_data);
@@ -250,12 +250,12 @@ export default function CreatorDashboard() {
       const { success, message } = await res.json();
 
       if (success) {
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 500);
       } else {
         console.log(message)
       }
 
-      //handleProfileUpdate(profileData);
+      handleProfileUpdate(profileData);
     };
 
     return (

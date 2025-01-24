@@ -13,33 +13,33 @@ export async function POST(request) {
 
     const supa_client = SupabaseServer();
     const AccountDB = supa_client.from("Account");
-
-    let query = ``;
+    
+    const { data: existingData } = await AccountDB.select('*');
+    
+    if (!existingData) throw "No info on giving acount";
 
     if (username) {
-        if (query.length === 0) {
-            query += `username.eq.${username}`;
-        } else {
-            query += `username.eq.${username},`;
-        }
+      const existingUser = existingData.filter(i => i.username === username);
+      const currentUser = existingData.filter(i => i.account_id === user_token.value);
+    
+      // Check username availability
+      if (existingUser && existingUser.length > 0 ) {
+        if (existingUser[0].username !== currentUser[0].username) throw "Username Already Exists"
+      };
     }
 
-    const check_exsisting = await AccountDB.select().or(query);
-
-    if (check_exsisting && check_exsisting.length > 0) throw "Try a different Username";
-
-    const {data: new_data, error: checkError} = await AccountDB.update({
+    const updated_data = {
       ...(username && { username }),
       ...(aboutme && { aboutme }),
-    }).eq("account_id", user_token.value);
+    }
+    
+    const { error: checkError } = await AccountDB.update(updated_data)
+      .eq("account_id", user_token.value);
 
-    if (checkError){console.log(checkError); throw "Server Error"};
-    console.log(new_data);
-
+    if (checkError) throw "Server Error";
     return NextResponse.json({
-        success: true,
+      success: true,
     });
-
 
   } catch(e) {
     return NextResponse.json({
