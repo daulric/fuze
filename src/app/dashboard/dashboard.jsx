@@ -2,25 +2,9 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import {
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,30 +13,15 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import waitFor from '@/lib/waitFor';
 
-const initialBlogs = [
-  { 
-    id: '1', 
-    title: 'My Coding Journey', 
-    description: 'Reflections on becoming a developer', 
-    thumbnail: '/placeholder-blog-1.jpg' 
-  },
-  { 
-    id: '2', 
-    title: 'Top 10 Programming Tips', 
-    description: 'Insights for new programmers', 
-    thumbnail: '/placeholder-blog-2.jpg' 
-  }
-];
-
 export default function CreatorDashboard() {
   const [videos, setVideos] = useState(null);
-  const [blogs, setBlogs] = useState(initialBlogs);
+  const [blogs, setBlogs] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     waitFor(() => {
       return sessionStorage.getItem("user") !== null;
-    }, 1000).then(() => {
+    }, 1500).then(() => {
       const user_data = JSON.parse(sessionStorage.getItem("user"));
       if (!user_data) return;
       setUserProfile(user_data);
@@ -71,9 +40,10 @@ export default function CreatorDashboard() {
 
       if (!response.ok) return;
 
-      const data = await response.json();
-      if (data.success) {
-        setVideos(data.data);
+      const {success, data } = await response.json();
+      if (success) {
+        const sort_recently_updated = data.sort((a, b) => new Date(b.upload_at) - new Date(a.upload_at));
+        setVideos(sort_recently_updated)
       }
     }
 
@@ -109,37 +79,47 @@ export default function CreatorDashboard() {
   };
 
   const ContentCard = ({ item, type, onEdit }) => (
-    <Card className="mb-4 bg-gray-800 border-gray-800">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-800 bg-gray-800">
+    <Card className="mb-4 bg-gray-800 border-gray-700">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-700 bg-gray-800">
         <CardTitle className="text-white">{item.title}</CardTitle>
         <div className="flex space-x-2">
-          <EditContentDialog 
-            item={item} 
-            type={type} 
-            onEdit={onEdit} 
-          />
+          <EditContentDialog item={item} type={type} onEdit={onEdit} />
         </div>
       </CardHeader>
-      <CardContent className="bg-gray-800">
-        <div className="relative w-full h-48">
-          <Suspense>
-            <Image 
-              src={item.thumbnail} 
-              alt={`${item.title} thumbnail`}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover rounded-md text-gray-100"
-              priority={false}
-              loading='eager'
-            />
-          </Suspense>
+      <CardContent className="bg-gray-800 pt-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative w-full md:w-1/3 h-48 md:h-auto">
+            <Suspense fallback={<div className="w-full h-full bg-gray-700 animate-pulse rounded-md"></div>}>
+              <Image
+                src={item.thumbnail || "/placeholder.svg"}
+                alt={`${item.title} thumbnail`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                className="object-contain rounded-md"
+                priority={false}
+                loading="eager"
+              />
+            </Suspense>
+          </div>
+          <div className="flex-1 space-y-4">
+            <p className="text-lg text-gray-300">{item.description}</p>
+            <div className="flex justify-between items-center text-sm text-gray-400">
+              <span>Views: {item.views}</span>
+              <span>Date: {new Date(item.upload_at).toLocaleString()}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <span>Privacy:</span>
+              <span
+                className={`px-2 py-1 rounded ${item.is_private ? "bg-red-900 text-red-200" : "bg-green-900 text-green-200"}`}
+              >
+                {item.is_private ? "Private" : "Public"}
+              </span>
+            </div>
+          </div>
         </div>
-        <p className="mt-2 text-lg text-gray-400">
-          {item.description}
-        </p>
       </CardContent>
     </Card>
-  );
+  )
 
   const EditContentDialog = ({ item, type, onEdit }) => {
     const [formData, setFormData] = useState(item);
@@ -250,12 +230,10 @@ export default function CreatorDashboard() {
       const { success, message } = await res.json();
 
       if (success) {
-        setTimeout(() => window.location.reload(), 500);
+        handleProfileUpdate(profileData);
       } else {
         console.log(message)
       }
-
-      handleProfileUpdate(profileData);
     };
 
     return (
@@ -333,8 +311,8 @@ export default function CreatorDashboard() {
             ))}
           </TabsContent>
           <TabsContent value="blogs">
-            {blogs.map(blog => (
-              <ContentCard 
+            {blogs && blogs.map(blog => (
+              <ContentCard
                 key={blog.id} 
                 item={blog} 
                 type="Blog" 

@@ -77,10 +77,15 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
   const is_private_video = useCallback(() => {
     const user_client = JSON.parse(sessionStorage.getItem("user"));
-
+    
     if (VideoData.is_private === true) {
+      
+      if (!user_client) {
+        return notFound();
+      }
+      
       if (user_client.username !== VideoData.Account.username) {
-        notFound();
+        return notFound();
       }
     }
   }, [VideoData]);
@@ -271,8 +276,9 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       switch(payload.eventType) {
         case "UPDATE":
           if  (payload.new.video_id === VideoData.video_id) {
-            if (payload.new.is_private === true && user.username !== VideoData.Account.username) {
-              window.location.reload();
+            if (payload.new.is_private === true) {
+              if (!user) return window.location.reload();
+              if (user.username !== VideoData.Account.username) return window.location.reload();
             }
           }
 

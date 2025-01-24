@@ -104,7 +104,7 @@ const VideoGrid = ({ videos }) => (
     {videos.length !== 0 ? videos.map((video, index) => (
       <VideoCard key={index} {...video} />
     )) : (
-      <div>wait im loading my ram</div>
+      <div>memorizing what you like to watch</div>
     )}
   </div>
 );
