@@ -30,7 +30,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
     const checkStorage = () => {
       const item = sessionStorage.getItem("user");
       if (item !== null) {
-          setUser(JSON.parse(item));
+        setUser(JSON.parse(item));
       } else {
         setTimeout(checkStorage, 3);
       }

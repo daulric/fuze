@@ -31,7 +31,7 @@ function Logout() {
   window.location.reload();
 }
 
-const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile }) => {
+const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) => {
   const [user, setUser] = useState(null);
   const router = useRouter();
   const currentPathName = usePathname();
@@ -39,6 +39,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile }) => {
   return (
     <Suspense>
       <AccountProfileContent
+        isPWA={isPWA}
         user={user}
         setUser={setUser}
         currentPathName={currentPathName}
@@ -59,6 +60,7 @@ const AccountProfileContent = ({
   toggleSidebar,
   isSidebarHidden,
   isMobile,
+  isPWA
 }) => {
   const searchParams = useSearchParams();
 
@@ -81,7 +83,7 @@ const AccountProfileContent = ({
       const user_token = cookieStore.get("user");
 
       if (!user_token) {
-        sessionStorage.removeItem("user");
+        //sessionStorage.removeItem("user");
         if (currentPathName === "/auth" && allQueryParams) return;
         return; //(window.location.href = `/auth?p=${currentPathName}${queryParams}`);
       }
@@ -115,7 +117,7 @@ const AccountProfileContent = ({
   return (
     <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       <div className="flex items-center space-x-4">
-        {isMobile && (
+        {(isPWA ? false : isMobile) && (
           <Button
             variant="ghost"
             className="p-2 hover:bg-gray-700"
