@@ -87,7 +87,7 @@ const BottomMenu = () => {
   );
 
   return (
-    <nav ref={navRef} className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-800 z-50">
+    <nav ref={navRef} className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-800 z-50 h-[4.4rem]">
       {activeMenu && (
         <div
           className="absolute bg-gray-800 border-t border-gray-700 shadow-lg"
