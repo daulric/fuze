@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Video, FileText, Eye, User, BadgeCheck } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
+import waitFor from '@/lib/waitFor';
 
 const CardMark = ({message}) => {
   return (
@@ -25,16 +26,10 @@ const UserProfilePage = ({ username }) => {
 
   const getProfile = useCallback(async () => {
     if (!username) {
-      const checkStorage = () => {
-        const item = sessionStorage.getItem("user");
-        if (item !== null) {
-          const temp_profile = JSON.parse(item);
-          setProfileInfo(temp_profile);
-        } else {
-          setTimeout(checkStorage, 3);
-        }
-      };
-      checkStorage();
+      waitFor(() => sessionStorage.getItem("user"), 1000).then(() => {
+        const item = JSON.parse(sessionStorage.getItem("user"));
+        setProfileInfo(item);
+      });
     } else {
       try {
         const response = await fetch(`/api/profile?username=${username}`);

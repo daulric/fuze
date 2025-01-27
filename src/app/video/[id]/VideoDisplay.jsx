@@ -9,10 +9,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import VideoPlayer from "./VideoPlayer";
 import RecommendedVideos from './RecommendedSection';
-import { useSearchParams, useParams } from "next/navigation";
 import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
+import waitFor from '@/lib/waitFor';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -172,11 +172,14 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       moveToTop(watchHistory, VideoData.video_id);
       localStorage.setItem("watchHistory", JSON.stringify(watchHistory));
     }
-    const user_data = sessionStorage.getItem("user");
     
-    if (user_data) {
-      setUser(JSON.parse(user_data));
-    }
+    waitFor(() => sessionStorage.getItem("user"), 500).then(() => {
+      const user_data = sessionStorage.getItem("user");
+      
+      if (user_data) {
+        setUser(JSON.parse(user_data));
+      }
+    });
 
     getVideoLikes();
     fetchRecommendedVids();
@@ -380,7 +383,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    disabled={user === null ? true : false}
+                    disabled={!user ? true : false}
                     className={`flex items-center space-x-2 ${userLiked ? 'hover:bg-red-300' :'hover:bg-blue-100' } ${userLiked ? 'text-blue-500' : 'text-gray-400'}`}
                     onClick={handleLike}
                   >
@@ -398,7 +401,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
-                    disabled={user === null ? true : false}
+                    disabled={!user ? true : false}
                     size="sm"
                     className={`flex items-center space-x-2 hover:bg-blue-100 ${userDisliked ? 'hover:bg-red-300' :'hover:bg-blue-100' } ${userDisliked ? 'text-red-500' : 'text-gray-400'}`}
                     onClick={handleDislike}

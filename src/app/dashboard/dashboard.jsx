@@ -21,7 +21,7 @@ export default function CreatorDashboard() {
   useEffect(() => {
     waitFor(() => {
       return sessionStorage.getItem("user") !== null;
-    }, 1500).then(() => {
+    }, 500).then(() => {
       const user_data = JSON.parse(sessionStorage.getItem("user"));
       if (!user_data) return;
       setUserProfile(user_data);

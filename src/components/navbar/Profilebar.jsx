@@ -8,6 +8,7 @@ import store from "@/tools/cookieStore";
 import { useRouter, usePathname, useSearchParams, redirect } from "next/navigation";
 import Image from "next/image";
 import SearchBar from "./Searchbar";
+import { usePathInfo } from "@/lib/getPathname";
 
 const cookieStore = store();
 
@@ -188,7 +189,7 @@ const AccountProfileContent = ({
           {!user && (
             <DropdownMenuItem
               className="flex items-center bg-gray-700 text-gray-50"
-              onClick={() => (window.location.href = "/auth")}
+              onClick={() =>  window.location.href = `/auth?${usePathInfo()}`}
             >
               <LogIn className="mr-2 h-4 w-4" />
               <span>Login</span>
