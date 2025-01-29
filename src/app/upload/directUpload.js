@@ -10,8 +10,12 @@ export default async function directUpload(video_id, video_file, video_thumbnail
         const Uploads_Storage = supa_client.storage.from("Uploads");
 
         if (video_id) {
-            const video_last_index =  video_file.name.lastIndexOf(".");
-            const video_file_extension = video_last_index !== -1 ? video_file.name.slice(video_last_index + 1) : '';
+          const video_file_extension = video_file?.name
+            ? video_file.name.includes(".")
+              ? video_file.name.slice(video_file.name.lastIndexOf(".") + 1)
+              : "mp4" // Default to "mp4" if no extension is found
+            : "mp4"; // Default to "mp4" if video_file.name is missing
+
 
             const img_last_index =  video_thumbnail.name.lastIndexOf(".");
             const img_file_extension = img_last_index !== -1 ? video_thumbnail.name.slice(img_last_index + 1) : '';
@@ -41,6 +45,7 @@ export default async function directUpload(video_id, video_file, video_thumbnail
         }
 
     } catch(e) {
+      console.log(e);
         return {
             success: false,
             message: e,
