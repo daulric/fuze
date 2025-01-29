@@ -1,94 +1,91 @@
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile } from '@ffmpeg/util';
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
-let ffmpeg = null;
+// Initialize FFmpeg instance
+const ffmpeg = createFFmpeg({ log: true });
 
-export async function compressVideo(file, options = {}) {
-  if (!file) throw new Error("No file provided");
-
-  const {
-    crf = 23,
-    preset = 'medium',
-    onProgress = () => {}
-  } = options;
-
+/**
+ * Compresses a video file using FFmpeg
+ * @param {File} videoFile - The video file to compress
+ * @param {Function} onProgress - Optional callback for compression progress
+ * @returns {Promise<Blob>} Compressed video as a Blob
+ */
+export async function compressVideo(videoFile, onProgress = () => {}) {
   try {
-    // Lazy initialize FFmpeg
-    if (!ffmpeg) {
-      ffmpeg = new FFmpeg();
-      ffmpeg.on('progress', ({ progress }) => {
-        onProgress(progress);
-      });
-    }
-
-    if (!ffmpeg.loaded) {
+    // Load FFmpeg if not already loaded
+    if (!ffmpeg.isLoaded()) {
       await ffmpeg.load();
     }
 
-    const inputFileName = file.name || 'input.mp4';
-    const outputFileName = 'output.mp4';
+    // Set up progress handling
+    ffmpeg.setProgress(({ ratio }) => {
+      onProgress(Math.round(ratio * 100));
+    });
 
-    // Write input file to FFmpeg file system
-    const fileData = await fetchFile(file);
-    await ffmpeg.writeFile(inputFileName, fileData);
+    // Write the input file to FFmpeg's file system
+    await ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFile));
 
-    // Compress video with H.264 settings
-    await ffmpeg.exec([
-      '-i', inputFileName,
-      '-c:v', 'libx264',        // H.264 video codec
-      '-crf', crf.toString(),   // Quality setting
-      '-preset', preset,        // Compression preset
-      '-profile:v', 'main',     // H.264 profile
-      '-level', '4.0',          // H.264 level
-      '-pix_fmt', 'yuv420p',    // Pixel format for compatibility
-      '-movflags', '+faststart', // Enable fast start for web playback
-      '-c:a', 'aac',            // Audio codec
-      '-b:a', '128k',           // Audio bitrate
-      '-ac', '2',               // Stereo audio
-      outputFileName
-    ]);
-
-    // Read compressed file
-    const data = await ffmpeg.readFile(outputFileName);
-
-    // Cleanup
-    await ffmpeg.deleteFile(inputFileName);
-    await ffmpeg.deleteFile(outputFileName);
-
-    // Return compressed file
-    return new File(
-      [data],
-      'compressed_' + (file.name || 'video.mp4'),
-      { type: 'video/mp4' }
+    // Run compression command
+    await ffmpeg.run(
+      '-i', 'input.mp4',
+      '-c:v', 'libx264',    // Video codec
+      '-crf', '23',         // Compression quality (18-28, lower = better)
+      '-preset', 'medium',  // Compression speed
+      '-c:a', 'aac',       // Audio codec
+      '-b:a', '128k',      // Audio bitrate
+      'output.mp4'
     );
 
+    // Read the compressed file
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    
+    // Clean up
+    ffmpeg.FS('unlink', 'input.mp4');
+    ffmpeg.FS('unlink', 'output.mp4');
+
+    // Return as blob
+    return new Blob([data.buffer], { type: 'video/mp4' });
   } catch (error) {
-    console.error('Video compression error:', error);
-    return null;
+    console.error('Compression error:', error);
+    throw new Error('Video compression failed');
   }
 }
 
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+/**
+ * Captures a frame from a video file at a specified time
+ * @param {File} videoFile - The video file to capture from
+ * @param {number} timeInSeconds - Time in seconds to capture the frame
+ * @returns {Promise<Blob>} Screenshot as a PNG Blob
+ */
+export async function captureVideoFrame(videoFile, timeInSeconds = 0) {
+  try {
+    // Load FFmpeg if not already loaded
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load();
+    }
 
-export const extractImageFromVideo = async (videoFile, outputImageName = "output.webp", time = '00:00:01') => {
-  const ffmpeg = createFFmpeg({ log: true });
+    // Write the input file to FFmpeg's file system
+    await ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFile));
 
-  // Load FFmpeg
-  await ffmpeg.load();
+    // Capture frame
+    await ffmpeg.run(
+      '-i', 'input.mp4',
+      '-ss', timeInSeconds.toString(),  // Seek to specified time
+      '-frames:v', '1',                 // Capture single frame
+      '-f', 'image2',                   // Force image format
+      'screenshot.png'                  // Output filename
+    );
 
-  // Write the video file to FFmpeg's virtual file system
-  ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(videoFile));
+    // Read the captured frame
+    const data = ffmpeg.FS('readFile', 'screenshot.png');
+    
+    // Clean up
+    ffmpeg.FS('unlink', 'input.mp4');
+    ffmpeg.FS('unlink', 'screenshot.png');
 
-  // Run FFmpeg to extract a frame at the given time
-  await ffmpeg.run(
-    '-i', 'input.mp4',        // Input video file
-    '-ss', time,              // Time to capture the frame (e.g., 1 second)
-    '-frames:v', '1',         // Extract only one frame
-    outputImageName           // Output image file name
-  );
-
-  // Read the output image
-  const data = ffmpeg.FS('readFile', outputImageName);
-  // Convert the Uint8Array to a Blob for download or preview
-  return new Blob([data.buffer], { type: 'image/jpeg' });
-};
+    // Return as blob
+    return new Blob([data.buffer], { type: 'image/png' });
+  } catch (error) {
+    console.error('Screenshot capture error:', error);
+    throw new Error('Frame capture failed');
+  }
+}
