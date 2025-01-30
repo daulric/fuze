@@ -2,15 +2,11 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from "@ffmpeg/util";
 
 // Initialize FFmpeg instance
-let ffmpeg;
+const ffmpeg = new FFmpeg();
  // Load FFmpeg once globally
 
 export async function compressVideo(videoFile) {
   try {
-    
-    if (!ffmpeg) {
-      ffmpeg = new FFmpeg();
-    }
     
     if (!ffmpeg.loaded) {
       await ffmpeg.load();

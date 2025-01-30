@@ -13,7 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import directUpload from "./directUpload";
 import store from "@/tools/cookieStore";
-import { compressVideo } from "@/lib/BlobHandler"
+//import { compressVideo } from "@/lib/BlobHandler"
 
 const cookieStore = store();
 
@@ -184,9 +184,9 @@ const VideoUploadPage = () => {
           if (!data.success) reject(data.message);
           
           if (data.video_id) {
-            const compressed_video = await compressVideo(file);
+            //const compressed_video = await compressVideo(file);
             
-            const uploaded_content = await directUpload(data.video_id, compressed_video, thumbnail);
+            const uploaded_content = await directUpload(data.video_id, file, thumbnail);
             resolve(uploaded_content);
           }
           
