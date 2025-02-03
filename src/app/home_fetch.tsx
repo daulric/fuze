@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import HomePage from "./home";
+import { Result } from "postcss";
 
 interface VideoItem {
   title: string;
@@ -68,48 +69,42 @@ export default function Home() {
         setData(cached_videos.data);
       } catch (e) {
 
-        switch (e) {
+        if (e === "new") {
+          if (data) return;
+          
+          const response = await fetch(`/api/video/recommend`, {
+            body: JSON.stringify({ limit: 16 }),
+            method: "POST",
+          });
+        
+          if (!response.ok) return;
+          const {success, data: new_data} = await response.json();
+          console.log(success, new_data);
+          if (!success) return;
+          
+          if (new_data.length === 0) return;
 
-          case "new":
-            if (data) break;
-            const response = await fetch(`/api/video/recommend`, {
-              body: JSON.stringify({ limit: 16 }),
-              method: "POST",
-            });
+          const temp_data = new_data.map((i: VideoItem) => {
+            return {
+              title: i.title,
+              views: format_views(i.views),
+              link: `/video?id=${i.video_id}`,
+              uploadTime: timeAgo(i.upload_at),
+              channel: i.Account.username,
+              thumbnail: i.thumbnail,
+              video: i.video
+            };
+          });
           
-            if (response.ok) {
-              const res = await response.json();
-              const temp_data: unknown[] = [];
-              
-              if (!res.success) break;
-              
-              res.data.map((i: VideoItem) => {
-                temp_data.push({
-                  title: i.title,
-                  views: format_views(i.views),
-                  link: `/video?id=${i.video_id}`,
-                  uploadTime: timeAgo(i.upload_at),
-                  channel: i.Account.username,
-                  thumbnail: i.thumbnail,
-                  video: i.video
-                });
-              });
-              
-              const new_cached_data: CachedVideos = {
-                data: temp_data,
-                expires: Date.now(),
-              }
-              
-              sessionStorage.setItem("home_page_video_cache", JSON.stringify(new_cached_data))
-              setData(temp_data);
-            }
-            
-            break;
+          const new_cached_data: CachedVideos = {
+            data: temp_data,
+            expires: Date.now(),
+          }
           
-          
-          default:
-            break;
+          sessionStorage.setItem("home_page_video_cache", JSON.stringify(new_cached_data));
+          setData(temp_data);
         }
+
       }
     }
     
@@ -118,7 +113,7 @@ export default function Home() {
 
   return (
     <>
-      <HomePage VideoData={data ? data : []}/>
+      <HomePage VideoData={data}/>
     </>
   );
 }

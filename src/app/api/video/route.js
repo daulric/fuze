@@ -44,85 +44,85 @@ async function DatabaseQuery(supa_client, query) {
 
 async function GetFullData(supa_client) {
     try {
-        const videos_db = supa_client.from("Video");
-        const Uploads_Storage = supa_client.storage.from("Uploads");
+      const videos_db = supa_client.from("Video");
+      const Uploads_Storage = supa_client.storage.from("Uploads");
 
-        const {data: Vid_Data, error: dbError} = await videos_db.select("*, Account(username, is_verified)");
-        
-        if (dbError) throw dbError;
+      const {data: Vid_Data, error: dbError} = await videos_db.select("*, Account(username, is_verified)");
+      
+      if (dbError) throw dbError;
 
-        const handler_data = await Promise.all(Vid_Data.map(async (videoData) => {
-            // Add retry logic for file listing
-            const getFilesList = async (retries = 3) => {
-                for (let i = 0; i < retries; i++) {
-                    try {
-                        const { data, error } = await Uploads_Storage.list(videoData.video_id);
-                        if (error) throw error;
-                        return data;
-                    } catch (error) {
-                        if (i === retries - 1) throw error;
-                        // Exponential backoff
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                    }
-                }
-            };
+      const handler_data = await Promise.all(Vid_Data.map(async (videoData) => {
+          // Add retry logic for file listing
+          const getFilesList = async (retries = 3) => {
+              for (let i = 0; i < retries; i++) {
+                  try {
+                      const { data, error } = await Uploads_Storage.list(videoData.video_id);
+                      if (error) throw error;
+                      return data;
+                  } catch (error) {
+                      if (i === retries - 1) throw error;
+                      // Exponential backoff
+                      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                  }
+              }
+          };
 
-            // Add retry logic for signed URLs
-            const getSignedUrl = async (path, retries = 3) => {
-                for (let i = 0; i < retries; i++) {
-                    try {
-                        const { data, error } = await Uploads_Storage.createSignedUrl(path, 30);
-                        if (error) throw error;
-                        return data.signedUrl;
-                    } catch (error) {
-                        if (i === retries - 1) throw error;
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                    }
-                }
-            };
+          // Add retry logic for signed URLs
+          const getSignedUrl = async (path, retries = 3) => {
+              for (let i = 0; i < retries; i++) {
+                  try {
+                      const { data, error } = await Uploads_Storage.createSignedUrl(path, 30);
+                      if (error) throw error;
+                      return data.signedUrl;
+                  } catch (error) {
+                      if (i === retries - 1) throw error;
+                      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                  }
+              }
+          };
 
-            try {
-                const files = await getFilesList();
-                
-                if (!files || files.length === 0) {
-                    return {
-                        ...videoData,
-                        video: null,
-                        thumbnail: "/logo.svg",
-                        error: "No files found"
-                    };
-                }
-
-                const videoFile = files.find(file => file.name.includes("video"));
-                const thumbnailFile = files.find(file => file.name.includes("thumbnail"));
-
-                const [videoUrl, thumbnailUrl] = await Promise.all([
-                    videoFile ? getSignedUrl(`${videoData.video_id}/${videoFile.name}`) : Promise.resolve(null),
-                    thumbnailFile ? getSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`) : Promise.resolve("/logo.svg")
-                ]);
-
-                return {
-                    ...videoData,
-                    video: videoUrl,
-                    thumbnail: thumbnailUrl,
-                    meta: {
-                        video: videoFile,
-                        thumbnail: thumbnailFile,
-                    }
-                };
-            } catch (error) {
-                console.error(`Error processing video ${videoData.video_id}:`, error);
-                return {
-                    ...videoData,
-                    video: null,
-                    thumbnail: "/logo.svg",
-                    error: error.message
-                };
+          try {
+            const files = await getFilesList();
+            
+            if (!files || files.length === 0) {
+              return null;
             }
-        }));
 
-        // Filter out failed items if needed
-        return handler_data.filter(item => item.video !== null);
+            const videoFile = files.find(file => file.name.includes("video"));
+            
+            if (videoFile) {
+              const thumbnailFile = files.find(file => file.name.includes("thumbnail"));
+
+              const [videoUrl, thumbnailUrl] = await Promise.all([
+                  videoFile ? getSignedUrl(`${videoData.video_id}/${videoFile.name}`) : Promise.resolve(null),
+                  thumbnailFile ? getSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`) : Promise.resolve("/logo.svg")
+              ]);
+              
+            
+              return {
+                  ...videoData,
+                  video: videoUrl,
+                  thumbnail: thumbnailUrl,
+                  meta: {
+                      video: videoFile,
+                      thumbnail: thumbnailFile,
+                  }
+              };
+            }
+
+          } catch (error) {
+              console.error(`Error processing video ${videoData.video_id}:`, error);
+              return {
+                  ...videoData,
+                  video: null,
+                  thumbnail: "/logo.svg",
+                  error: error.message
+              };
+          }
+      }));
+
+      // Filter out failed items if needed
+      return handler_data.filter(Boolean);
     } catch (error) {
         console.error('Error processing video data:', error);
         throw error; // Propagate error for proper handling in GET route
@@ -138,19 +138,18 @@ async function GetSearchData(supa_client, search_query) {
         const search_query_lower = search_query.toLowerCase();
         return (
             (
-                item.Account.username.toLowerCase().includes(search_query_lower) ||
-                item.title.toLowerCase().includes(search_query_lower) ||
-                item.description.toLowerCase().includes(search_query_lower)
+              item.Account.username.toLowerCase().includes(search_query_lower) ||
+              item.title.toLowerCase().includes(search_query_lower) ||
+              item.description.toLowerCase().includes(search_query_lower)
             ) &&
             item.is_private === false
         )
     })
 
     return NextResponse.json({
-        success: true,
-        data: searched_data,
+      success: true,
+      data: searched_data,
     });
-
 }
 
 export async function GET(request) {
@@ -158,76 +157,75 @@ export async function GET(request) {
     const queries = Object.fromEntries(searchParams.entries());
 
     try {
-        const supa_client = SupabaseServer();
+      const supa_client = SupabaseServer();
 
-        if (Object.keys(queries).length !== 0) {
-            if (queries.search) {
-                return GetSearchData(supa_client, queries.search);
-            }
+      if (Object.keys(queries).length !== 0) {
+          if (queries.search) {
+              return GetSearchData(supa_client, queries.search);
+          }
 
-            if (queries.is_private) {
-                const is_user = (await cookies()).get("user");
-                if (!is_user) {
-                    return NextResponse.json({
-                        success: false,
-                        message: "Authentication required"
-                    }, { status: 401 });
-                }
-                return DatabaseQuery(supa_client, {...queries, account_id: is_user.value});
-            }
-            
-            if (queries.all) {
-                const is_user = (await cookies()).get("user");
-                if (!is_user) {
-                    return NextResponse.json({
-                        success: false,
-                        message: "Authentication required"
-                    }, { status: 401 });
-                }
-                return DatabaseQuery(supa_client, {account_id: is_user.value});
-            }
+          if (queries.is_private) {
+              const is_user = (await cookies()).get("user");
+              if (!is_user) {
+                  return NextResponse.json({
+                      success: false,
+                      message: "Authentication required"
+                  }, { status: 401 });
+              }
+              return DatabaseQuery(supa_client, {...queries, account_id: is_user.value});
+          }
+          
+          if (queries.all) {
+              const is_user = (await cookies()).get("user");
+              if (!is_user) {
+                  return NextResponse.json({
+                      success: false,
+                      message: "Authentication required"
+                  }, { status: 401 });
+              }
+              return DatabaseQuery(supa_client, {account_id: is_user.value});
+          }
 
-            return DatabaseQuery(supa_client, {...queries, is_private: false});
-        }
+          return DatabaseQuery(supa_client, {...queries, is_private: false});
+      }
 
-        return DatabaseQuery(supa_client, {is_private: false});
+      return DatabaseQuery(supa_client, {is_private: false});
     } catch(error) {
-        console.error('API Error:', error);
-        return NextResponse.json({
-            success: false,
-            message: error.message || "Internal server error",
-            code: error.code || 'UNKNOWN_ERROR'
-        }, { 
-            status: error.status || 500 
-        });
+      console.error('API Error:', error);
+      return NextResponse.json({
+          success: false,
+          message: error.message || "Internal server error",
+          code: error.code || 'UNKNOWN_ERROR'
+      }, { 
+          status: error.status || 500 
+      });
     }
 }
 
 export async function PUT(request) {
-    try {
-        
-        const {video_id, ...data} = await request.json();
+  try {
 
-        if (!video_id) throw "Video ID Not Provided";
+    const {video_id, ...data} = await request.json();
 
-        const supa_client = SupabaseServer();
-        const video_db = supa_client.from("Video");
+    if (!video_id) throw "Video ID Not Provided";
 
-        await video_db.update({
-            title: data.title,
-            description: data.description,
-            is_private: data.is_private,
-        }).eq("video_id", video_id);
+    const supa_client = SupabaseServer();
+    const video_db = supa_client.from("Video");
 
-        return NextResponse.json({
-            success: true,
-        });
+    await video_db.update({
+        title: data.title,
+        description: data.description,
+        is_private: data.is_private,
+    }).eq("video_id", video_id);
 
-    } catch(e) {
-        return NextResponse.json({
-            success: false,
-            message: e
-        });
-    }
+    return NextResponse.json({
+        success: true,
+    });
 
+  } catch(e) {
+    return NextResponse.json({
+        success: false,
+        message: e
+    });
+  }
 }
