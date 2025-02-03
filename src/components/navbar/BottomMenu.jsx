@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 import waitFor from "@/lib/waitFor"
+import Link from "next/link";
 
 const MenuItem = ({ href, icon: Icon, label, isActive, onClick, buttonRef }) => {
   const Content = (
@@ -24,21 +25,21 @@ const MenuItem = ({ href, icon: Icon, label, isActive, onClick, buttonRef }) => 
   }
 
   return (
-    <a href={href} className="flex flex-col items-center justify-center relative">
+    <Link href={href} className="flex flex-col items-center justify-center relative">
       {Content}
-    </a>
+    </Link>
   )
 }
 
 const SubMenuItem = ({ link, text, Icon, onClick }) => (
-  <a
+  <Link
     href={link}
     className="flex items-center space-x-2 px-4 py-3 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
     onClick={onClick}
   >
     <Icon className="h-5 w-5" />
     <span className="text-sm">{text}</span>
-  </a>
+  </Link>
 )
 
 export default function BottomNav() {
@@ -49,9 +50,11 @@ export default function BottomNav() {
   const menuRefs = useRef({})
   const navRef = useRef(null)
   const touchStartRef = useRef(null);
+  
+  const excluded_paths = ["/upload", "/policy", "/settings"];
 
   useEffect(() => {
-    waitFor(() => sessionStorage.getItem("user"), 500).then(() => {
+    waitFor(() => sessionStorage.getItem("user"), 200).then(() => {
       const userData = JSON.parse(sessionStorage.getItem("user"))
       if (userData) {
         setUser(userData)
@@ -138,7 +141,7 @@ export default function BottomNav() {
   );
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden">
+    <div className={`${excluded_paths.includes(pathname) ? "invisible" : ""} fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden`}>
       {activeMenu && (
         <div
           className="absolute bottom-[calc(100%+1rem)] bg-black/90 backdrop-blur-md rounded-lg border border-white/10 shadow-lg overflow-hidden"

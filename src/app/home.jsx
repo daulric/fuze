@@ -3,7 +3,6 @@
 import { useState, Suspense, useRef, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import Image from "next/image";
-import Link from "next/link";
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -66,7 +65,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
             src={thumbnail}
             height={100}
             width={300}
-            alt="Video thumbnail"
+            alt=""
             className={`absolute inset-0 w-full h-full object-contain z-10 transition-opacity duration-500 ${
               isHovered ? "opacity-20" : "opacity-100"
             }`}

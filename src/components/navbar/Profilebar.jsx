@@ -94,7 +94,9 @@ const AccountProfileContent = ({
         allowId: true,
       });
 
-      const response = await fetch(`/api/profile?${query.toString()}`);
+      const response = await fetch(`/api/profile?${query.toString()}`, {
+        cache: "no-cache",
+      });
 
       if (!response.ok) {
         return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
