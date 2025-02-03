@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useRef, useCallback } from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -25,21 +24,21 @@ const MenuItem = ({ href, icon: Icon, label, isActive, onClick, buttonRef }) => 
   }
 
   return (
-    <Link href={href} className="flex flex-col items-center justify-center relative">
+    <a href={href} className="flex flex-col items-center justify-center relative">
       {Content}
-    </Link>
+    </a>
   )
 }
 
 const SubMenuItem = ({ link, text, Icon, onClick }) => (
-  <Link
+  <a
     href={link}
     className="flex items-center space-x-2 px-4 py-3 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
     onClick={onClick}
   >
     <Icon className="h-5 w-5" />
     <span className="text-sm">{text}</span>
-  </Link>
+  </a>
 )
 
 export default function BottomNav() {
