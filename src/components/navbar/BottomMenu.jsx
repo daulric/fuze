@@ -1,41 +1,55 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard } from "lucide-react"
+import { cn } from "@/lib/utils"
 import waitFor from "@/lib/waitFor"
 
-const MenuButton = ({ text, Icon, onClick, isActive, buttonRef }) => (
-  <button
-    ref={buttonRef}
-    onClick={onClick}
-    className={`flex flex-col items-center ${isActive ? "text-blue-500" : "text-white"} relative z-10`}
-  >
-    <Icon className="h-6 w-6" />
-    <span className="text-xs">{text}</span>
-  </button>
-)
+const MenuItem = ({ href, icon: Icon, label, isActive, onClick, buttonRef }) => {
+  const Content = (
+    <>
+      <Icon className={cn("h-6 w-6 mb-1", isActive ? "text-white" : "text-gray-400")} />
+      <span className={cn("text-xs", isActive ? "text-white" : "text-gray-400")}>{label}</span>
+      {isActive && <div className="absolute -bottom-2.5 w-1 h-1 rounded-full bg-blue-500" />}
+    </>
+  )
 
-const StandaloneButton = ({ text, Icon, href }) => (
-  <Link href={href} className="flex flex-col items-center text-white">
-    <Icon className="h-6 w-6" />
-    <span className="text-xs">{text}</span>
-  </Link>
-)
+  if (onClick) {
+    return (
+      <button ref={buttonRef} onClick={onClick} className="flex flex-col items-center justify-center relative">
+        {Content}
+      </button>
+    )
+  }
+
+  return (
+    <Link href={href} className="flex flex-col items-center justify-center relative">
+      {Content}
+    </Link>
+  )
+}
 
 const SubMenuItem = ({ link, text, Icon, onClick }) => (
-  <Link href={link} className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-700 text-white" onClick={onClick}>
+  <Link
+    href={link}
+    className="flex items-center space-x-2 px-4 py-3 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+    onClick={onClick}
+  >
     <Icon className="h-5 w-5" />
     <span className="text-sm">{text}</span>
   </Link>
 )
 
-const BottomMenu = () => {
+export default function BottomNav() {
+  const pathname = usePathname()
   const [user, setUser] = useState(null)
   const [activeMenu, setActiveMenu] = useState(null)
   const [submenuPosition, setSubmenuPosition] = useState({ left: 0, width: 0 })
-  const menuRefs = useRef({});
+  const menuRefs = useRef({})
   const navRef = useRef(null)
+  const touchStartRef = useRef(null);
 
   useEffect(() => {
     waitFor(() => sessionStorage.getItem("user"), 500).then(() => {
@@ -46,73 +60,113 @@ const BottomMenu = () => {
     })
   }, [])
 
-  const toggleMenu = (menuName) => {
-    if (activeMenu === menuName) {
-      setActiveMenu(null)
-    } else {
-      setActiveMenu(menuName)
-      const buttonRect = menuRefs.current[menuName].getBoundingClientRect()
-      const navRect = navRef.current.getBoundingClientRect()
-      const leftPosition = buttonRect.left - navRect.left
-      const rightSpace = navRect.width - (leftPosition + buttonRect.width)
-      const submenuWidth = Math.max(buttonRect.width, 150) // Minimum width of 150px
+  const toggleMenu = useCallback(
+    (menuName) => {
+      if (activeMenu === menuName) {
+        setActiveMenu(null)
+      } else {
+        setActiveMenu(menuName)
+        const buttonRect = menuRefs.current[menuName].getBoundingClientRect()
+        const navRect = navRef.current.getBoundingClientRect()
+        const leftPosition = buttonRect.left - navRect.left
+        const rightSpace = navRect.width - (leftPosition + buttonRect.width)
+        const submenuWidth = Math.max(buttonRect.width, 200)
 
-      let adjustedLeft = leftPosition
-      if (rightSpace < submenuWidth - buttonRect.width) {
-        // Adjust left position if there's not enough space on the right
-        adjustedLeft = Math.max(0, leftPosition - (submenuWidth - buttonRect.width))
+        let adjustedLeft = leftPosition
+        if (rightSpace < submenuWidth - buttonRect.width) {
+          adjustedLeft = Math.max(0, leftPosition - (submenuWidth - buttonRect.width))
+        }
+
+        setSubmenuPosition({
+          left: adjustedLeft,
+          width: submenuWidth,
+        })
       }
+    },
+    [activeMenu],
+  )
 
-      setSubmenuPosition({
-        left: adjustedLeft,
-        width: submenuWidth,
-      })
-    }
-  }
-
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     setActiveMenu(null)
-  }
+  }, [])
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target) && activeMenu) {
+        closeMenu()
+      }
+    }
+
+    const handleTouchStart = (event) => {
+      touchStartRef.current = event.touches[0].clientY
+    }
+
+    const handleTouchMove = (event) => {
+      if (touchStartRef.current !== null) {
+        const touchEnd = event.touches[0].clientY
+        const diff = touchStartRef.current - touchEnd
+
+        if (Math.abs(diff) > 5) {
+          // Threshold for considering it a swipe
+          closeMenu()
+          touchStartRef.current = null
+        }
+      }
+    }
+
+    document.addEventListener("click", handleOutsideClick)
+    document.addEventListener("touchstart", handleTouchStart)
+    document.addEventListener("touchmove", handleTouchMove)
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick)
+      document.removeEventListener("touchstart", handleTouchStart)
+      document.removeEventListener("touchmove", handleTouchMove)
+    }
+  }, [activeMenu, closeMenu]);
   
-  const GetActiveMenu =() => (
+  const GetActiveMenu = () => (
     <>
-    {activeMenu === "more_item" && (
-      <div className="py-2">
-        {user && (<SubMenuItem link="/feed/liked" text="Liked Videos" Icon={Heart} onClick={closeMenu} />)}
-        <SubMenuItem link="/feed/history" text="History" Icon={History} onClick={closeMenu} />
-        {user && (<SubMenuItem link="/dashboard" text="Dashboard" Icon={LucideLayoutDashboard} onClick={closeMenu} />)}
-      </div>
-    )}
+      {activeMenu === "more_item" && (
+        <>
+          {user && <SubMenuItem link="/feed/liked" text="Liked Videos" Icon={Heart} onClick={closeMenu} />}
+          <SubMenuItem link="/feed/history" text="History" Icon={History} onClick={closeMenu} />
+          {user && <SubMenuItem link="/dashboard" text="Dashboard" Icon={LucideLayoutDashboard} onClick={closeMenu} />}
+        </>
+      )}
+      {/* We can add more trigger actions here */}
     </>
   );
 
   return (
-    <nav ref={navRef} className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-800 z-50 h-[4.4rem]">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden">
       {activeMenu && (
         <div
-          className="absolute bg-gray-800 border-t border-gray-700 shadow-lg"
+          className="absolute bottom-[calc(100%+1rem)] bg-black/90 backdrop-blur-md rounded-lg border border-white/10 shadow-lg overflow-hidden"
           style={{
-            bottom: "100%",
             left: `${submenuPosition.left}px`,
             width: `${submenuPosition.width}px`,
           }}
         >
-          <GetActiveMenu />
+          <div className="py-1">
+            <GetActiveMenu />
+          </div>
         </div>
       )}
-      <div className="flex justify-around items-center h-16">
-        <StandaloneButton text="Home" Icon={Home} href="/" />
-        {user && (<StandaloneButton text="Upload" href="/upload" Icon={Upload} />)}
-        <MenuButton
-          text="More"
-          Icon={MoreHorizontal}
-          onClick={() => toggleMenu("more_item")}
+      <nav
+        ref={navRef}
+        className="flex items-center bg-gray-95000 justify-between gap-8 px-8 py-4 bg-black/80 backdrop-blur-md rounded-full border border-transparent"
+      >
+        <MenuItem href="/" icon={Home} label="Home" isActive={pathname === "/"} />
+        {user && <MenuItem href="/upload" icon={Upload} label="Upload" isActive={pathname === "/upload"} />}
+        <MenuItem
+          icon={MoreHorizontal}
+          label="More"
           isActive={activeMenu === "more_item"}
-          buttonRef={el => menuRefs.current.more_item = el}
+          onClick={() => toggleMenu("more_item")}
+          buttonRef={(el) => (menuRefs.current.more_item = el)}
         />
-      </div>
-    </nav>
+      </nav>
+    </div>
   )
 }
-
-export default BottomMenu;

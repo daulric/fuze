@@ -62,10 +62,10 @@ const ClientWrapper = ({ children }) => {
         <ProfileBar toggleSidebar={toggleSidebar} isSidebarHidden={isHidden} isMobile={isMobile} isPWA={isPWA} />
         {(!isMobile || !isPWA) && <Sidebar isHidden={isHidden} setIsHidden={setIsHidden} isMobile={isPWA ? isPWA : isMobile} isPWA={isPWA} />}
         <main
-          className={`flex-1 h-[calc(100vh-${(isPWA && isMobile) ? "128px" : "64px" })] 
-            mt-16 ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"} 
-            ${isPWA && isMobile ? "mb-16" : ""
-          }`}
+          className={`flex-1 h-[calc(100vh-64px)] mt-16 
+            ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"} 
+            ${isMobile ? "mb-16" : ""}`
+          }
         >
           {children}
         </main>
