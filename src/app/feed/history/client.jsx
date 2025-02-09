@@ -88,7 +88,7 @@ export default function HistoryPage({history}) {
       <br/>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {histories ? histories.map((video) => (
-          <HistoryVideoCard key={video.id} link={`/video?id=${video.video_id}`} {...video} />
+          <HistoryVideoCard key={video.id} link={`/pulse?id=${video.video_id}`} {...video} />
         )) : 
         (<div>No history found</div>)
         }

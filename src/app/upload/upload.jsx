@@ -142,7 +142,7 @@ const VideoUploadPage = () => {
       });
 
       if (data.success === true) {
-        window.location.href = `/video?id=${data.video_id}`;
+        window.location.href = `/pulse?id=${data.video_id}`;
       } else {
         setMsg(data);
       }

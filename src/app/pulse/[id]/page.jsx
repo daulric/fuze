@@ -22,7 +22,7 @@ const cachedGetVideoData = cache(async (url, video_id) => {
 export async function generateMetadata({ params }) {
   const videoId = (await params).id;
   const baseUrl = await getUrl();
-  const canonicalUrl = `${baseUrl}/video?id=${videoId}`;
+  const canonicalUrl = `${baseUrl}/pulse?id=${videoId}`;
 
   const videoData = await cachedGetVideoData(baseUrl, videoId);
 

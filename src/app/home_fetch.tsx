@@ -88,7 +88,7 @@ export default function Home() {
             return {
               title: i.title,
               views: format_views(i.views),
-              link: `/video?id=${i.video_id}`,
+              link: `/pulse?id=${i.video_id}`,
               uploadTime: timeAgo(i.upload_at),
               channel: i.Account.username,
               thumbnail: i.thumbnail,

@@ -42,22 +42,24 @@ export default function LikedVideosPage() {
   useEffect(() => {
     
     async function getLikedVideos() {
+
+      if (likedVideos.length > 0) return;
         
-        const response = await fetch('/api/video/likes/filter', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            filter: '*, Video(*,  Account(username))',
-          }),
-        });
-        
-        const {success, data} = await response.json();
-        
-        if (success) {
-          setLikedVideos(data);
-        }
+      const response = await fetch('/api/video/likes/filter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filter: '*, Video(*,  Account(username))',
+        }),
+      });
+      
+      const {success, data} = await response.json();
+      
+      if (success) {
+        setLikedVideos(data);
+      }
     }
     
     getLikedVideos();
@@ -74,7 +76,7 @@ export default function LikedVideosPage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {likedVideos.map((video) => (
-          <LikedVideoCard key={video.video_id} link={`/video?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video} />
+          <LikedVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video} />
         ))}
       </div>
     </div>

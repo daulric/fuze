@@ -5,11 +5,11 @@ export function middleware(request) {
   const response = NextResponse.next();
   const { pathname, searchParams } = new URL(request.url);
 
-  if (pathname === "/video") {
+  if (pathname === "/pulse") {
     // Video ID to Dynamic
     if (searchParams.has("id")) {
       let id = searchParams.get("id");
-      return NextResponse.redirect(new URL(`/video/${id}`, request.url));
+      return NextResponse.redirect(new URL(`/pulse/${id}`, request.url));
     }
   }
   

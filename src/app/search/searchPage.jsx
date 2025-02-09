@@ -38,7 +38,7 @@ const VideoCard = ({ title, Account, views, upload_at, thumbnail, video_id, desc
       className="flex flex-col md:flex-row gap-4 bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 w-full mb-4"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      href={{pathname: "/video", query:{ id: video_id }}}
+      href={{pathname: "/pulse", query:{ id: video_id }}}
     >
       <div className="relative w-full md:w-64 h-48 md:h-36">
         <Image loading='eager' src={thumbnail} alt={title} className="w-full h-full object-cover" height={100} width={100} quality={100}/>
