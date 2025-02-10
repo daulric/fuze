@@ -34,19 +34,25 @@ const posts = [
       username: "mikec",
       avatar: "/logo.svg?height=40&width=40",
     },
-    content: "Some highlights from our team building event! 🎉 #TeamBuilding #WorkCulture",
+    content: "Artificial Intelligence (AI) is the simulation of human intelligence in machines, enabling them to learn, reason, and solve problems. AI is widely used in applications such as natural language processing, computer vision, robotics, and automation. Machine learning, a subset of AI, allows systems to improve through experience without explicit programming. AI powers virtual assistants, recommendation systems, autonomous vehicles, and medical diagnostics. While AI enhances efficiency and decision-making, concerns about ethics, bias, and job displacement remain. As AI continues to evolve, responsible development and regulation are crucial to ensuring its benefits outweigh its risks in society.",
     timestamp: "2024-02-09T11:45:00Z",
     images: [
-      "/logo.svg?height=800&width=600",
-      "/logo.svg?height=400&width=600",
-      "/logo.svg?height=400&width=600",
-      "/logo.svg?height=400&width=600",
+      "/logo.svg",
+      "/logo.svg",
+      "/logo.svg",
+      "/logo.svg",
     ],
   },
 ]
 
+export const metadata = {
+  title: "Flare",
+  description: "Flare Content"
+}
+
 export default async function PostPage({ params }) {
-  const post = posts.find((p) => p.id === params.id)
+  const id = (await params).id
+  const post = posts.find((p) => p.id === id)
 
   if (!post) {
     notFound()
@@ -61,12 +67,12 @@ export default async function PostPage({ params }) {
               <ArrowLeft className="h-5 w-5" />
             </Link>
           </Button>
-          <h1 className="text-lg font-semibold">Post</h1>
+          <h1 className="text-lg font-semibold">Flare</h1>
         </div>
       </header>
-      <main className="flex-grow">
+      {/*<main className=""> */}
         <PostView post={post} />
-      </main>
+      {/*</main>*/}
     </div>
   )
 }
