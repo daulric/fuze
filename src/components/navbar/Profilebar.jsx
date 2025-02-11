@@ -106,7 +106,7 @@ const AccountProfileContent = ({
 
       if (account_data.profile) {
         delete account_data.profile.Video;
-        delete account_data.profile.Blogs;
+        delete account_data.profile.Posts;
 
         const string_data = JSON.stringify(account_data.profile);
         sessionStorage.setItem("user", string_data);

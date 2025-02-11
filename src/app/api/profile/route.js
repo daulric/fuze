@@ -65,7 +65,7 @@ export async function GET(request) {
             time_created,
             aboutme,
             Video (video_id, title, views),
-            Blogs (blog_id)
+            Posts (post_id)
         `);
 
         if (account_id) {

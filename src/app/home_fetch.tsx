@@ -79,7 +79,7 @@ export default function Home() {
         
           if (!response.ok) return;
           const {success, data: new_data} = await response.json();
-          console.log(success, new_data);
+
           if (!success) return;
           
           if (new_data.length === 0) return;
