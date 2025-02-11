@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -14,6 +14,7 @@ export default function PostView({ post }) {
   const [isLiked, setIsLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(post.likes || 0)
   const [viewsCount, setViewsCount] = useState(post.views || 0)
+  const [authorAvatar, setAuthorAvatar] = useState(null);
 
   const openImageView = (index) => {
     setSelectedImageIndex(index)
@@ -35,6 +36,23 @@ export default function PostView({ post }) {
     setIsLiked((prev) => !prev)
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
   }
+  
+  useEffect(() => {
+    
+    async function fetchAuthorAvatar() {
+      const response = await fetch(`/api/profile?username=${post.Account.username}`, {
+        cache: "no-store",
+      });
+      
+      if (!response.ok) return;
+      const { profile } = await response.json();
+      if (profile.avatar_url === null) return;
+      setAuthorAvatar(profile.avatar_url);
+    }
+    
+    fetchAuthorAvatar();
+    
+  }, []);
 
   return (
     <div className="bg-gray-900 flex items-center justify-center p-4">
@@ -42,12 +60,12 @@ export default function PostView({ post }) {
         <CardHeader className="flex-shrink-0 flex flex-col sm:flex-row items-start gap-2 border-b border-gray-700 bg-gray-800 z-10 py-3 rounded">
           <div className="flex items-center gap-4 flex-grow">
             <Avatar>
-              <AvatarImage src={post.author.avatar} alt={post.author.name} />
-              <AvatarFallback className="bg-gray-600">{post.author.name[0]}</AvatarFallback>
+              <AvatarImage src={authorAvatar} alt={post?.Account?.username || "/logo.svg" } />
+              <AvatarFallback className="bg-gray-600">{post?.Account?.username[0]}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-semibold">{post.author.name}</p>
-              <p className="text-sm text-gray-400">{new Date(post.timestamp).toLocaleDateString()}</p>
+              <p className="font-semibold">{post?.Account?.username}</p>
+              <p className="text-sm text-gray-400">{new Date(post.created_at).toLocaleDateString()}</p>
             </div>
           </div>
           <div className="flex">

@@ -13,5 +13,13 @@ export function middleware(request) {
     }
   }
   
+  if (pathname === "/flare") {
+    // Video ID to Dynamic
+    if (searchParams.has("id")) {
+      let id = searchParams.get("id");
+      return NextResponse.redirect(new URL(`/flare/${id}`, request.url));
+    }
+  }
+  
   return response;
 }

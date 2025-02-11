@@ -44,10 +44,6 @@ async function GetFullData(supa_client) {
         try {
           const files = await getFilesList();
           
-          if (!files || files.length === 0) {
-            return null;
-          }
-
           if (files) {
 
             const signed_urls = files.map((file) => {
