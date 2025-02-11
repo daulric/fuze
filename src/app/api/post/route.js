@@ -126,8 +126,7 @@ async function GetSearchData(supa_client, search_query) {
         return (
           (
             item.Account.username.toLowerCase().includes(search_query_lower) ||
-            item.title.toLowerCase().includes(search_query_lower) ||
-            item.description.toLowerCase().includes(search_query_lower)
+            item.content.toLowerCase().includes(search_query_lower)
           ) &&
           item.is_private === false
         )
@@ -169,8 +168,8 @@ export async function GET(request) {
         const is_user = (await cookies()).get("user");
         if (!is_user) {
             return NextResponse.json({
-                success: false,
-                message: "Authentication required"
+              success: false,
+              message: "Authentication required"
             }, { status: 401 });
         }
         return DatabaseQuery(supa_client, {account_id: is_user.value});

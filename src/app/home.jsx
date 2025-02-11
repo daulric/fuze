@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, Suspense, useRef, useEffect } from 'react';
-import { Play } from 'lucide-react';
 import Image from "next/image";
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }) => {
@@ -98,6 +97,42 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
     </a>
   );
 };
+
+export function PostCard({ post_id, username, avatar, created_at, images }) {
+  return (
+    <Link href={`/flare/${post_id}`}>
+      <Card className="hover:bg-gray-800/50 transition-colors">
+        <CardHeader className="flex flex-row items-center gap-4">
+          <Avatar>
+            <AvatarImage src={avatar} alt={username} />
+            <AvatarFallback>{username[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-semibold">{username}</p>
+            <p className="text-sm text-muted-foreground">{new Date(created_at).toLocaleDateString()}</p>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p>{post.content}</p>
+          {images && images.length > 0 && (
+            <div className="aspect-video relative overflow-hidden rounded-lg bg-muted">
+              <img
+                src={images[0] || "/logo.svg"}
+                alt="Post preview"
+                className="object-cover w-full h-full"
+              />
+              {images.length > 1 && (
+                <div className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur">
+                  +{images.length - 1} more
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
+  )
+}
 
 const VideoGrid = ({ videos }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
