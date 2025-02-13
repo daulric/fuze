@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { cache } from "react";
 import getUrl from "@/lib/geturl";
+import { Suspense } from "react";
 
 const cached_post = cache(async (url, post_id) => {
   
@@ -66,7 +67,9 @@ export default async function PostPage({ params }) {
         </div>
       </header>
       <main className="">
-        <PostView post={post} />
+        <Suspense fallback={<div>Loading flare...</div>}>
+          <PostView post={post} />
+        </Suspense>
       </main>
     </div>
   )

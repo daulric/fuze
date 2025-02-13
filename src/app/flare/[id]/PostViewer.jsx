@@ -1,20 +1,23 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
+import { useSwipeable } from "react-swipeable"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Heart, Eye, Share2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function PostView({ post }) {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null)
-  const [isLiked, setIsLiked] = useState(false)
-  const [likesCount, setLikesCount] = useState(post.likes || 0)
-  const [viewsCount, setViewsCount] = useState(post.views || 0)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likes || 0);
+  const [viewsCount, setViewsCount] = useState(post.views || 0);
   const [authorAvatar, setAuthorAvatar] = useState(null);
+  const [showLikeAnimation, setShowLikeAnimation] = useState(null);
+  const [dialogLastTap, setDialogLastTap] = useState(0)
 
   const openImageView = (index) => {
     setSelectedImageIndex(index)
@@ -25,34 +28,51 @@ export default function PostView({ post }) {
   }
 
   const goToNextImage = () => {
-    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % post.images.length);
+    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % post.images.length)
   }
 
   const goToPreviousImage = () => {
     setSelectedImageIndex((prevIndex) => (prevIndex - 1 + post.images.length) % post.images.length)
   }
 
-  const toggleLike = () => {
+  const toggleLike = useCallback(() => {
     setIsLiked((prev) => !prev)
-    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
-  }
-  
-  useEffect(() => {
+    setLikesCount((prev) => prev + (isLiked ? -1 : 1))
+  }, [isLiked])
+
+  const handleDialogDoubleTap = useCallback(() => {
+    const now = Date.now()
     
+    if ((now - dialogLastTap) < 300) {
+      toggleLike();
+      setShowLikeAnimation(true);
+      setTimeout(() => setShowLikeAnimation(false), 1000);
+    }
+    
+    setDialogLastTap(now);
+  }, [dialogLastTap, toggleLike])
+
+  useEffect(() => {
     async function fetchAuthorAvatar() {
       const response = await fetch(`/api/profile?username=${post.Account.username}`, {
         cache: "no-store",
-      });
-      
-      if (!response.ok) return;
-      const { profile } = await response.json();
-      if (profile.avatar_url === null) return;
-      setAuthorAvatar(profile.avatar_url);
+      })
+
+      if (!response.ok) return
+      const { profile } = await response.json()
+      if (profile.avatar_url === null) return
+      setAuthorAvatar(profile.avatar_url)
     }
-    
-    fetchAuthorAvatar();
-    
-  }, []);
+
+    fetchAuthorAvatar()
+  }, [post.Account.username])
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: goToNextImage,
+    onSwipedRight: goToPreviousImage,
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  })
 
   return (
     <div className="bg-gray-900 flex items-center justify-center p-4">
@@ -60,7 +80,7 @@ export default function PostView({ post }) {
         <CardHeader className="flex-shrink-0 flex flex-col sm:flex-row items-start gap-2 border-b border-gray-700 bg-gray-800 z-10 py-3 rounded">
           <div className="flex items-center gap-4 flex-grow">
             <Avatar>
-              <AvatarImage src={authorAvatar} alt={post?.Account?.username || "/logo.svg" } />
+              <AvatarImage src={authorAvatar} alt={post?.Account?.username || "/logo.svg"} />
               <AvatarFallback className="bg-gray-600">{post?.Account?.username[0]}</AvatarFallback>
             </Avatar>
             <div>
@@ -105,6 +125,7 @@ export default function PostView({ post }) {
                   <Image
                     src={image || "/logo.svg"}
                     alt={`Post image ${index + 1}`}
+                    unoptimized
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -123,8 +144,8 @@ export default function PostView({ post }) {
         <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-gray-800 border-gray-700">
           <DialogTitle className="sr-only">Full size image</DialogTitle>
           {selectedImageIndex !== null && (
-            <div className="relative w-full h-full min-h-[300px]">
-              <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative w-full h-full min-h-[300px]" {...swipeHandlers}>
+              <div className="absolute inset-0 flex items-center justify-center" onTouchStart={handleDialogDoubleTap}>
                 <Image
                   src={post.images[selectedImageIndex] || "/logo.svg"}
                   alt={`Full size image ${selectedImageIndex + 1}`}
@@ -137,6 +158,11 @@ export default function PostView({ post }) {
                     e.currentTarget.src = "/placeholder.svg"
                   }}
                 />
+                {showLikeAnimation === true && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Heart fill="red" className="text-transparent bg-transparent h-24 w-24 animate-ping" />
+                  </div>
+                )}
               </div>
               <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
                 {selectedImageIndex + 1} / {post.images.length}
