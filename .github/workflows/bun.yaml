@@ -1,0 +1,25 @@
+name: Bun CI
+
+on:
+  push:
+    branches: [ "master", "dev-branch", "ua-changes" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        bun-version: [1.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Bun ${{ matrix.bun-version }}
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ matrix.bun-version }}
+      - run: bun install
+      - run: bun run build --if-present
+      - run: bun test --if-present
