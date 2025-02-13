@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
+import directUpload from "./directUpload";
 
 export default function SocialPost() {
   const [thought, setThought] = useState("")
@@ -14,12 +15,32 @@ export default function SocialPost() {
   const [previews, setPreviews] = useState([])
   const fileInputRef = useRef(null)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await fetch("/api/post", {
+      method: "POST",
+      body: JSON.stringify({ content: thought }),
+    }).then(async (response) => {
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) return data.post_id;
+      }
+    }).then(async (post_id) => {
+      if (images && images.length > 0) {
+        const {success, message} = await directUpload(post_id, images);
+        if (!success) throw message;
+        return post_id;
+      }
+
+    }).then((post_id) => {
+      window.location.href = `/flare?id=${post_id}`;
+    }).catch(console.log);
+    
     e.preventDefault()
-    console.log("Posted:", thought, images)
     setThought("")
     setImages([])
-    setPreviews([])
+    setPreviews([]);
+    
   }
 
   const handleImageChange = (e) => {

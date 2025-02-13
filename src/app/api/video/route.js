@@ -213,9 +213,9 @@ export async function PUT(request) {
     const video_db = supa_client.from("Video");
 
     await video_db.update({
-        title: data.title,
-        description: data.description,
-        is_private: data.is_private,
+      title: data.title,
+      description: data.description,
+      is_private: data.is_private,
     }).eq("video_id", video_id);
 
     return NextResponse.json({

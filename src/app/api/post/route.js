@@ -28,10 +28,10 @@ async function GetFullData(supa_client) {
         };
 
         // Add retry logic for signed URLs
-        const getSignedUrl = async (path, retries = 3) => {
+        const getSignedUrl = async (path, length = 30, retries = 3) => {
           for (let i = 0; i < retries; i++) {
             try {
-              const { data, error } = await Uploads_Storage.createSignedUrl(path, 30);
+              const { data, error } = await Uploads_Storage.createSignedUrl(path, length);
               if (error) throw error;
               return data.signedUrl;
             } catch (error) {
@@ -46,9 +46,9 @@ async function GetFullData(supa_client) {
           
           if (files) {
 
-            const signed_urls = files.map((file) => {
-              return getSignedUrl(`${postData.post_id}/${file.name}`);
-            })
+            const signed_urls = await Promise.all(
+              files.map(async (file) => getSignedUrl(`${postData.post_id}/${file.name}`, 300))
+            );
           
             return {
               ...postData,
@@ -187,5 +187,39 @@ export async function GET(request) {
       code: error.code || 'UNKNOWN_ERROR'
     }, { status: error.status || 500 });
     
+  }
+}
+
+export async function POST(request) {
+  try {
+    const supa_client = SupabaseServer();
+    const requested_data = await request.json();
+    
+    const user = (await cookies()).get("user");
+    
+    if (!user) throw "no user";
+    
+    const posts_db = supa_client.from("Posts");
+    const account_id = user.value;
+    
+    const {data, error} = await posts_db.insert({
+      content: requested_data.content,
+      account_id,
+      is_private: false,
+    }).select().single();
+
+    if (error) throw error;
+    
+    return NextResponse.json({
+      success: true,
+      post_id: data.post_id,
+    });
+
+  } catch(e) {
+    return NextResponse.json({
+      success: false,
+      message: e.message || e || "Internal server error",
+      code: e.code || 'UNKNOWN_ERROR'
+    }, { status: e.status || 500 });
   }
 }

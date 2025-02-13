@@ -33,10 +33,10 @@ export async function generateMetadata({params}) {
   }
   
   return {
-    title: `${post.Account.username} using Flare`,
+    title: `${post.Account.username} using flare`,
     description: `${post.Account.username} post a flare`,
     openGraph: {
-      title: `${post.Account.username} using Flare`,
+      title: `${post.Account.username} using flare`,
       description: `${post.Account.username} post a flare`,
       url: canonicalUrl,
     },

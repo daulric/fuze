@@ -25,7 +25,7 @@ export default function PostView({ post }) {
   }
 
   const goToNextImage = () => {
-    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % post.images.length)
+    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % post.images.length);
   }
 
   const goToPreviousImage = () => {
@@ -103,7 +103,7 @@ export default function PostView({ post }) {
                   onClick={() => openImageView(index)}
                 >
                   <Image
-                    src={image || "/placeholder.svg"}
+                    src={image || "/logo.svg"}
                     alt={`Post image ${index + 1}`}
                     fill
                     className="object-cover"
@@ -126,11 +126,12 @@ export default function PostView({ post }) {
             <div className="relative w-full h-full min-h-[300px]">
               <div className="absolute inset-0 flex items-center justify-center">
                 <Image
-                  src={post.images[selectedImageIndex] || "/placeholder.svg"}
+                  src={post.images[selectedImageIndex] || "/logo.svg"}
                   alt={`Full size image ${selectedImageIndex + 1}`}
                   className="max-w-full max-h-full object-contain"
                   width={1200}
                   height={800}
+                  loading="eager"
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg"
                   }}

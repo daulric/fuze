@@ -18,11 +18,11 @@ export async function POST(request) {
         const video_db = supa_client.from("Video");
 
         const { data: final_video_data, error: data_error } = await video_db.insert({
-            title: video_data.title,
-            description: video_data.description,
-            account_id: video_data.account_id,
-            is_private: video_data.is_private,
-            age_18: video_data.age_18,
+          title: video_data.title,
+          description: video_data.description,
+          account_id: video_data.account_id,
+          is_private: video_data.is_private,
+          age_18: video_data.age_18,
         }).select().single();
 
         if (data_error) { throw `Server Error : ${data_error}` }
