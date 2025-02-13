@@ -131,6 +131,7 @@ export default function PostView({ post }) {
                   className="max-w-full max-h-full object-contain"
                   width={1200}
                   height={800}
+                  unoptimized
                   loading="eager"
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg"
