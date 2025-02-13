@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { usePathname } from "next/navigation"
-import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard } from "lucide-react"
+import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard, Pencil } from "lucide-react"
 import { cn } from "@/lib/utils"
 import waitFor from "@/lib/waitFor"
 import Link from "next/link";
@@ -50,6 +50,7 @@ export default function BottomNav() {
   const menuRefs = useRef({})
   const navRef = useRef(null)
   const touchStartRef = useRef(null);
+  const Controller = new AbortController();
   
   const excluded_paths = ["/upload", "/policy", "/settings"];
 
@@ -116,14 +117,12 @@ export default function BottomNav() {
       }
     }
 
-    document.addEventListener("click", handleOutsideClick)
-    document.addEventListener("touchstart", handleTouchStart)
-    document.addEventListener("touchmove", handleTouchMove)
+    document.addEventListener("click", handleOutsideClick, { signal: Controller.signal })
+    document.addEventListener("touchstart", handleTouchStart, { signal: Controller.signal })
+    document.addEventListener("touchmove", handleTouchMove, { signal: Controller.signal })
 
     return () => {
-      document.removeEventListener("click", handleOutsideClick)
-      document.removeEventListener("touchstart", handleTouchStart)
-      document.removeEventListener("touchmove", handleTouchMove)
+      Controller.abort();
     }
   }, [activeMenu, closeMenu]);
   
@@ -161,6 +160,7 @@ export default function BottomNav() {
       >
         <MenuItem href="/" icon={Home} label="Home" isActive={pathname === "/"} />
         {user && <MenuItem href="/upload" icon={Upload} label="Upload" isActive={pathname === "/upload"} />}
+        {user && <MenuItem href="/flare/create" icon={Pencil} label="Flare" isActive={pathname === "/flare/create"} />}
         <MenuItem
           icon={MoreHorizontal}
           label="More"
