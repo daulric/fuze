@@ -169,7 +169,7 @@ export default function BottomNav() {
           onClick={() => toggleMenu("more_item")}
           buttonRef={(el) => (menuRefs.current.more_item = el)}
         />
-        {!user && <MenuItem href={`/auth?p=${usePathInfo()}`} icon={CircleUser} label="Account" isActive={pathname === "/auth"} />}
+        {!user && <MenuItem href={`/auth?${usePathInfo()}`} icon={CircleUser} label="Account" isActive={pathname === "/auth"} />}
       </nav>
     </div>
   )
