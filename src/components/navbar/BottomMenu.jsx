@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { usePathname } from "next/navigation"
-import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard, Pencil } from "lucide-react"
+import { Home, Upload, Heart, History, MoreHorizontal, LucideLayoutDashboard, Pencil, CircleUser } from "lucide-react"
 import { cn } from "@/lib/utils"
 import waitFor from "@/lib/waitFor"
 import Link from "next/link";
+import {usePathInfo} from "@/lib/getPathname"
 
 const MenuItem = ({ href, icon: Icon, label, isActive, onClick, buttonRef }) => {
   const Content = (
@@ -168,6 +169,7 @@ export default function BottomNav() {
           onClick={() => toggleMenu("more_item")}
           buttonRef={(el) => (menuRefs.current.more_item = el)}
         />
+        {!user && <MenuItem href={`/auth?${usePathInfo()}`} icon={CircleUser} label="Account" isActive={pathname === "/auth"} />}
       </nav>
     </div>
   )
