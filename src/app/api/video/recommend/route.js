@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 export async function POST(request) {
 
   try {
-    const { limit } = await request.json();
+    const { limit, length = 30 } = await request.json();
     if (!limit) throw "Limit Not Provided!";
     
     const supabase = SupabaseServer();
@@ -47,8 +47,8 @@ export async function POST(request) {
         
         // Getting Signed Url for these data;
         const [signed_video, signed_thumbnail] = await Promise.all([
-          videoFile && VideoStorage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 30),
-          thumbnailFile && VideoStorage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 30),
+          videoFile && VideoStorage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, length),
+          thumbnailFile && VideoStorage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, length),
         ]);
   
         const videoUrl = videoFile ? signed_video.data.signedUrl : null;

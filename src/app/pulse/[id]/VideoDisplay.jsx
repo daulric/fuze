@@ -99,7 +99,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
     const response = await fetch("/api/video/recommend", {
       method: "POST", 
-      body: JSON.stringify({limit: 5})
+      body: JSON.stringify({limit: 5, length: 60})
     });
     
     if (!response.ok) return [];

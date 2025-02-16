@@ -68,10 +68,10 @@ async function GetFullData(supa_client) {
           };
 
           // Add retry logic for signed URLs
-          const getSignedUrl = async (path, retries = 3) => {
+          const getSignedUrl = async (path, length = 30, retries = 3) => {
               for (let i = 0; i < retries; i++) {
                   try {
-                      const { data, error } = await Uploads_Storage.createSignedUrl(path, 30);
+                      const { data, error } = await Uploads_Storage.createSignedUrl(path, length);
                       if (error) throw error;
                       return data.signedUrl;
                   } catch (error) {
@@ -94,8 +94,8 @@ async function GetFullData(supa_client) {
               const thumbnailFile = files.find(file => file.name.includes("thumbnail"));
 
               const [videoUrl, thumbnailUrl] = await Promise.all([
-                  videoFile ? getSignedUrl(`${videoData.video_id}/${videoFile.name}`) : Promise.resolve(null),
-                  thumbnailFile ? getSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`) : Promise.resolve("/logo.svg")
+                  videoFile ? getSignedUrl(`${videoData.video_id}/${videoFile.name}`, 300) : Promise.resolve(null),
+                  thumbnailFile ? getSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 300) : Promise.resolve("/logo.svg")
               ]);
               
             

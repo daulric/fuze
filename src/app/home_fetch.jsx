@@ -57,7 +57,7 @@ export default function Home() {
         if (e === "new") {
   
           const response = await fetch(`/api/video/recommend`, {
-            body: JSON.stringify({ limit: 16 }),
+            body: JSON.stringify({ limit: 16, length: 60 }),
             method: "POST",
           });
         
