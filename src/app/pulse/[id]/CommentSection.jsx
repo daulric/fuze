@@ -50,7 +50,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   const [isLoading, setIsLoading] = useState(true);
   const user_client = useUser();
   const [pre_comment_profiles, setPreCommentProfiles] = useState(null);
-  const [all_profile_fetched, setAllProfilesFetched] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const supabase = SupabaseClient();
@@ -65,7 +64,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     }
 
     async function getProfilesForComments() {
-      if (all_profile_fetched) return;
       if (pre_comment_profiles) return;
       const profiles = await getProfiles();
       setPreCommentProfiles(profiles);
@@ -158,7 +156,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
       setComments([]);
     }
 
-  }, [all_profile_fetched, pre_comment_profiles, supabase, videoId]);
+  }, [pre_comment_profiles, supabase, videoId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -185,8 +183,8 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   function handleTyping(e) {
     setIsTyping(true);
     setNewComment(e.target.value);
-    clearTimeout(window.typingTimeout);
-    window.typingTimeout = setTimeout(() => setIsTyping(false), 1000);
+    clearTimeout(globalThis.typingTimeout);
+    globalThis.typingTimeout = setTimeout(() => setIsTyping(false), 1000);
   }
 
   const getRecentComments = () => {

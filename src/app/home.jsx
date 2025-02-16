@@ -2,6 +2,8 @@
 
 import { useState, Suspense, useRef, useEffect } from 'react';
 import Image from "next/image";
+import Link from "next/link";
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -41,7 +43,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
   }, []);
 
   return (
-    <a
+    <Link
       className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       href={link}
     >
@@ -94,7 +96,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
           {views} views • {uploadTime}
         </p>
       </div>
-    </a>
+    </Link>
   );
 };
 

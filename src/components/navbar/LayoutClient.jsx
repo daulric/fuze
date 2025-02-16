@@ -33,9 +33,9 @@ const ClientWrapper = ({ children }) => {
   useEffect(() => {
 
     const checkMobile = () => {
-      const is_pwa = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      const is_pwa = globalThis.navigator.standalone || globalThis.matchMedia('(display-mode: standalone)').matches;
       const pathExcluded = getPathName();
-      const mobile = window.innerWidth < 1080;
+      const mobile = globalThis.innerWidth < 1080;
       
       setIsMobile(() => {
         
@@ -81,7 +81,7 @@ const ClientWrapper = ({ children }) => {
     getUser();
 
     checkMobile();
-    window.addEventListener("resize", checkMobile, { signal: controller.signal })
+    globalThis.addEventListener("resize", checkMobile, { signal: controller.signal })
     return () => controller.abort()
   }, [pathName])
 

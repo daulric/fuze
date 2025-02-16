@@ -9,8 +9,8 @@ export default function PULSE_CLIENT_PWA() {
   const [isPwa, setIsPwa] = useState(false);
   
   useEffect(() => {
-    const isPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-
+    const isPWA = globalThis.navigator.standalone || globalThis.matchMedia('(display-mode: standalone)').matches;
+    
     if (isPWA && isMobile()) {
       setIsPwa(true);
     }

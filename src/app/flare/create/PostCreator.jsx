@@ -33,7 +33,7 @@ export default function SocialPost() {
       }
 
     }).then((post_id) => {
-      window.location.href = `/flare?id=${post_id}`;
+      globalThis.location.href = `/flare?id=${post_id}`;
     }).catch(console.log);
     
     e.preventDefault()

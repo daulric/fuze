@@ -167,9 +167,7 @@ const AuthPage = () => {
     if (isLogin === true) {
       handleLoginForm(user_info, setMsg).then((success) => {
         if (success === true) {
-          setTimeout(() => {
-            window.location.href = `${redirected_path || "/"}?${path_to_redirect}`
-          }, 1000);
+          globalThis.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
         } else if (success === false) {
           setIsLogining(false);
         }
@@ -177,9 +175,7 @@ const AuthPage = () => {
     } else if (isLogin === false) {
       handleSignupForm(user_info, setMsg).then((success) => {
         if (success === true) {
-          setTimeout(() => {
-            window.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
-          }, 1000);
+          globalThis.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
         } else if (success === false) {
           setIsLogining(false);
         }

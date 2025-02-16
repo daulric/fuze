@@ -30,7 +30,7 @@ function Logout() {
     sessionStorage.removeItem("user")
   }
 
-  window.location.reload();
+  globalThis.location.reload();
 }
 
 const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) => {
@@ -109,14 +109,14 @@ const AccountProfileContent = ({user, router, toggleSidebar, isSidebarHidden, is
             <>
               <DropdownMenuItem
                 className="flex items-center bg-gray-700 text-gray-50"
-                onClick={() => (window.location.href = "/profile")}
+                onClick={() => (globalThis.location.href = "/profile")}
               >
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex items-center bg-gray-700 text-gray-50"
-                onClick={() => (window.location.href = "/settings")}
+                onClick={() => (globalThis.location.href = "/settings")}
               >
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
@@ -126,7 +126,7 @@ const AccountProfileContent = ({user, router, toggleSidebar, isSidebarHidden, is
           {!user && (
             <DropdownMenuItem
               className="flex items-center bg-gray-700 text-gray-50"
-              onClick={() =>  window.location.href = `/auth?${usePathInfo()}`}
+              onClick={() =>  globalThis.location.href = `/auth?${usePathInfo()}`}
             >
               <LogIn className="mr-2 h-4 w-4" />
               <span>Login</span>
@@ -134,7 +134,7 @@ const AccountProfileContent = ({user, router, toggleSidebar, isSidebarHidden, is
           )}
           <DropdownMenuItem
             className="flex items-center bg-gray-700 text-gray-50"
-            onClick={() => (window.location.href = "/policy")}
+            onClick={() => (globalThis.location.href = "/policy")}
           >
             <Settings className="mr-2 h-4 w-4" />
             <span>Policy</span>

@@ -1,12 +1,12 @@
 "use client";
 
 export function usePathInfo() {
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const pathname = typeof globalThis !== "undefined" ? globalThis.location.pathname : "";
 
   // Get query parameters as an object
   const getQueryParams = () => {
-    if (typeof window === "undefined") return {};
-    const searchParams = new URLSearchParams(window.location.search);
+    if (typeof globalThis === "undefined") return {};
+    const searchParams = new URLSearchParams(globalThis.location.search);
     return Object.fromEntries(searchParams.entries());
   };
 

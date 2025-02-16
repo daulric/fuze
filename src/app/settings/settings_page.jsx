@@ -86,7 +86,7 @@ const SettingsPage = () => {
     const data = await response.json();
 
     if (data.success === false) { setProfileSaving(false); return;}
-    return window.location.reload();
+    return globalThis.location.reload();
   };
 
   return (

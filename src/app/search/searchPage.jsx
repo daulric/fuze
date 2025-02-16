@@ -67,11 +67,13 @@ const SearchResults = () => {
       setSearchQuery(searchQuery); // Keep input in sync with URL
       
       const getData = async () => {
+
         if (!searchQuery) {
           setSearchedVideos([]);
           return;
         }
-  
+        
+        if (searched_videos.length > 0) return;
         setIsLoading(true);
 
         try {

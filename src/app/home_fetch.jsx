@@ -2,24 +2,8 @@
 
 import { useEffect, useState } from "react";
 import HomePage from "./home";
-import { Result } from "postcss";
 
-interface VideoItem {
-  title: string;
-  views: number;
-  video_id: string | number;
-  upload_at: string;
-  Account: { username: string };
-  thumbnail: string;
-  video: string;
-}
-
-type CachedVideos = {
-  data: unknown;
-  expires: number;
-}
-
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr) {
   const diff =  Date.now() - new Date(dateStr).getTime(); // Difference in milliseconds
 
   const seconds = Math.floor(diff / 1000);
@@ -39,7 +23,7 @@ function timeAgo(dateStr: string): string {
   return 'just now';
 }
 
-function format_views(views: number) {
+function format_views(views) {
   if (views >= 1e6) {
     return (views / 1e6).toFixed(1) + 'M'; // Format in millions
   } else if (views >= 1e3) {
@@ -50,16 +34,17 @@ function format_views(views: number) {
 }
 
 export default function Home() {
-  const [data, setData] = useState<unknown | null>(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     async function getRandomVideos() {
+      
       try {
-        if (data) return;
+        if (data && data.length > 0) return;
         if (!sessionStorage.getItem("home_page_video_cache")) throw "new";
   
-        const store: string = sessionStorage.getItem("home_page_video_cache") || "{}";
-        const cached_videos: CachedVideos = JSON.parse(store);
+        const store = sessionStorage.getItem("home_page_video_cache") || "{}";
+        const cached_videos = JSON.parse(store);
         
         if (!cached_videos.expires || !cached_videos.data) throw "new";
       
@@ -70,8 +55,7 @@ export default function Home() {
       } catch (e) {
 
         if (e === "new") {
-          if (data) return;
-          
+  
           const response = await fetch(`/api/video/recommend`, {
             body: JSON.stringify({ limit: 16 }),
             method: "POST",
@@ -84,7 +68,7 @@ export default function Home() {
           
           if (new_data.length === 0) return;
 
-          const temp_data = new_data.map((i: VideoItem) => {
+          const temp_data = new_data.map((i) => {
             return {
               title: i.title,
               views: format_views(i.views),
@@ -96,7 +80,7 @@ export default function Home() {
             };
           });
           
-          const new_cached_data: CachedVideos = {
+          const new_cached_data = {
             data: temp_data,
             expires: Date.now(),
           }

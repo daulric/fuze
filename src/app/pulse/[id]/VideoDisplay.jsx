@@ -77,22 +77,20 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   };
 
   const is_private_video = useCallback(() => {
-    const user_client = JSON.parse(sessionStorage.getItem("user"));
-    
+
     if (VideoData.is_private === true) {
       
-      if (!user_client) {
+      if (!user) {
         return notFound();
       }
       
-      if (user_client.username !== VideoData.Account.username) {
+      if (user.username !== VideoData.Account.username) {
         return notFound();
       }
     }
   }, [VideoData]);
 
   const fetchRecommendedVids = useCallback(async () => {
-    if (recommendedVideos) return;
 
     function getRandomItems(array, count) {
       const shuffled = array.sort(() => 0.5 - Math.random());
@@ -114,10 +112,11 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
   }, [VideoData.video_id]);
 
-  //Fetch Video
+  //Fetch Videos
   useEffect(() => {
     
     async function getVideoLikes() {
+      if (likes || dislikes) return;
       const response = await fetch(`/api/video/likes?video_id=${VideoData.video_id}`);
 
       if (!response.ok) return;
@@ -175,7 +174,10 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
 
     getVideoLikes();
-    fetchRecommendedVids();
+    if (!recommendedVideos) {
+      fetchRecommendedVids();
+    }
+
     addWatchList();
     
     return () => {
@@ -272,8 +274,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         case "UPDATE":
           if  (payload.new.video_id === VideoData.video_id) {
             if (payload.new.is_private === true) {
-              if (!user) return window.location.reload();
-              if (user.username !== VideoData.Account.username) return window.location.reload();
+              if (!user) return globalThis.location.reload();
+              if (user.username !== VideoData.Account.username) return globalThis.location.reload();
             }
           }
 
@@ -341,7 +343,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <button onClick={() => window.location.href = `/profile/${VideoData?.Account?.username}`} className="flex items-center space-x-3">
+            <button onClick={() => globalThis.location.href = `/profile/${VideoData?.Account?.username}`} className="flex items-center space-x-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={VideoData?.uploaderPic} alt={VideoData?.Account?.username} />
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
