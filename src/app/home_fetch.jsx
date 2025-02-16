@@ -49,7 +49,7 @@ export default function Home() {
         if (!cached_videos.expires || !cached_videos.data) throw "new";
       
         const expired_time = (Date.now() - cached_videos.expires) / 1000;
-        if (expired_time > 15) throw "new";
+        if (expired_time > 60) throw "new";
         
         setData(cached_videos.data);
       } catch (e) {

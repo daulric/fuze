@@ -8,6 +8,7 @@ import BottomMenu from "@/components/navbar/BottomMenu";
 import GetMobile from "@/lib/isMobileDevice";
 import { UserContext } from "@/lib/UserContext"
 import store from "@/tools/cookieStore";
+import DeepComparison from "@/lib/DeepComparison";
 
 const cookieStore = store();
 
@@ -55,6 +56,11 @@ const ClientWrapper = ({ children }) => {
       const user_token = cookieStore.get("user");
       
       if (!user_token) return;
+      const user_data = JSON.parse(sessionStorage.getItem("user"))
+      
+      if (user_data) {
+        setUser(user_data);
+      }
       
       const query = new URLSearchParams({
         account_id: user_token,
@@ -63,6 +69,7 @@ const ClientWrapper = ({ children }) => {
       
       const res = await fetch(`/api/profile?${query.toString()}`, {
         cache: "no-cache",
+        signal: controller.signal,
       });
       
       if (!res.ok) return
@@ -71,11 +78,12 @@ const ClientWrapper = ({ children }) => {
       if (profile) {
         delete profile.Video;
         delete profile.Posts;
-        sessionStorage.setItem("user", JSON.stringify(profile));
-        setUser(profile);
+        
+        if (!DeepComparison(user_data, profile)) {
+          sessionStorage.setItem("user", JSON.stringify(profile));
+          setUser(profile);
+        }
       }
-      
-      console.log("getting user from LAYOUTCLIENT");
     }
     
     getUser();
