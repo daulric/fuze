@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import waitFor from "@/lib/waitFor"
 import Link from "next/link";
 import {usePathInfo} from "@/lib/getPathname"
+import { useUser } from "@/lib/UserContext"
 
 const MenuItem = ({ href, icon: Icon, label, isActive, onClick, buttonRef }) => {
   const Content = (
@@ -45,7 +46,7 @@ const SubMenuItem = ({ link, text, Icon, onClick }) => (
 
 export default function BottomNav() {
   const pathname = usePathname()
-  const [user, setUser] = useState(null)
+  const user = useUser();
   const [activeMenu, setActiveMenu] = useState(null)
   const [submenuPosition, setSubmenuPosition] = useState({ left: 0, width: 0 })
   const menuRefs = useRef({})
@@ -54,15 +55,6 @@ export default function BottomNav() {
   const Controller = new AbortController();
   
   const excluded_paths = ["/upload", "/policy", "/settings"];
-
-  useEffect(() => {
-    waitFor(() => sessionStorage.getItem("user"), 200).then(() => {
-      const userData = JSON.parse(sessionStorage.getItem("user"))
-      if (userData) {
-        setUser(userData)
-      }
-    })
-  }, [])
 
   const toggleMenu = useCallback(
     (menuName) => {

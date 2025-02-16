@@ -12,25 +12,13 @@ import { Pencil, Upload } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import waitFor from '@/lib/waitFor';
+import { useUser } from "@/lib/UserContext";
 
 export default function CreatorDashboard() {
   const [videos, setVideos] = useState(null);
   const [blogs, setBlogs] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-
-  useEffect(() => {
-    waitFor(() => {
-      return sessionStorage.getItem("user") !== null;
-    }, 500).then(() => {
-      const user_data = JSON.parse(sessionStorage.getItem("user"));
-      if (!user_data) return;
-      setUserProfile(user_data);
-    });
-
-    return () => {
-      setUserProfile(null);
-    }
-  }, []);
+  const user = useUser();
+  const [userProfile, setUserProfile] = useState(user);
 
   useEffect(() => {
     async function fetch_videos() {

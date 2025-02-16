@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useUser } from "@/lib/UserContext"
 
 const SettingsPage = () => {
   const [profilePicture, setProfilePicture] = useState(null);
@@ -22,16 +23,8 @@ const SettingsPage = () => {
   });
   const [ProfileSaving, setProfileSaving] = useState(false);
 
-  const [user, setUser] = useState(null);
+  const user = useUser();
   const [copied, setCopied] = useState(false);
-
-  const fetchUser = useCallback(() => {
-    if (user) return;
-    const temp_user = JSON.parse(sessionStorage.getItem('user'));
-    if (!temp_user) return;
-
-    setUser(temp_user);
-  }, [user, setUser])
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
@@ -60,7 +53,6 @@ const SettingsPage = () => {
     }
   };
 
-  useEffect(() => fetchUser(), [fetchUser]);
   useEffect(() => {
     if (!user) return;
     setAboutMe(user.aboutme)

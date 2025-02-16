@@ -109,6 +109,10 @@ export default function Home() {
     }
     
     getRandomVideos();
+    
+    return () => {
+      setData(null);
+    }
   }, []);
 
   return (

@@ -4,21 +4,20 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 
 export const metadata = {
-    title: "My Profile",
+  title: "My Profile",
 }
 
 export default async function PAGE() {
-    // Fetch username here
+  // Fetch username here
+  const user_token = (await cookies()).get("user")
+  
+  if (!user_token) {
+    return notFound();
+  }
 
-    const user_token = (await cookies()).get("user")
-    
-    if (!user_token) {
-        return notFound();
-    }
-
-    return (
-        <Suspense fallback={<div>loading profile...</div>} >
-            <ProfileDisplay />
-        </Suspense>
-    )
+  return (
+    <Suspense fallback={<div>loading profile...</div>} >
+      <ProfileDisplay />
+    </Suspense>
+  )
 }

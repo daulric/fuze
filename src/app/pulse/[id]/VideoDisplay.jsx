@@ -13,6 +13,7 @@ import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
 import waitFor from '@/lib/waitFor';
+import { useUser } from "@/lib/UserContext"
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -23,7 +24,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [viewCount, setViewCount] = useState(null);
   const videoContainerRef = useRef(null);
   const [isCommenting, setIsCommenting] = useState(false);
-  const [user, setUser] = useState(null);
+  const user = useUser();
   const [recommendedVideos, setRecommendedVideos] = useState(null);
   const supabase = SupabaseServer();
 
@@ -172,14 +173,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       moveToTop(watchHistory, VideoData.video_id);
       localStorage.setItem("watchHistory", JSON.stringify(watchHistory));
     }
-    
-    waitFor(() => sessionStorage.getItem("user"), 500).then(() => {
-      const user_data = sessionStorage.getItem("user");
-      
-      if (user_data) {
-        setUser(JSON.parse(user_data));
-      }
-    });
 
     getVideoLikes();
     fetchRecommendedVids();
@@ -190,7 +183,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       setDislikes(null);
       setUserLiked(null);
       setUserDisliked(null);
-      setUser(null);
       setRecommendedVideos(null);
     }
 

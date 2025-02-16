@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator"
+import { useUser } from "@/lib/UserContext"
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
   <Link href={href} >
@@ -20,24 +21,11 @@ const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
 
 const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) => {
   const [collapsed] = useState(defaultCollapsed);
-  const [user, setUser] = useState(null);
+  const user = useUser();
   const sidebarRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const minSwipeDistance = 50;
-
-  useEffect(() => {
-    const checkStorage = () => {
-      const item = sessionStorage.getItem("user");
-      if (item !== null) {
-        setUser(JSON.parse(item));
-      } else {
-        setTimeout(checkStorage, 3);
-      }
-    };
-
-    checkStorage()
-  }, [setUser]);
 
   useEffect(() => {
     const controller = new AbortController();

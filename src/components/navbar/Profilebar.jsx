@@ -9,6 +9,7 @@ import { useRouter, usePathname, useSearchParams, redirect } from "next/navigati
 import Image from "next/image";
 import SearchBar from "./Searchbar";
 import { usePathInfo } from "@/lib/getPathname";
+import { useUser } from "@/lib/UserContext"
 
 const cookieStore = store();
 
@@ -33,17 +34,14 @@ function Logout() {
 }
 
 const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) => {
-  const [user, setUser] = useState(null);
+  const user = useUser();
   const router = useRouter();
-  const currentPathName = usePathname();
 
   return (
     <Suspense>
       <AccountProfileContent
         isPWA={isPWA}
         user={user}
-        setUser={setUser}
-        currentPathName={currentPathName}
         router={router}
         toggleSidebar={toggleSidebar}
         isSidebarHidden={isSidebarHidden}
@@ -53,70 +51,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
   );
 };
 
-const AccountProfileContent = ({
-  user,
-  setUser,
-  currentPathName,
-  router,
-  toggleSidebar,
-  isSidebarHidden,
-  isMobile,
-  isPWA
-}) => {
-  const searchParams = useSearchParams();
-
-  const allQueryParams = useMemo(() => {
-    return Object.fromEntries(searchParams.entries());
-  }, [searchParams]);
-
-  const queryParams = useMemo(() => {
-    let temp_string = "";
-    for (const [key, value] of Object.entries(allQueryParams)) {
-      if (key !== "p") {
-        temp_string += `&${key}=${value}`;
-      }
-    }
-    return temp_string;
-  }, [allQueryParams]);
-
-  useEffect(() => {
-    const fetch_profile = async () => {
-      const user_token = cookieStore.get("user");
-
-      if (!user_token) {
-        //sessionStorage.removeItem("user");
-        if (currentPathName === "/auth" && allQueryParams) return;
-        return; //(window.location.href = `/auth?p=${currentPathName}${queryParams}`);
-      }
-
-      const query = new URLSearchParams({
-        account_id: user_token,
-        allowId: true,
-      });
-
-      const response = await fetch(`/api/profile?${query.toString()}`, {
-        cache: "no-cache",
-      });
-
-      if (!response.ok) {
-        return (window.location.href = `/auth?p=${currentPathName}?${queryParams}`);
-      }
-
-      const account_data = await response.json();
-
-      if (account_data.profile) {
-        delete account_data.profile.Video;
-        delete account_data.profile.Posts;
-
-        const string_data = JSON.stringify(account_data.profile);
-        sessionStorage.setItem("user", string_data);
-        setUser(account_data.profile);
-      }
-    };
-
-    fetch_profile();
-  }, [currentPathName, queryParams, allQueryParams, setUser]);
-
+const AccountProfileContent = ({user, router, toggleSidebar, isSidebarHidden, isMobile, isPWA }) => {
   return (
     <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
       <div className="flex items-center space-x-4">

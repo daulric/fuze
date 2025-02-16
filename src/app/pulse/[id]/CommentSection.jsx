@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
 import { User, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useUser } from "@/lib/UserContext"
 
 import SupabaseClient from "@/supabase/server";
 
@@ -47,7 +48,7 @@ const CommentSection = ({ videoId, setIsTyping }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [user_client, setUserClient] = useState(null);
+  const user_client = useUser();
   const [pre_comment_profiles, setPreCommentProfiles] = useState(null);
   const [all_profile_fetched, setAllProfilesFetched] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -118,8 +119,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
       }
     };
 
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    setUserClient(user);
     getProfilesForComments();
     loadComments();
 
