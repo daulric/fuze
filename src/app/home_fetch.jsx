@@ -38,9 +38,9 @@ export default function Home() {
 
   useEffect(() => {
     async function getRandomVideos() {
-      
+      if (data) return;
+  
       try {
-        if (data && data.length > 0) return;
         if (!sessionStorage.getItem("home_page_video_cache")) throw "new";
   
         const store = sessionStorage.getItem("home_page_video_cache") || "{}";
@@ -53,9 +53,8 @@ export default function Home() {
         
         setData(cached_videos.data);
       } catch (e) {
-
         if (e === "new") {
-  
+
           const response = await fetch(`/api/video/recommend`, {
             body: JSON.stringify({ limit: 16, length: 60 }),
             method: "POST",

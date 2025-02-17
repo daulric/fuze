@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Rewind, FastForward } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
@@ -15,6 +17,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
+  const controller = new AbortController();
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
@@ -109,8 +112,6 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-    
     const handleKeyPress = (e) => {
       switch (e.key.toLowerCase()) {
         case ' ':
@@ -144,10 +145,13 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
           break;
       }
     };
-    
-    if (!isCommenting) {
-      document.addEventListener('keydown', handleKeyPress, { signal: controller.signal });
-    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) return;
+      handleKeyPress(e);
+    }, {
+      signal: controller.signal
+    });
     
     const video_player = videoRef.current;
 

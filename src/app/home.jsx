@@ -46,6 +46,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
     <Link
       className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       href={link}
+      prefetch={false}
     >
       <div className="relative">
         <div

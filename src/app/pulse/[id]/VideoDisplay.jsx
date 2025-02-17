@@ -23,7 +23,6 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [userDisliked, setUserDisliked] = useState(null);
   const [viewCount, setViewCount] = useState(null);
   const videoContainerRef = useRef(null);
-  const [isCommenting, setIsCommenting] = useState(false);
   const user = useUser();
   const [recommendedVideos, setRecommendedVideos] = useState(null);
   const supabase = SupabaseServer();
@@ -91,6 +90,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   }, [VideoData]);
 
   const fetchRecommendedVids = useCallback(async () => {
+    
+    if (recommendedVideos) return;
 
     function getRandomItems(array, count) {
       const shuffled = array.sort(() => 0.5 - Math.random());
@@ -116,7 +117,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   useEffect(() => {
     
     async function getVideoLikes() {
-      if (likes || dislikes) return;
+      if (likes && dislikes) return;
       const response = await fetch(`/api/video/likes?video_id=${VideoData.video_id}`);
 
       if (!response.ok) return;
@@ -174,9 +175,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     }
 
     getVideoLikes();
-    if (!recommendedVideos) {
-      fetchRecommendedVids();
-    }
+    fetchRecommendedVids();
 
     addWatchList();
     
@@ -324,10 +323,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
               </div>
             }>
               <div className="absolute inset-0">
-                <VideoPlayer
-                  isCommenting={isCommenting}
-                  videoData={VideoData}
-                />
+                <VideoPlayer videoData={VideoData} />
               </div>
             </Suspense>
           ) : (
@@ -447,7 +443,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         </Card>
 
         <Suspense fallback={<div>loading comments...</div>} >
-          <CommentSection videoId={VideoData.video_id} setIsTyping={setIsCommenting} />
+          <CommentSection videoId={VideoData.video_id} />
         </Suspense>
 
         <div className="bg-gray-900 min-h-screen p-4">

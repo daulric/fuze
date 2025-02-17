@@ -44,7 +44,7 @@ const Comment = ({ user, comment, created_at }) => {
   );
 };
 
-const CommentSection = ({ videoId, setIsTyping }) => {
+const CommentSection = ({ videoId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -180,13 +180,6 @@ const CommentSection = ({ videoId, setIsTyping }) => {
     }
   };
 
-  function handleTyping(e) {
-    setIsTyping(true);
-    setNewComment(e.target.value);
-    clearTimeout(globalThis.typingTimeout);
-    globalThis.typingTimeout = setTimeout(() => setIsTyping(false), 1000);
-  }
-
   const getRecentComments = () => {
     return comments.slice(0, 3);
   };
@@ -216,13 +209,12 @@ const CommentSection = ({ videoId, setIsTyping }) => {
             <form onSubmit={handleSubmit} className="flex-1">
               <Textarea
                 value={newComment}
-                onChange={handleTyping}
-                onFocus={() => setIsTyping(true)}
+                onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add a comment..."
                 className="mb-2 resize-none bg-gray-800 text-gray-100 border-gray-700"
               />
               <div className="flex justify-end">
-                <Button type="submit" variant="secondary" onClick={() => setIsTyping(false)} className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
+                <Button type="submit" variant="secondary" className="bg-gray-700 text-gray-100 hover:bg-gray-600">Comment</Button>
               </div>
             </form>
           </div>
