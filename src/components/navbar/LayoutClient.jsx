@@ -6,25 +6,16 @@ import Sidebar from "@/components/navbar/Sidebar"
 import { usePathname } from "next/navigation"
 import BottomMenu from "@/components/navbar/BottomMenu";
 import GetMobile from "@/lib/isMobileDevice";
-import { UserContext } from "@/lib/UserContext"
-import store from "@/tools/cookieStore";
-import DeepComparison from "@/lib/DeepComparison";
-
-const cookieStore = store();
+import { UserContextProvider } from "@/lib/UserContext";
 
 const ClientWrapper = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isPWA, setIsPWA] = useState(false);
-  const [user, setUser] = useState(null);
   const pathName = usePathname();
   const controller = new AbortController();
 
   const PathNameList = ["video", "pulse"];
-  
-  controller.signal.addEventListener("abort", () => {
-    setUser(null);
-  });
   
   function getPathName() {
     const splited = pathName.split("/")[1]
@@ -51,42 +42,6 @@ const ClientWrapper = ({ children }) => {
       })
 
     }
-    
-    async function getUser() {
-      const user_token = cookieStore.get("user");
-      
-      if (!user_token) return;
-      const user_data = JSON.parse(sessionStorage.getItem("user"))
-      
-      if (user_data) {
-        setUser(user_data);
-      }
-      
-      const query = new URLSearchParams({
-        account_id: user_token,
-        allowId: true,
-      });
-      
-      const res = await fetch(`/api/profile?${query.toString()}`, {
-        cache: "no-cache",
-        signal: controller.signal,
-      });
-      
-      if (!res.ok) return
-      const { profile } = await res.json();
-      
-      if (profile) {
-        delete profile.Video;
-        delete profile.Posts;
-        
-        if (!DeepComparison(user_data, profile)) {
-          sessionStorage.setItem("user", JSON.stringify(profile));
-          setUser(profile);
-        }
-      }
-    }
-    
-    getUser();
 
     checkMobile();
     globalThis.addEventListener("resize", checkMobile, { signal: controller.signal })
@@ -104,7 +59,7 @@ const ClientWrapper = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={user}>
+    <UserContextProvider>
       <div className="relative h-screen overflow-hidden overscroll-none">
         <div className="flex h-screen">
           <ProfileBar toggleSidebar={toggleSidebar} isSidebarHidden={isHidden} isMobile={isMobile} isPWA={isPWA} />
@@ -120,7 +75,7 @@ const ClientWrapper = ({ children }) => {
           {(isPWA && isMobile) && <BottomMenu />}
         </div>
       </div>
-    </UserContext.Provider>
+    </UserContextProvider>
   )
 }
 

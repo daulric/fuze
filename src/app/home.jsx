@@ -70,7 +70,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
             className={`absolute inset-0 w-full h-full object-contain z-10 transition-opacity duration-500 ${
               isHovered ? "opacity-20" : "opacity-100"
             }`}
-            loading='eager'
+            unoptimized
           />
 
           {/* Video Element */}
