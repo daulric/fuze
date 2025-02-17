@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
+import { useState, useEffect } from "react"
 import ProfileBar from "@/components/navbar/Profilebar"
 import Sidebar from "@/components/navbar/Sidebar"
 import { usePathname } from "next/navigation"

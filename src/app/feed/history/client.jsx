@@ -32,47 +32,48 @@ const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   );
 };
   
-export default function HistoryPage({history}) {
-  const [histories, setHistory] = useState(history || null);
+export default function HistoryPage() {
+  const [histories, setHistory] = useState(null);
 
   useEffect(() => {
     const history_data = JSON.parse(localStorage.getItem('watchHistory'));
     
     async function fetchHistory() {
-      if (history_data) {
-        const response = await fetch("/api/video/group", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({group: history_data}),
+      if (!history_data) return;
+      if (histories) return;
+
+      const response = await fetch("/api/video/group", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({group: history_data, length: 300}),
+      });
+      
+      if (!response.ok) return;
+      
+      const { success, data } = await response.json();
+      
+      if (success === true) {
+        const perma_data = data.sort((a, b) => {
+          const indexA = history_data.indexOf(a.video_id);
+          const indexB = history_data.indexOf(b.video_id);
+          
+          return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
         });
         
-        if (!response.ok) return;
-        
-        const { success, data } = await response.json();
-        
-        if (success === true) {
-          const perma_data = data.sort((a, b) => {
-            const indexA = history_data.indexOf(a.video_id);
-            const indexB = history_data.indexOf(b.video_id);
-            
-            return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
-          });
-          
-          setHistory(perma_data);
-          return;
-        }
+        setHistory(perma_data);
+        return;
       }
     }
     
     fetchHistory();
 
-  }, [history]);
+  }, []);
 
   function clearHistory() {
     setHistory(null);
-    if (localStorage.getItem('watchHistory') === null) return;
+    if (!localStorage.getItem('watchHistory')) return;
     localStorage.removeItem('watchHistory');
   }
 
@@ -87,11 +88,11 @@ export default function HistoryPage({history}) {
       </div>
       <br/>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {histories ? histories.map((video) => (
-          <HistoryVideoCard key={video.id} link={`/pulse?id=${video.video_id}`} {...video} />
-        )) : 
-        (<div>No history found</div>)
-        }
+      {histories ? histories.map((video) => (
+          <HistoryVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} {...video} />
+        )) 
+        : <div>No history found</div>
+      }
       </div>
     </div>
   );

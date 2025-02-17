@@ -26,8 +26,6 @@ async function GetUserProfiles() {
             { sortBy: { column: 'created_at', order: 'desc' } }
           );
           
-          console.log(ProfilePic);
-          
           if (ProfilePic.length !== 0) {
             const findPic = ProfilePic[0];
             user.avatar_url = ProfileStorage.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl;

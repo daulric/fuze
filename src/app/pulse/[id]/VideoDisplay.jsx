@@ -12,7 +12,6 @@ import RecommendedVideos from './RecommendedSection';
 import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
-import waitFor from '@/lib/waitFor';
 import { useUser } from "@/lib/UserContext"
 
 const YouTubeStylePlayer = ({ VideoData }) => {
@@ -163,7 +162,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       return;
     }
 
-    async function addWatchList() {
+    function addWatchList() {
       let watchHistory = [];
 
       if (localStorage.getItem("watchHistory") !== null) {

@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState, useMemo } from "react";
+import { Suspense } from "react";
 import { Settings, LogOut, LogIn, User, Menu, X, Info } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import store from "@/tools/cookieStore";
-import { useRouter, usePathname, useSearchParams, redirect } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import Image from "next/image";
 import SearchBar from "./Searchbar";
 import { usePathInfo } from "@/lib/getPathname";

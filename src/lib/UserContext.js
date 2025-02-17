@@ -61,7 +61,9 @@ export function UserContextProvider({children}) {
           }
         }
       } catch (e) {
-        console.log("hmm seems like an abortion happened here");
+        if (e) {
+          console.log("hmm seems like an abortion happened here");
+        }
       }
     }
   

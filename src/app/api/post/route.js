@@ -183,9 +183,9 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: false,
-      message: error.message || "Internal server error",
-      code: error.code || 'UNKNOWN_ERROR'
-    }, { status: error.status || 500 });
+      message: e.message || "Internal server error",
+      code: e.code || 'UNKNOWN_ERROR'
+    }, { status: e.status || 500 });
     
   }
 }

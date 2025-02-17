@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { useSwipeable } from "react-swipeable"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"

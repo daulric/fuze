@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Upload } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import waitFor from '@/lib/waitFor';
 import { useUser } from "@/lib/UserContext";
 
 export default function CreatorDashboard() {

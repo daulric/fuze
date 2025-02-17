@@ -16,11 +16,14 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative">
-          <img
+          <Image
             src={thumbnail} 
             alt={title} 
             className="w-full h-24 sm:h-32 object-cover" 
             loading='eager'
+            width={100}
+            height={100}
+            unoptimized
           />
           <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <Play className="text-white" size={32} />

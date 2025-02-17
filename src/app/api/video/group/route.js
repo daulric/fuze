@@ -8,7 +8,7 @@ export async function POST(request) {
     const user_token = (await cookies()).get("user");
     if (!user_token) throw "Account is Needed";
     
-    const { group } = await request.json();
+    const { group, length = 30 } = await request.json();
     if (!group ||  group.length === 0) throw "Group Data is Needed";
     
     const supa_client = SupabaseServer();
@@ -34,8 +34,8 @@ export async function POST(request) {
         const thumbnailFile = data.find((file) => file.name.includes("thumbnail"));
     
         const [signed_video, signed_thumbnail] = await Promise.all([
-          videoFile ? VideoStorage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, 30) : null,
-          thumbnailFile ? VideoStorage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, 30) : null,
+          videoFile ? VideoStorage.createSignedUrl(`${videoData.video_id}/${videoFile.name}`, length) : null,
+          thumbnailFile ? VideoStorage.createSignedUrl(`${videoData.video_id}/${thumbnailFile.name}`, length) : null,
         ]);
     
         return {
