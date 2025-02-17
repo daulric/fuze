@@ -21,14 +21,20 @@ async function GetUserProfiles() {
 
     const all_users = await Promise.all(
         data.map(async (user) => {
-            const { data: ProfilePic } = await ProfileStorage.list(`${user.account_id}`);
-            const findPic = ProfilePic?.find(item => item?.name?.split(".")[0] === "profile_pic");
-            user.avatar_url = findPic
-                ? ProfileStorage.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl
-                : null;
-            
-            delete user.account_id;
-            return user;
+          const { data: ProfilePic } = await ProfileStorage.list(
+            `${user.account_id}`, 
+            { sortBy: { column: 'created_at', order: 'desc' } }
+          );
+          
+          console.log(ProfilePic);
+          
+          if (ProfilePic.length !== 0) {
+            const findPic = ProfilePic[0];
+            user.avatar_url = ProfileStorage.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl;
+          }
+          
+          delete user.account_id;
+          return user;
         })
     );
 
@@ -84,14 +90,20 @@ export async function GET(request) {
         
         const user = user_data[0];
         
-        const { data: ProfilePic} = await ProfileDB.list(`${user.account_id}`);
-        const findPic = ProfilePic.find(item => item?.name?.split(".")[0] === "profile_pic");
-        user.avatar_url = findPic ? ProfileDB.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl : null;
-        
+        const { data: ProfilePic} = await ProfileDB.list(
+          `${user.account_id}`,
+          { limit: 1, sortBy: { column: 'created_at', order: 'desc' } }
+        );
+
+        if (ProfilePic.length !== 0) {
+          const findPic = ProfilePic[0];
+          user.avatar_url = ProfileDB.getPublicUrl(`${user.account_id}/${findPic.name}`).data.publicUrl;
+        }
+
         const user_profile = { ...user };
         
         if ((!allowId && !account_id) || !account_id || !allowId) {
-            delete user_profile.account_id;
+          delete user_profile.account_id;
         }
 
         return NextResponse.json({
