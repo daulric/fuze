@@ -186,7 +186,11 @@ export async function GET(request) {
               return DatabaseQuery(supa_client, {account_id: is_user.value});
           }
 
-          return DatabaseQuery(supa_client, {...queries, is_private: false});
+          if (queries.allow_age_18) {
+            return DatabaseQuery(supa_client, {...queries, is_private: false, age_18: true})
+          }
+
+          return DatabaseQuery(supa_client, {...queries, is_private: false, age_18: false});
       }
 
       return DatabaseQuery(supa_client, {is_private: false});

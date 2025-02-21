@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 export async function POST(request) {
 
   try {
-    const { limit, length = 30 } = await request.json();
+    const { limit, length = 30, allow_age_18 = false } = await request.json();
     if (!limit) throw "Limit Not Provided!";
     
     const supabase = SupabaseServer();
@@ -14,8 +14,7 @@ export async function POST(request) {
     const {data, error} = await VideoDB.select("*, Account(username, is_verified)")
     .then(({data, error}) => {
         if (error) return { data: null, error };
-
-        return data.filter(i => i.is_private !== true);
+        return data.filter(i => (i.is_private !== true && i.age_18 === allow_age_18 ));
     }).then((data) => {
         const shuffled = [...data];
 
@@ -54,15 +53,12 @@ export async function POST(request) {
         const videoUrl = videoFile ? signed_video.data.signedUrl : null;
         const thumbnailUrl = thumbnailFile ? signed_thumbnail.data.signedUrl : "/logo.svg";
         
+        delete videoData.account_id;
+
         return {
           ...videoData,
           video: videoUrl,
           thumbnail: thumbnailUrl,
-          
-          meta: {
-            video: videoFile,
-            thumbnail: thumbnailFile,
-          }
         };
       };
       

@@ -1,46 +1,47 @@
 "use client"
 
-import { useState, Suspense, useRef, useEffect } from 'react';
-import Image from "next/image";
-import Link from "next/link";
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useState, Suspense, useRef, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const videoRef = useRef();
-  const timeoutRef = useRef();
+  const [isHovered, setIsHovered] = useState(false)
+  const videoRef = useRef()
+  const timeoutRef = useRef()
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current)
     }
 
-    setIsHovered(true);
+    setIsHovered(true)
     if (videoRef.current) {
-      videoRef.current.muted = true; // Ensure the video is muted for autoplay
+      videoRef.current.muted = true
       videoRef.current.play().catch((error) => {
-        console.log("Autoplay prevented:", error);
-      });
+        console.log("Autoplay prevented:", error)
+      })
     }
-  };
+  }
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
+    setIsHovered(false)
     if (videoRef.current) {
       timeoutRef.current = setTimeout(() => {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }, 100);
+        videoRef.current.pause()
+        videoRef.current.currentTime = 0
+      }, 100)
     }
-  };
+  }
 
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        clearTimeout(timeoutRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   return (
     <Link
@@ -49,12 +50,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
       prefetch={false}
     >
       <div className="relative">
-        <div
-          className="aspect-video w-full relative"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Transparent background */}
+        <div className="aspect-video w-full relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           <div
             className="absolute inset-0 bg-cover bg-center z-0 opacity-20"
             style={{
@@ -62,9 +58,8 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
             }}
           ></div>
 
-          {/* Main Image */}
           <Image
-            src={thumbnail}
+            src={thumbnail || "/placeholder.svg"}
             height={100}
             width={300}
             alt=""
@@ -74,7 +69,6 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
             unoptimized
           />
 
-          {/* Video Element */}
           <video
             ref={videoRef}
             src={video}
@@ -98,63 +92,86 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
         </p>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export function PostCard({ post_id, username, avatar, created_at, images }) {
+const PostCard = ({ post_id, username, avatar, created_at, images, content }) => {
   return (
-    <Link href={`/flare/${post_id}`}>
-      <Card className="hover:bg-gray-800/50 transition-colors">
-        <CardHeader className="flex flex-row items-center gap-4">
-          <Avatar>
+    <Link
+      className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
+      href={`/flare/${post_id}`}
+      prefetch={false}
+    >
+      <div className="relative">
+        <div className="aspect-video w-full relative">
+          {images && images.length > 0 ? (
+            <>
+              <Image
+                src={images[0] || "/placeholder.svg"}
+                height={100}
+                width={300}
+                alt="Post preview"
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                unoptimized
+              />
+              {images.length > 1 && (
+                <div className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur z-20">
+                  +{images.length - 1} more
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-gray-700 flex items-center justify-center p-4">
+              <p className="text-gray-200 text-sm line-clamp-6 overflow-hidden">{content}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="p-4">
+        <div className="flex items-center mb-2">
+          <Avatar className="w-8 h-8 mr-2 text-gray-500">
             <AvatarImage src={avatar} alt={username} />
             <AvatarFallback>{username[0]}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-semibold">{username}</p>
-            <p className="text-sm text-muted-foreground">{new Date(created_at).toLocaleDateString()}</p>
+            <h3 className="font-bold text-lg truncate text-white">{username}</h3>
+            <p className="text-xs text-gray-500">{new Date(created_at).toLocaleDateString()}</p>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p>{post.content}</p>
-          {images && images.length > 0 && (
-            <div className="aspect-video relative overflow-hidden rounded-lg bg-muted">
-              <img
-                src={images[0] || "/logo.svg"}
-                alt="Post preview"
-                className="object-cover w-full h-full"
-              />
-              {images.length > 1 && (
-                <div className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur">
-                  +{images.length - 1} more
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+        {images && images.length > 0 && <p className="text-sm text-gray-400 line-clamp-2">{content}</p>}
+      </div>
     </Link>
   )
 }
 
-const VideoGrid = ({ videos }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    {videos ? videos.map((video, index) => (
-      <VideoCard key={index} {...video} />
-    )) : (
-      <div>tryna find something u like</div>
-    )}
-  </div>
-);
+const MixedContentGrid = ({ videoData, postData }) => {
+  const combinedContent = [...videoData, ...postData].sort(() => Math.random() - 0.5)
 
-const VideosGrid = ({VideoData}) => {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {combinedContent.map((item, index) => (
+        <div key={index}>{item.hasOwnProperty("video") ? <VideoCard {...item} /> : <PostCard username={item.Account.username} {...item} />}</div>
+      ))}
+    </div>
+  )
+}
+
+const MixedContentPage = ({ VideoData, PostsData }) => {
+
+  if (!VideoData || !PostsData) {
+    return (
+      <>looooking at my algorithm</>
+    )
+  }
+
   return (
     <div className="bg-gray-900 min-h-screen p-4">
-      <Suspense fallback={<div>loading some vids...</div>} >
-        <VideoGrid videos={VideoData} />
+      <Suspense fallback={<div>Loading content...</div>}>
+        <MixedContentGrid videoData={VideoData} postData={PostsData} />
       </Suspense>
     </div>
-  );
-};
+  )
+}
 
-export default VideosGrid;
+export default MixedContentPage

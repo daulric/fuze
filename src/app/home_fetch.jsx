@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import HomePage from "./home";
+import { useUser } from "@/lib/UserContext";
+import CheckAge from "@/lib/checkdob";
 
 function timeAgo(dateStr) {
   const diff =  Date.now() - new Date(dateStr).getTime(); // Difference in milliseconds
@@ -35,6 +37,8 @@ function format_views(views) {
 
 export default function Home() {
   const [data, setData] = useState(null);
+  const [posts, setPosts] = useState(null);
+  const user = useUser();
 
   useEffect(() => {
     async function getRandomVideos() {
@@ -55,8 +59,10 @@ export default function Home() {
       } catch (e) {
         if (e === "new") {
 
+          const allow_age_18 = CheckAge(user?.dob) || false;
+
           const response = await fetch(`/api/video/recommend`, {
-            body: JSON.stringify({ limit: 16, length: 60 }),
+            body: JSON.stringify({ limit: 16, length: 60, allow_age_18 }),
             method: "POST",
           });
         
@@ -91,16 +97,65 @@ export default function Home() {
       }
     }
     
+    async function getRandomPosts() {
+
+      if (posts) return;
+
+      try {
+        if (!sessionStorage.getItem("home_page_posts_cache")) throw "new";
+
+        const store = sessionStorage.getItem("home_page_posts_cache") || "{}";
+        const cached_posts = JSON.parse(store);
+
+        if (!cached_posts.expires || !cached_posts.data) throw "new";
+      
+        const expired_time = (Date.now() - cached_posts.expires) / 1000;
+        if (expired_time > 60) throw "new";
+        
+        setPosts(cached_posts.data);
+
+
+      } catch (e) {
+        if (e === "new") {
+          if (posts) return;
+
+          const allow_age_18 = CheckAge(user?.dob) || false;
+
+          const response = await fetch(`/api/post/recommend`, {
+            body: JSON.stringify({ limit: 16, length: 60, allow_age_18 }),
+            method: "POST",
+          });
+
+          if (!response.ok) return;
+          const {success, data: new_data} = await response.json();
+
+          if (!success) return;
+          if (new_data.length === 0) return;
+
+          const new_cached_data = {
+            data: new_data,
+            expires: Date.now(),
+          }
+          
+          sessionStorage.setItem("home_page_posts_cache", JSON.stringify(new_cached_data));
+          setPosts(new_data);
+        }
+
+      }
+    }
+
     getRandomVideos();
+    getRandomPosts();
     
     return () => {
       setData(null);
+      setPosts(null)
     }
   }, []);
 
   return (
     <>
-      <HomePage VideoData={data}/>
+      <HomePage VideoData={data} PostsData={posts}/>
     </>
   );
 }
