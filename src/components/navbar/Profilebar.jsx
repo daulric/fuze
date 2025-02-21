@@ -5,7 +5,7 @@ import { Settings, LogOut, LogIn, User, Menu, X, Info } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import store from "@/tools/cookieStore";
-import { useRouter, redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import SearchBar from "./Searchbar";
 import { usePathInfo } from "@/lib/getPathname";
@@ -55,7 +55,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
             </Button>
           )}
   
-          <Button onClick={() => redirect("/")} className="bg-transparent flex items-center space-x-2">
+          <Button onClick={() => router.push("/")} className="bg-transparent flex items-center space-x-2">
             <Image
               loading="eager"
               src="/logo.svg"

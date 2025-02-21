@@ -1,5 +1,6 @@
 import "./globals.css";
 import LayoutProvider from "@/components/LayoutProvider"
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata = {
   title: "Home",
@@ -15,6 +16,7 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <body>
+        <NextTopLoader showSpinner={false} />
         <LayoutProvider>
           {children}
         </LayoutProvider>
