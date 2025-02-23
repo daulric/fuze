@@ -9,12 +9,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { signal } from "@preact/signals-react"
+
+const likesCount = signal(0);
+const viewsCount = signal(0);
 
 export default function PostView({ post }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.likes || 0);
-  const [viewsCount, setViewsCount] = useState(post.views || 0);
   const [authorAvatar, setAuthorAvatar] = useState(null);
   const [showLikeAnimation, setShowLikeAnimation] = useState(null);
   const [dialogLastTap, setDialogLastTap] = useState(0)
@@ -37,8 +39,8 @@ export default function PostView({ post }) {
 
   const toggleLike = useCallback(() => {
     setIsLiked((prev) => !prev)
-    setLikesCount((prev) => prev + (isLiked ? -1 : 1))
-  }, [isLiked])
+    likesCount.value = likesCount.value + (isLiked ? -1 : 1)
+  }, [isLiked]);
 
   const handleDialogDoubleTap = useCallback(() => {
     const now = Date.now()

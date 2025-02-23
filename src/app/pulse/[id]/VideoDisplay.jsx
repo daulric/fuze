@@ -13,6 +13,9 @@ import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
 import { useUser } from "@/lib/UserContext"
+import { signal } from '@preact/signals-react';
+
+const viewCount = signal(0);
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -20,11 +23,12 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [dislikes, setDislikes] = useState(null);
   const [userLiked, setUserLiked] = useState(null);
   const [userDisliked, setUserDisliked] = useState(null);
-  const [viewCount, setViewCount] = useState(null);
   const videoContainerRef = useRef(null);
   const user = useUser();
   const [recommendedVideos, setRecommendedVideos] = useState(null);
   const supabase = SupabaseServer();
+  
+  viewCount.value = VideoData.views;
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
@@ -291,8 +295,8 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
         case "UPDATE":
           if (payload.new.video_id === VideoData.video_id) {
-            if (payload.new.views > viewCount) {
-              setViewCount(payload.new.views);
+            if (payload.new.views > viewCount.value) {
+              viewCount.value = payload.new.views;
             }
           }
           
@@ -308,7 +312,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
       supabase.removeChannel(realtime_likes);
     }
 
-  }, [VideoData, dislikes, is_private_video, likes, supabase, user, viewCount]);
+  }, [VideoData, dislikes, is_private_video, likes, supabase, user]);
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-900 text-white">
@@ -364,7 +368,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-gray-400">
               <Eye className="h-5 w-5" />
-              <span>{viewCount ? viewCount : VideoData.views} views</span>
+              <span>{viewCount} views</span>
             </div>
             <TooltipProvider>
               <Tooltip>
