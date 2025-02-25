@@ -4,7 +4,6 @@ import { useState, Suspense, useRef, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
 
 const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }) => {
   const [isHovered, setIsHovered] = useState(false)
@@ -47,7 +46,6 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
     <Link
       className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       href={link}
-      prefetch={false}
     >
       <div className="relative">
         <div className="aspect-video w-full relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -100,7 +98,6 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
     <Link
       className="group block bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105"
       href={`/flare/${post_id}`}
-      prefetch={false}
     >
       <div className="relative">
         <div className="aspect-video w-full relative">

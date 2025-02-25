@@ -5,6 +5,7 @@ import { Play, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from 'react'
 import Link from "next/link";
+import { effect, useComputed, useSignal } from '@preact/signals-react'
 
 const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   return (
@@ -33,14 +34,25 @@ const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
 };
   
 export default function HistoryPage() {
-  const [histories, setHistory] = useState(null);
+  const histories = useSignal([]);
+
+  const HistoryComponents = useComputed(() => {
+    if (histories.value.length > 0) {
+      return histories.value.map((video) => (
+        <HistoryVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} {...video} /> 
+      ));
+    } else {
+      return ( <div>u ent have a history</div> )
+    }
+  });
 
   useEffect(() => {
-    const history_data = JSON.parse(localStorage.getItem('watchHistory'));
     
     async function fetchHistory() {
+      const history_data = JSON.parse(localStorage.getItem('watchHistory'));
+
       if (!history_data) return;
-      if (histories) return;
+      if (histories.value.length > 0) return;
 
       const response = await fetch("/api/video/group", {
         method: "POST",
@@ -62,17 +74,21 @@ export default function HistoryPage() {
           return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
         });
         
-        setHistory(perma_data);
+        histories.value = perma_data;
         return;
       }
     }
     
     fetchHistory();
 
+    return () => {
+      histories.value = [];
+    }
+
   }, []);
 
   function clearHistory() {
-    setHistory(null);
+    histories.value = [];
     if (!localStorage.getItem('watchHistory')) return;
     localStorage.removeItem('watchHistory');
   }
@@ -88,11 +104,7 @@ export default function HistoryPage() {
       </div>
       <br/>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {histories ? histories.map((video) => (
-          <HistoryVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} {...video} />
-        )) 
-        : <div>No history found</div>
-      }
+        { HistoryComponents }
       </div>
     </div>
   );

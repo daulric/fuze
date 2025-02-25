@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import HomePage from "./home";
 import { useUser } from "@/lib/UserContext";
 import CheckAge from "@/lib/checkdob";
+import { useSignal, computed, useComputed } from "@preact/signals-react"
 
 function timeAgo(dateStr) {
   const diff =  Date.now() - new Date(dateStr).getTime(); // Difference in milliseconds
@@ -36,13 +37,15 @@ function format_views(views) {
 }
 
 export default function Home() {
-  const [data, setData] = useState(null);
-  const [posts, setPosts] = useState(null);
   const user = useUser();
+  const posts = useSignal(null);
+  const data = useSignal(null);
+
+  const HomePageCompute = useComputed(() => ( <HomePage VideoData={data.value} PostsData={posts.value} />  ))
 
   useEffect(() => {
     async function getRandomVideos() {
-      if (data) return;
+      if (data.value) return;
   
       try {
         if (!sessionStorage.getItem("home_page_video_cache")) throw "new";
@@ -55,7 +58,7 @@ export default function Home() {
         const expired_time = (Date.now() - cached_videos.expires) / 1000;
         if (expired_time > 60) throw "new";
         
-        setData(cached_videos.data);
+        data.value = cached_videos.data;
       } catch (e) {
         if (e === "new") {
 
@@ -91,15 +94,14 @@ export default function Home() {
           }
           
           sessionStorage.setItem("home_page_video_cache", JSON.stringify(new_cached_data));
-          setData(temp_data);
+          data.value = temp_data;
         }
 
       }
     }
     
     async function getRandomPosts() {
-
-      if (posts) return;
+      if (posts.value) return;
 
       try {
         if (!sessionStorage.getItem("home_page_posts_cache")) throw "new";
@@ -112,12 +114,11 @@ export default function Home() {
         const expired_time = (Date.now() - cached_posts.expires) / 1000;
         if (expired_time > 60) throw "new";
         
-        setPosts(cached_posts.data);
-
+        posts.value = cached_posts.data;
 
       } catch (e) {
         if (e === "new") {
-          if (posts) return;
+          if (posts.value) return;
 
           const allow_age_18 = CheckAge(user?.dob) || false;
 
@@ -138,7 +139,7 @@ export default function Home() {
           }
           
           sessionStorage.setItem("home_page_posts_cache", JSON.stringify(new_cached_data));
-          setPosts(new_data);
+          posts.value = new_data;
         }
 
       }
@@ -148,14 +149,10 @@ export default function Home() {
     getRandomPosts();
     
     return () => {
-      setData(null);
-      setPosts(null)
+      posts.value = null;
+      data.value = null;
     }
   }, []);
 
-  return (
-    <>
-      <HomePage VideoData={data} PostsData={posts}/>
-    </>
-  );
+  return (<>{HomePageCompute}</>);
 }

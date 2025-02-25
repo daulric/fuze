@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 
 import { useSearchParams } from "next/navigation"
 import Link from "next/link";
+import { useComputed, useSignal } from '@preact/signals-react';
 
 function timeAgo(dateStr) {
   const dateObj = new Date(dateStr);
@@ -58,41 +59,64 @@ const VideoCard = ({ title, Account, views, upload_at, thumbnail, video_id, desc
 
 const SearchResults = () => {
     const searchParams = useSearchParams();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searched_videos, setSearchedVideos] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const searchQuery = searchParams.get("query");
+
+    // searched_data;
+    const searched_videos = useSignal([]);
+    const searchVideosLength = useComputed(() => searched_videos.value.length);
+    const searchVideosMap = useComputed(() => searched_videos.value.map((video, index) => (
+      <VideoCard key={index} {...video} />
+    )));
+
+    const isLoading = useSignal(false);
+
+    const results_found = useComputed(() => {
+      return searchQuery && (
+        <p className="text-gray-400 mb-4">
+            {isLoading.value === false && `Found ${searchVideosLength.value} results for "${searchQuery}"`}
+        </p>
+      )
+    });
+
+    const searchVideosStatus = useComputed(() => {
+      return (searchQuery && searchVideosLength.value === 0) && (
+        <div className="text-center text-gray-400 py-8">
+          {isLoading.value === false ? `No videos found for ${searchQuery}` : "hmmm im searching my database. mind waiting"}
+        </div>
+      )
+    })
     
     useEffect(() => {
-      const searchQuery = searchParams.get("query") || "";
-      setSearchQuery(searchQuery); // Keep input in sync with URL
-      
-      const getData = async () => {
 
-        if (!searchQuery) {
-          setSearchedVideos([]);
-          return;
-        }
+      const getData = async () => {
         
-        if (searched_videos.length > 0) return;
-        setIsLoading(true);
+        if (!searchQuery || searchQuery.length === 0) return;
+
+        if (searched_videos.value.length > 0) return;
+        isLoading.value = true;
 
         try {
           const response = await fetch(`/api/video?search=${searchQuery}`);
           if (!response.ok) throw "error fetching query";
 
-          const data = await response.json();
-
-          setSearchedVideos(data ? data.data : []);
+          const {data} = await response.json();
+          searched_videos.value = data;
         } catch (error) {
           console.error("Error fetching videos:", error);
-          setSearchedVideos([]);
+          searched_videos.value = [];
+          isLoading.value = false;
         } finally {
-          setIsLoading(false);
+          isLoading.value = false;
         }
       };
   
       getData();
-    }, [searchParams]);
+
+      return () => {
+        searched_videos.value = [];
+      }
+
+    }, [searchParams, searchQuery]);
 
     if (!searchParams.get("query")) {
       return notFound();
@@ -103,21 +127,11 @@ const SearchResults = () => {
 
         {/* Search Results */}
         <div className="max-w-4xl mx-auto">
-          {searchQuery && (
-            <p className="text-gray-400 mb-4">
-                {isLoading === false ? `Found ${searched_videos.length} results for "${searchQuery}"` : "waiting..."}
-            </p>
-          )}
+          {results_found }
           <div className="flex flex-col gap-4">
-            {searched_videos.map((video, index) => (
-                <VideoCard key={index} {...video} />
-            ))}
+            { searchVideosMap }
           </div>
-          {searchQuery && searched_videos.length === 0 && (
-            <div className="text-center text-gray-400 py-8">
-                {isLoading === false ? `No videos found for ${searchQuery}` : "..."}
-            </div>
-          )}
+          { searchVideosStatus }
         </div>
       </div>
     );

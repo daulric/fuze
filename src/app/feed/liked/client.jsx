@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Play, ThumbsUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Link from "next/link";
+import { useComputed, useSignal } from '@preact/signals-react';
 
 const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
   return (
@@ -36,14 +37,18 @@ const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
 };
 
 export default function LikedVideosPage() {
-  
-  const [likedVideos, setLikedVideos] = useState([]);
+
+  const likedVideos = useSignal([]);
+  const likedVideo_Length = useComputed(() => likedVideos.value.length);
+  const LikedVideoComponents = useComputed(() => likedVideos.value.map((video) => (
+    <LikedVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video}/>
+  )))
   
   useEffect(() => {
     
     async function getLikedVideos() {
 
-      if (likedVideos.length > 0) return;
+      if (likedVideo_Length.value > 0) return;
         
       const response = await fetch('/api/video/likes/filter', {
         method: 'POST',
@@ -58,7 +63,7 @@ export default function LikedVideosPage() {
       const {success, data} = await response.json();
       
       if (success) {
-        setLikedVideos(data);
+        likedVideos.value = data;
       }
     }
     
@@ -71,13 +76,11 @@ export default function LikedVideosPage() {
         <h1 className="text-2xl font-bold text-white">Liked Videos</h1>
         <div variant="outline" size="sm" className="flex items-center bg-transparent">
           <ThumbsUp size={16} className="mr-2" />
-          {likedVideos.length} videos
+          {likedVideo_Length} videos
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {likedVideos.map((video) => (
-          <LikedVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} thumbnail={video.thumbnail} {...video.Video} />
-        ))}
+        { LikedVideoComponents }
       </div>
     </div>
   );

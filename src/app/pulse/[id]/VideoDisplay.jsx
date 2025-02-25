@@ -13,9 +13,7 @@ import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
 import { useUser } from "@/lib/UserContext"
-import { signal } from '@preact/signals-react';
-
-const viewCount = signal(0);
+import { useSignal, computed, useComputed } from '@preact/signals-react';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -25,10 +23,11 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const [userDisliked, setUserDisliked] = useState(null);
   const videoContainerRef = useRef(null);
   const user = useUser();
-  const [recommendedVideos, setRecommendedVideos] = useState(null);
   const supabase = SupabaseServer();
   
-  viewCount.value = VideoData.views;
+  const viewCount = useSignal( VideoData.views || 0);
+  const recommendedVideos = useSignal(null);
+  const recommendedVideosComputed = useComputed(() => (  <RecommendedVideos videos={recommendedVideos.value} /> ));
 
   const truncateDescription = (text, limit = 150) => {
     if (!text) return "No description available.";
@@ -94,7 +93,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
 
   const fetchRecommendedVids = useCallback(async () => {
     
-    if (recommendedVideos) return;
+    if (recommendedVideos.value) return;
 
     function getRandomItems(array, count) {
       const shuffled = array.sort(() => 0.5 - Math.random());
@@ -111,8 +110,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     const { data } = await response.json();
     if (data) {
       const filter_recommended = data.filter((i) => i.video_id !== VideoData.video_id);
-      const recommended = getRandomItems(filter_recommended, 4);
-      setRecommendedVideos(recommended); 
+      recommendedVideos.value = getRandomItems(filter_recommended, 4);
     }
   }, [VideoData.video_id]);
 
@@ -183,11 +181,11 @@ const YouTubeStylePlayer = ({ VideoData }) => {
     addWatchList();
     
     return () => {
+      recommendedVideos.value = null
       setLikes(null);
       setDislikes(null);
       setUserLiked(null);
       setUserDisliked(null);
-      setRecommendedVideos(null);
     }
 
   }, [VideoData, fetchRecommendedVids]);
@@ -452,7 +450,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         <div className="bg-gray-900 min-h-screen p-4">
           <div className="sticky top-4">
             <Suspense fallback={<div>loading recommended videos...</div>} >
-              <RecommendedVideos videos={recommendedVideos} />
+              { recommendedVideosComputed }
             </Suspense>
           </div>
         </div>

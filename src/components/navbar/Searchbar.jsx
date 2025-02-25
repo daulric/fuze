@@ -109,7 +109,7 @@ const SearchBar = () => {
             ref={inputRef}
             type="text"
             placeholder="Search..."
-            value={searchTerm}
+            value={searchTerm && searchTerm}
             onChange={handleSearch}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsActive(true)}
@@ -117,7 +117,7 @@ const SearchBar = () => {
           />
           <Button 
             onClick={() => executeSearch(searchTerm)}
-            disabled={!searchTerm.trim()}
+            disabled={searchTerm && !searchTerm.trim()}
             className="absolute right-1 top-1/2 transform -translate-y-1/2 p-2 rounded-full hover:bg-gray-600"
             variant="ghost"
           >
