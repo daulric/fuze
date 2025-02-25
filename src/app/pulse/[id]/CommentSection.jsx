@@ -120,7 +120,7 @@ const CommentSection = ({ videoId }) => {
     getProfilesForComments();
     loadComments();
 
-    const realtime_comments = supabase.channel(videoId)
+    const realtime_comments = supabase.channel(`video-${videoId}`)
     .on(
       "postgres_changes",
       { 

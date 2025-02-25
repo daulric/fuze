@@ -9,7 +9,7 @@ export default function NotFound() {
       <div className="max-w-md text-center">
         <div className="mb-8">
           <div className="w-24 h-24 rounded-full bg-gray-800 mx-auto flex items-center justify-center mb-6">
-            <span className="text-4xl">❌</span>
+            <span className="text-4xl">✅</span>
           </div>
           <h1 className="text-4xl font-bold text-white mb-4">Already Logged In</h1>
           <p className="text-gray-400 mb-8">
