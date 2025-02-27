@@ -3,9 +3,9 @@
 import Image from 'next/image'
 import { Play, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Link from "next/link";
-import { effect, useComputed, useSignal } from '@preact/signals-react'
+import { useComputed, useSignal } from '@preact/signals-react'
 
 const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
   return (
@@ -34,25 +34,23 @@ const HistoryVideoCard = ({ title, views, thumbnail, link, ...otherData }) => {
 };
   
 export default function HistoryPage() {
-  const histories = useSignal([]);
+  const histories = useSignal(null);
 
   const HistoryComponents = useComputed(() => {
-    if (histories.value.length > 0) {
-      return histories.value.map((video) => (
-        <HistoryVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} {...video} /> 
-      ));
-    } else {
-      return ( <div>u ent have a history</div> )
-    }
+    if (!histories.value || histories.value.length === 0) return ( <div>u ent have a history yet</div> );  
+
+    return histories.value.map((video) => (
+      <HistoryVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} {...video} /> 
+    ));
   });
 
   useEffect(() => {
-    
+
     async function fetchHistory() {
       const history_data = JSON.parse(localStorage.getItem('watchHistory'));
 
       if (!history_data) return;
-      if (histories.value.length > 0) return;
+      if (histories.value) return;
 
       const response = await fetch("/api/video/group", {
         method: "POST",
@@ -75,7 +73,6 @@ export default function HistoryPage() {
         });
         
         histories.value = perma_data;
-        return;
       }
     }
     

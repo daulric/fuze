@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, createContext, useState, useEffect, useMemo } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import DeepComparison from "@/lib/DeepComparison";
 import store from "@/tools/cookieStore";
 
@@ -74,7 +74,7 @@ export function UserContextProvider({children}) {
   
   return (
     <UserContext.Provider value={user}>
-      {useMemo(() => children, [children])}
+      { children }
     </UserContext.Provider>
   );
 }
