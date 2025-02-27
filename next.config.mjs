@@ -22,7 +22,11 @@ const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '4mb'
-    }
+    },
+
+    turbo: {
+      enabled: true,
+    },
   },
 
   images: {
