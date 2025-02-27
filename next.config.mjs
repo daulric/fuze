@@ -19,6 +19,10 @@ const nextConfig = {
     
   },
 
+  serverActions: {
+    bodySizeLimit: '4mb' // Set desired value here
+  },
+
   images: {
     unoptimized: process.env.VERCEL && true,
     

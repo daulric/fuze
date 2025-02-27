@@ -11,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useUser } from "@/lib/UserContext"
+import { useUser } from "@/lib/UserContext";
+import { TrimEdges } from "@/lib/ImageManager"
 
 const SettingsPage = () => {
   const [profilePicture, setProfilePicture] = useState(null);
@@ -26,17 +27,25 @@ const SettingsPage = () => {
   const user = useUser();
   const [copied, setCopied] = useState(false);
 
-  const handleProfilePictureChange = (e) => {
+  const handleProfilePictureChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      const trimed_img = await TrimEdges(file, 400, 400);
+      const blob = new Blob([trimed_img], { type: "image/webp" });
+
+      if (!blob) return;
+
       const reader = new FileReader();
+
       reader.onloadend = () => {
         setProfilePicture({
           result: reader.result,
-          picture: file,
+          picture: blob,
         });
       };
-      reader.readAsDataURL(file);
+
+      console.log(URL.createObjectURL(blob));
+      reader.readAsDataURL(blob);
     }
   };
 
