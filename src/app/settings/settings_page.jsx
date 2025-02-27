@@ -123,16 +123,18 @@ const SettingsPage = () => {
               Privacy
             </TabsTrigger>
           </TabsList>
-          {ProfileTab(
-            profilePicture, 
-            handleProfilePictureChange, 
-            aboutMe, setAboutMe, 
-            socialLinks, 
-            handleSocialLinkChange, 
-            HandleAccountSubmission, 
-            ProfileSaving, user
-            )}
-          {AccountTab (user, handleCopyUserId, copied) }
+          <ProfileTab
+            profilePicture={profilePicture}
+            handleProfilePictureChange={handleProfilePictureChange}
+            aboutMe={aboutMe}
+            setAboutMe={setAboutMe}
+            socialLinks={socialLinks}
+            handleSocialLinkChange={handleSocialLinkChange}
+            HandleAccountSubmission={HandleAccountSubmission}
+            ProfileSaving={ProfileSaving}
+            user={user}
+          />
+          <AccountTab user={user} handleCopyUserId={handleCopyUserId} copied={copied} />
           <PrivacyTab />
         </Tabs>
       </div>
@@ -182,7 +184,7 @@ function PrivacyTab() {
   )
 }
 
-function AccountTab(user, handleCopyUserId, copied) {
+function AccountTab({user, handleCopyUserId, copied}) {
   return (
     <TabsContent value="account">
       <Card className="bg-gray-900 border-gray-800">
@@ -235,7 +237,7 @@ function AccountTab(user, handleCopyUserId, copied) {
   );
 }
 
-function ProfileTab(profilePicture, handleProfilePictureChange, aboutMe, setAboutMe, socialLinks, handleSocialLinkChange, HandleAccountSubmission, ProfileSaving, user) {
+function ProfileTab({profilePicture, handleProfilePictureChange, aboutMe, setAboutMe, socialLinks, handleSocialLinkChange, HandleAccountSubmission, ProfileSaving, user}) {
   return (
     <TabsContent value="profile">
       <Card className="bg-gray-900 border-gray-800">
