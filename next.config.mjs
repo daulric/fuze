@@ -19,8 +19,10 @@ const nextConfig = {
     
   },
 
-  serverActions: {
-    bodySizeLimit: '4mb' // Set desired value here
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '4mb'
+    }
   },
 
   images: {
