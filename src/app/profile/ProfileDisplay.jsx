@@ -27,8 +27,8 @@ const UserProfilePage = ({ username }) => {
   const posts = useSignal(null);
 
   const videos_computed = useComputed(() => {
-    if (!videos.value) return (<CardMark message={`loading videos`}/>);
-    if (videos.value.length === 0) return (<CardMark message={`no videos from ${profile ? profile?.Account?.username : ""}`}/>)
+    if (!videos.value) return (<CardMark message={`...`}/>);
+    if (videos.value.length === 0) return (<CardMark message={`no videos from ${profile.username }`}/>)
     return videos.value.map((video) => (
       <Link href={`/pulse?id=${video.video_id}`} key={video.video_id} className="block">
         <Card className="overflow-hidden bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
@@ -59,7 +59,7 @@ const UserProfilePage = ({ username }) => {
   });
 
   const posts_computed = useComputed(() => {
-    if (!posts.value) return (<CardMark message={"loading posts"} />);
+    if (!posts.value) return (<CardMark message={"..."} />);
     if (posts.value.length === 0) return (<CardMark message={`no posts from ${profile?.username}`} />)
 
     return posts.value.map((post) => (
@@ -163,14 +163,14 @@ const UserProfilePage = ({ username }) => {
       <Card className="mb-6 bg-gray-800 shadow-md border border-gray-700">
         <CardContent className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
           <Avatar className="h-24 w-24 ring-2 ring-gray-700">
-            <AvatarImage src={profile?.avatar_url} alt={profile?.username} />
+            <AvatarImage src={profile?.avatar_url} alt={profile?.username || "nah g. he doh exist"} />
             <AvatarFallback className="bg-gray-700 text-gray-300">
               <User className="h-20 w-20"/>
             </AvatarFallback>
           </Avatar>
           <div className="text-center sm:text-left">
             <h1 className="text-2xl font-bold text-white flex items-center justify-center sm:justify-start">
-              {profile?.username}
+              {profile ? profile.username : "nah g. he doh exist"}
               {profile?.is_verified && (
                 <BadgeCheck className="ml-2 h-5 w-5 text-blue-400" />
               )}
