@@ -9,17 +9,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { signal } from "@preact/signals-react"
-
-const likesCount = signal(0);
-const viewsCount = signal(0);
+import { useSignal, useComputed } from "@preact/signals-react";
+import SupabaseServer from "@/supabase/server"
+import { useUser } from "@/lib/UserContext"
 
 export default function PostView({ post }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [authorAvatar, setAuthorAvatar] = useState(null);
   const [showLikeAnimation, setShowLikeAnimation] = useState(null);
-  const [dialogLastTap, setDialogLastTap] = useState(0)
+  const [dialogLastTap, setDialogLastTap] = useState(0);
+  const supabase = SupabaseServer();
+  const user = useUser();
+
+  const likesCount = useSignal(null);
+  const viewsCount = useSignal(post.views || 0);
+
 
   const openImageView = (index) => {
     setSelectedImageIndex(index)
@@ -37,9 +42,24 @@ export default function PostView({ post }) {
     setSelectedImageIndex((prevIndex) => (prevIndex - 1 + post.images.length) % post.images.length)
   }
 
-  const toggleLike = useCallback(() => {
-    setIsLiked((prev) => !prev)
-    likesCount.value = likesCount.value + (isLiked ? -1 : 1)
+  const toggleLike = useCallback(async () => {
+    await fetch(`/api/post/likes`, {
+      method: "POST",
+      body: JSON.stringify({
+        liked: !isLiked,
+        post_id: post.post_id,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.ok && res.json())
+    .then(({success}) => {
+      if (success) {
+        setIsLiked((prev) => !prev);
+        likesCount.value = likesCount.value + (isLiked ? -1 : 1);
+      }
+    });
+
   }, [isLiked]);
 
   const handleDialogDoubleTap = useCallback(() => {
@@ -58,7 +78,7 @@ export default function PostView({ post }) {
     async function fetchAuthorAvatar() {
       const response = await fetch(`/api/profile?username=${post.Account.username}`, {
         cache: "no-store",
-      })
+      });
 
       if (!response.ok) return
       const { profile } = await response.json()
@@ -66,8 +86,30 @@ export default function PostView({ post }) {
       setAuthorAvatar(profile.avatar_url)
     }
 
-    fetchAuthorAvatar()
-  }, [post.Account.username])
+    async function getLikes() {
+      if (likesCount.value) return;
+      const response = await fetch(`/api/post/likes?post_id=${post.post_id}`);
+      
+      if (!response.ok) return;
+      
+      const { success, user_data, all_data } = await response.json();
+
+      if (!success) return;
+
+      if (all_data) {
+        const liked_data = all_data.filter((i) => i.is_like === true);
+        console.log(liked_data.length);
+        likesCount.value = liked_data.length;
+        if (user_data) {
+          setIsLiked(user_data.is_like);
+        }
+      }
+
+    }
+
+    fetchAuthorAvatar();
+    getLikes();
+  }, [post.Account.username, likesCount.value]);
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: goToNextImage,
@@ -101,6 +143,7 @@ export default function PostView({ post }) {
               <Button
                 variant="ghost"
                 size="sm"
+                disabled={!user}
                 className={cn("hover:text-red-500", isLiked && "text-red-500", "rounded-full", "hover:bg-gray-600")}
                 onClick={toggleLike}
               >

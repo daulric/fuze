@@ -54,6 +54,14 @@ export default async function PostPage({ params }) {
     notFound()
   }
 
+  if (process.env.NODE_ENV === "production") {
+    await fetch(`${url}/api/post/views`, {
+      method: "POST",
+      body: JSON.stringify({ post_id: post.post_id }),
+    });
+  }
+
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       <header className="sticky top-0 z-20 border-b border-gray-800 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/60">

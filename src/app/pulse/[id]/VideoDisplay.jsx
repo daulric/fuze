@@ -13,7 +13,7 @@ import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
 import { useUser } from "@/lib/UserContext"
-import { useSignal, computed, useComputed } from '@preact/signals-react';
+import { useSignal, useComputed } from '@preact/signals-react';
 
 const YouTubeStylePlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -48,7 +48,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   };
 
   async function sendLikes({liked, disliked}) {
-    await fetch(`/api/video/likes?video_id=${VideoData.video_id}`, {
+    await fetch(`/api/video/likes`, {
       method: "POST",
       body: JSON.stringify({
         video_id: VideoData.video_id,
