@@ -57,7 +57,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
           ></div>
 
           <Image
-            src={thumbnail || "/placeholder.svg"}
+            src={thumbnail || "/logo.svg"}
             height={100}
             width={300}
             alt=""
