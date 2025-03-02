@@ -65,7 +65,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
               width={20}
               height={20}
             />
-            <span className="text-white text-lg font-semibold">zTube</span>
+            <span className="text-white text-lg font-semibold">fuze</span>
           </Button>
         </div>
   

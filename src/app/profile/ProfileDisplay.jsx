@@ -131,7 +131,6 @@ const UserProfilePage = ({ username }) => {
       if (!response.ok) throw new Error('Failed to fetch posts');
       const { success, data} = await response.json();
       if (success) {
-        console.log(data);
         posts.value = data;
       }
     } catch (error) {

@@ -9,8 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useSignal, useComputed } from "@preact/signals-react";
-import SupabaseServer from "@/supabase/server"
+import { useSignal } from "@preact/signals-react";
 import { useUser } from "@/lib/UserContext"
 
 export default function PostView({ post }) {
@@ -19,7 +18,6 @@ export default function PostView({ post }) {
   const [authorAvatar, setAuthorAvatar] = useState(null);
   const [showLikeAnimation, setShowLikeAnimation] = useState(null);
   const [dialogLastTap, setDialogLastTap] = useState(0);
-  const supabase = SupabaseServer();
   const user = useUser();
 
   const likesCount = useSignal(null);
@@ -66,7 +64,10 @@ export default function PostView({ post }) {
     const now = Date.now()
     
     if ((now - dialogLastTap) < 300) {
-      toggleLike();
+      if (!isLiked) {
+        toggleLike();
+      }
+      
       setShowLikeAnimation(true);
       setTimeout(() => setShowLikeAnimation(false), 1000);
     }
@@ -98,7 +99,6 @@ export default function PostView({ post }) {
 
       if (all_data) {
         const liked_data = all_data.filter((i) => i.is_like === true);
-        console.log(liked_data.length);
         likesCount.value = liked_data.length;
         if (user_data) {
           setIsLiked(user_data.is_like);

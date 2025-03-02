@@ -18,8 +18,8 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
     setIsHovered(true)
     if (videoRef.current) {
       videoRef.current.muted = true
-      videoRef.current.play().catch((error) => {
-        console.log("Autoplay prevented:", error)
+      videoRef.current.play().catch((e) => {
+        if (e) console.log("Autoplay prevented");
       })
     }
   }
@@ -104,7 +104,7 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
           {images && images.length > 0 ? (
             <>
               <Image
-                src={images[0] || "/placeholder.svg"}
+                src={images[0] || "/logo.svg"}
                 height={100}
                 width={300}
                 alt="Post preview"

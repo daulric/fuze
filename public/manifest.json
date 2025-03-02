@@ -135,8 +135,8 @@
     "display": "standalone",
     "dir": "auto",
     "lang": "en-US",
-    "name": "zTube",
-    "short_name": "ztube",
+    "name": "Fuze",
+    "short_name": "Fuze",
     "description": "A Free Speech Platform",
     "scope": "/",
     "start_url": "/"

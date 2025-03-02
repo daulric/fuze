@@ -1,6 +1,6 @@
-# zTube
+# Fuze
 
-Welcome to zTube, where creativity meets community! This platform allows users to upload videos, make posts, and interact with content through likes and comments. Our goal is to provide a vibrant space for content creators and consumers to connect, share ideas, and inspire one another.
+Welcome to Fuze, where creativity meets community! This platform allows users to upload videos, make posts, and interact with content through likes and comments. Our goal is to provide a vibrant space for content creators and consumers to connect, share ideas, and inspire one another.
 
 This is apart of our College Capstone Project. We hope this project make an impact on society.
 
@@ -23,8 +23,8 @@ To get started with the platform, follow these simple steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/daulric/ztube.git
-   cd ztube
+   git clone https://github.com/daulric/fuze.git
+   cd fuze
    ```
 
 2. **Install Dependencies**: 
