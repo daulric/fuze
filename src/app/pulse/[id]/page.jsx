@@ -14,6 +14,7 @@ const cachedGetVideoData = cache(async (url, video_id) => {
   if (!response.ok) return null;
 
   const { success, data } = await response.json();
+  console.log(success, data);
   if (!success || !data || data.length === 0) return null;
   return data[0];
 });
@@ -54,7 +55,6 @@ export default async function PAGE({ params }) {
   }
 
   const data = [];
-  console.log(video_data);
 
   if (video_data) {
     const res = await fetch(`${url}/api/profile?username=${video_data.Account.username}`, {
