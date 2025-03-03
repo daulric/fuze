@@ -56,7 +56,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
           <div className="absolute inset-0 z-0 overflow-hidden">
             <Image
               src={thumbnail || "/logo.svg"}
-              alt="Background thumbnail"
+              alt=""
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover opacity-20"
@@ -70,7 +70,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
             src={thumbnail || "/logo.svg"}
             height={100}
             width={300}
-            alt={`Thumbnail for ${title}`}
+            alt=""
             className={`absolute inset-0 w-full h-full object-contain z-10 transition-opacity duration-500 ${
               isHovered ? "opacity-20" : "opacity-100"
             }`}
@@ -116,7 +116,7 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
                 src={images[0] || "/logo.svg"}
                 height={100}
                 width={300}
-                alt="Post preview"
+                alt=""
                 className="absolute inset-0 w-full h-full object-cover z-10"
               />
               {images.length > 1 && (
