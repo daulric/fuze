@@ -80,7 +80,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
               <Avatar>
                 <AvatarImage src={user?.avatar_url} alt={user?.username} />
                 <AvatarFallback className="text-gray-800">
-                  {user?.username.charAt(0).toUpperCase() || "G"}
+                  {(user && user.username) ? user.username.charAt(0).toUpperCase() : "G"}
                 </AvatarFallback>
               </Avatar>
             </Button>

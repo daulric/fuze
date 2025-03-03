@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, Mail, Calendar } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -98,9 +98,14 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [msg, setMsg] = useState(null);
   const [isLogining, setIsLogining] = useState(false);
-  const [user_info, setUserInfo] = useState({});
+  const userInfoRef = {
+    email: useRef(null),
+    password: useRef(null),
+    username: useRef(null),
+    dob: useRef(null),
+  }
   const [isAnimating, setIsAnimating] = useState(false);
-  const [dobError, setDobError] = useState('');
+  const [dobError, setDobError] = useState(null);
   const searchParams = useSearchParams();
   const redirected_path = searchParams.get("p");
   const cookies = cookieStore();
@@ -118,8 +123,6 @@ const AuthPage = () => {
     setTimeout(() => {
       setIsLogin((state) => {
         setIsAnimating(false);
-        setDobError('');
-        setUserInfo({});
         return !state;
       });
     }, 300); // Half of the animation duration
@@ -138,26 +141,23 @@ const AuthPage = () => {
     }
 
     if (age < 13) {
-      setDobError('You must be at least 13 years old to register.');
+      setDobError(() => 'You must be at least 13 years old to register.');
       return false;
     } else if (age > 120) {
-      setDobError('Please enter a valid date of birth.');
+      setDobError(() => 'Please enter a valid date of birth.');
       return false;
     }
 
-    setDobError('');
+    setDobError(() => null);
     return true;
   };
 
   const handleSubmit = useCallback((e) => {
-    e.preventDefault();
     if (isLogining === true) return;
 
-    if (!isLogin && !validateDateOfBirth(user_info.dob)) {
-      return;
-    }
+    if (!isLogin && !validateDateOfBirth(userInfoRef.dob.current.value)) return;
     
-    if (!isValidEmail(user_info.email)) {
+    if (!isValidEmail(userInfoRef.email.current.value)) {
       setMsg({success: false, message: "Invalid Email Format"});
       setTimeout(() => setMsg(null), 2000)
       return;
@@ -165,7 +165,7 @@ const AuthPage = () => {
 
     setIsLogining(true);
     if (isLogin === true) {
-      handleLoginForm(user_info, setMsg).then((success) => {
+      handleLoginForm({ email: userInfoRef.email.current.value, password: userInfoRef.password.current.value }, setMsg).then((success) => {
         if (success === true) {
           globalThis.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
         } else if (success === false) {
@@ -173,7 +173,13 @@ const AuthPage = () => {
         }
       });
     } else if (isLogin === false) {
-      handleSignupForm(user_info, setMsg).then((success) => {
+      const UserInfo = {
+        email: userInfoRef.email.current.value,
+        password: userInfoRef.password.current.value,
+        dob: userInfoRef.dob.current.value,
+        username: userInfoRef.username.current.value,
+      }
+      handleSignupForm(UserInfo, setMsg).then((success) => {
         if (success === true) {
           globalThis.location.href = `${redirected_path || "/"}?${path_to_redirect}`;
         } else if (success === false) {
@@ -181,7 +187,11 @@ const AuthPage = () => {
         }
       });
     }
-  }, [isLogin, user_info, redirected_path, path_to_redirect, isLogining]);
+  }, [isLogin, redirected_path, path_to_redirect, isLogining]);
+
+  useEffect(() => {
+    console.log(dobError)
+  }, [dobError])
 
   const user_exists = useMemo(() => {
     const user = cookies.get("user");
@@ -203,13 +213,18 @@ const AuthPage = () => {
           <form
             autoComplete='on'
             onSubmit={(e) => {
-              if (e.target.checkValidity() && (!isLogin || validateDateOfBirth(user_info.dob))) {
+              e.preventDefault();
+
+              try {
+
+                if (!e.target.checkValidity()) throw "Invalid Format";
+                if (!isLogin && !validateDateOfBirth(userInfoRef.dob.current.value)) throw "Age not Allowed";
                 handleSubmit(e);
-              } else {
-                e.preventDefault();
+
+              } catch(e) {
                 setMsg({
                   success: false,
-                  message: "Invalid Field Format"
+                  message: e
                 });
                 setTimeout(() => setMsg(null), 2000)
               }
@@ -224,13 +239,12 @@ const AuthPage = () => {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
+                    ref={userInfoRef.username}
                     required
                     type="text"
                     id="name"
                     placeholder="example123"
                     className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
-                    onChange={(e) => { setUserInfo((state) => ({ ...state, username: e.target.value })) }}
-                    onFocus={(e) => { setUserInfo((state) => ({ ...state, username: e.target.value })) }}
                   />
                 </div>
               </div>
@@ -243,21 +257,12 @@ const AuthPage = () => {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
+                  ref={userInfoRef.email}
                   required
                   type="email"
                   id="email"
                   placeholder="you@example.com"
                   className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
-                  value={user_info.email}
-                  onChange={(e) => { 
-                    const email = e.target.value;
-                    setUserInfo((state) => ({ ...state, email: email }));
-                   }}
-
-                   onFocus={(e) => { 
-                    const email = e.target.value;
-                    setUserInfo((state) => ({ ...state, email: email }));
-                   }}
                 />
               </div>
             </div>
@@ -270,21 +275,12 @@ const AuthPage = () => {
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
+                    ref={userInfoRef.dob}
                     required
                     type="date"
                     id="dob"
                     max={new Date().toISOString().split('T')[0]}
                     className="pl-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
-                    onChange={(e) => {
-                      const selectedDate = e.target.value;
-                      setUserInfo((state) => ({ ...state, dob: selectedDate }));
-                      validateDateOfBirth(selectedDate);
-                    }}
-                    onFocus={(e) => {
-                      const selectedDate = e.target.value;
-                      setUserInfo((state) => ({ ...state, dob: selectedDate }));
-                      validateDateOfBirth(selectedDate);
-                    }}
                   />
                 </div>
                 {dobError && <p className="text-red-500 text-sm mt-1">{dobError}</p>}
@@ -298,14 +294,12 @@ const AuthPage = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
+                  ref={userInfoRef.password}
                   required
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   placeholder="••••••••"
                   className="pl-10 pr-10 bg-gray-700 text-gray-300 border-gray-600 w-full"
-                  value={user_info.password}
-                  onChange={(e) => setUserInfo((state) => ({ ...state, password: e.target.value })) }
-                  onFocus={(e) => setUserInfo((state) => ({ ...state, password: e.target.value })) }
                 />
                 <button
                   type="button"
@@ -332,7 +326,7 @@ const AuthPage = () => {
             <Button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              disabled={isLogining || (!isLogin && dobError)}
+              disabled={isLogining}
             >
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
