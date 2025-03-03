@@ -3,22 +3,18 @@ import MainVideoPage from './VideoDisplay';
 import getUrl from "@/lib/geturl";
 import { notFound } from 'next/navigation';
 
-// Use cache to memoize the result of getVideoData
 const cachedGetVideoData = cache(async (url, video_id) => {
-  console.log("running from cache", url, video_id);
-
   const response = await fetch(`${url}/api/video?video_id=${video_id}`);
 
   if (!response.ok) return null;
 
   const { success, data } = await response.json();
-  console.log(success, data);
   if (!success || !data || data.length === 0) return null;
   return data[0];
 });
 
 export async function generateMetadata({ params }) {
-  const videoId = (await params).id;
+  const {id: videoId} = await params;
   const baseUrl = await getUrl();
   const canonicalUrl = `${baseUrl}/pulse?id=${videoId}`;
 
