@@ -13,10 +13,9 @@ const cachedGetVideoData = cache(async (url, video_id) => {
 
   if (!response.ok) return null;
 
-  const data = await response.json();
-  if (!data || data.data.length === 0) return null;
-
-  return data.data[0];
+  const { success, data } = await response.json();
+  if (!success || !data || data.length === 0) return null;
+  return data[0];
 });
 
 export async function generateMetadata({ params }) {
@@ -47,14 +46,15 @@ export async function generateMetadata({ params }) {
 
 export default async function PAGE({ params }) {
   const url = await getUrl();
-  const id = (await params).id;
+  const { id } = await params;
   const video_data = await cachedGetVideoData(url, id);
 
   if (process.env.NODE_ENV !== "development") {
-    await fetch(`${url}/api/video/views?id=${id}`, { method: "post" });
+    await fetch(`${url}/api/video/views?id=${id}`, { method: "post", cache: "no-store" });
   }
 
   const data = [];
+  console.log(video_data);
 
   if (video_data) {
     const res = await fetch(`${url}/api/profile?username=${video_data.Account.username}`, {

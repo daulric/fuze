@@ -46,7 +46,7 @@ export async function generateMetadata({params}) {
 }
 
 export default async function PostPage({ params }) {
-  const id = (await params).id
+  const { id } = await params;
   const url = await getUrl();
   const post = await cached_post(url, id);
 
@@ -58,6 +58,7 @@ export default async function PostPage({ params }) {
     await fetch(`${url}/api/post/views`, {
       method: "POST",
       body: JSON.stringify({ post_id: post.post_id }),
+      cache: "no-store",
     });
   }
 
