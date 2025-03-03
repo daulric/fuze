@@ -57,7 +57,6 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
   
           <Button onClick={() => router.push("/")} className="bg-transparent flex items-center space-x-2">
             <Image
-              loading="eager"
               src="/logo.svg"
               priority
               alt="Logo"

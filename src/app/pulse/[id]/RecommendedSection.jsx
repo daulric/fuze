@@ -23,7 +23,6 @@ const RecommendedVideoCard = ({ title, views, thumbnail, link, ...otherData }) =
             loading='eager'
             width={100}
             height={100}
-            unoptimized
           />
           <div className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
             <Play className="text-white" size={32} />
