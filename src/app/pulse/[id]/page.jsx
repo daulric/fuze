@@ -5,11 +5,10 @@ import { notFound } from 'next/navigation';
 
 // Use cache to memoize the result of getVideoData
 const cachedGetVideoData = cache(async (url, video_id) => {
+  console.log("running from cache", url, video_id);
   if (!url || !video_id) return null;
 
-  const response = await fetch(`${url}/api/video?video_id=${video_id}`, {
-    cache: "no-store"
-  });
+  const response = await fetch(`${url}/api/video?video_id=${video_id}`);
 
   if (!response.ok) return null;
 
