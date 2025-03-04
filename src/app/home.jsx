@@ -135,7 +135,7 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
 
       <div className="p-4">
         <div className="flex items-center mb-2">
-          <Avatar className="w-8 h-8 mr-2 text-gray-300">
+          <Avatar className="w-8 h-8 mr-2 text-gray-800">
             <AvatarImage src={avatar} alt={username} />
             <AvatarFallback>{username[0]}</AvatarFallback>
           </Avatar>
