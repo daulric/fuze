@@ -46,6 +46,8 @@ export function UserContextProvider({children}) {
         
         const res = await fetch(`/api/profile?${query.toString()}`, {
           signal: controller.signal,
+        }).catch((e) => {
+          if (e) return;
         });
         
         if (!res.ok) return

@@ -67,6 +67,8 @@ export default function Home() {
           const response = await fetch(`/api/video/recommend`, {
             body: JSON.stringify({ limit: 16, length: 60, allow_age_18 }),
             method: "POST",
+          }).catch((e) => {
+            if (e) return;
           });
         
           if (!response.ok) return;
@@ -125,6 +127,8 @@ export default function Home() {
           const response = await fetch(`/api/post/recommend`, {
             body: JSON.stringify({ limit: 16, length: 60, allow_age_18 }),
             method: "POST",
+          }).catch((e) => {
+            if (e) return;
           });
 
           if (!response.ok) return;

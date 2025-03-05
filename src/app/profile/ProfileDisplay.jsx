@@ -110,7 +110,7 @@ const UserProfilePage = ({ username }) => {
     });
 
     try {
-      const response = await fetch(`/api/video?${query.toString()}`);
+      const response = await fetch(`/api/video?${query.toString()}`).catch((e) => {if (e) return});
       if (!response.ok) throw new Error('Failed to fetch videos');
       const {  success, data} = await response.json();
       if (success) {
@@ -129,7 +129,7 @@ const UserProfilePage = ({ username }) => {
     });
 
     try {
-      const response = await fetch(`/api/post?${query.toString()}`);
+      const response = await fetch(`/api/post?${query.toString()}`).catch((e) => {if (e) return});
       if (!response.ok) throw new Error('Failed to fetch posts');
       const { success, data} = await response.json();
       if (success) {
