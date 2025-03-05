@@ -6,7 +6,6 @@ import Sidebar from "@/components/navbar/Sidebar"
 import { usePathname } from "next/navigation"
 import BottomMenu from "@/components/navbar/BottomMenu";
 import GetMobile from "@/lib/isMobileDevice";
-import { UserContextProvider } from "@/lib/UserContext";
 
 const ClientWrapper = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -59,23 +58,21 @@ const ClientWrapper = ({ children }) => {
   }
 
   return (
-    <UserContextProvider>
-      <div className="relative h-screen overflow-hidden overscroll-none">
-        <div className="flex h-screen">
-          <ProfileBar toggleSidebar={toggleSidebar} isSidebarHidden={isHidden} isMobile={isMobile} isPWA={isPWA} />
-          {(!isMobile || !isPWA) && <Sidebar isHidden={isHidden} setIsHidden={setIsHidden} isMobile={isPWA ? isPWA : isMobile} isPWA={isPWA} />}
-          <main
-            className={`flex-1 h-[calc(100vh-64px)] mt-16 
-              ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"} 
-              ${isMobile ? "mb-16" : ""}`
-            }
-          >
-            {children}
-          </main>
-          {(isPWA && isMobile) && <BottomMenu />}
-        </div>
+    <div className="relative h-screen overflow-hidden overscroll-none">
+      <div className="flex h-screen">
+        <ProfileBar toggleSidebar={toggleSidebar} isSidebarHidden={isHidden} isMobile={isMobile} isPWA={isPWA} />
+        {(!isMobile || !isPWA) && <Sidebar isHidden={isHidden} setIsHidden={setIsHidden} isMobile={isPWA ? isPWA : isMobile} isPWA={isPWA} />}
+        <main
+          className={`flex-1 h-[calc(100vh-64px)] mt-16 
+            ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"} 
+            ${isMobile ? "mb-16" : ""}`
+          }
+        >
+          {children}
+        </main>
+        {(isPWA && isMobile) && <BottomMenu />}
       </div>
-    </UserContextProvider>
+    </div>
   )
 }
 

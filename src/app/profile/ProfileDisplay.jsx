@@ -35,7 +35,7 @@ const UserProfilePage = ({ username }) => {
           <CardHeader className="p-0">
             <Image
               src={video.thumbnail} 
-              alt={video.title} 
+              alt="" 
               width={300} 
               height={200} 
               className="w-full h-40 object-cover"
@@ -81,17 +81,19 @@ const UserProfilePage = ({ username }) => {
 
   const getProfile = useCallback(async () => {
     if (!username) {
-      waitFor(() => sessionStorage.getItem("user"), 100).then(() => {
+      waitFor(() => sessionStorage.getItem("user"), 1).then(() => {
         const item = JSON.parse(sessionStorage.getItem("user"));
         setProfileInfo(item);
       });
     } else {
       try {
-        const response = await fetch(`/api/profile?username=${username}`);
+        const response = await fetch(`/api/profile?username=${username}`, {
+          cache: "force-cache",
+        });
         if (!response.ok) throw new Error('Failed to fetch profile');
-        const data = await response.json();
-        if (data.success) {
-          setProfileInfo(data.profile);
+        const { success, profile } = await response.json();
+        if (success) {
+          setProfileInfo(profile);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -148,11 +150,14 @@ const UserProfilePage = ({ username }) => {
   
   useEffect(() => {
     if (profile) {
-      getVideos();
-      getPosts();
+      Promise.all([
+        getVideos(),
+        getPosts(),
+      ]);
     }
     
     return () => {
+      posts.value = null;
       videos.value = null;
     }
   }, [getVideos, profile]);

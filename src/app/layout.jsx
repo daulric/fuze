@@ -1,6 +1,7 @@
 import "./globals.css";
 import NextTopLoader from 'nextjs-toploader';
 import NavbarLayout from "@/components/navbar/LayoutClient";
+import { UserContextProvider } from "@/lib/UserContext";
 
 export const metadata = {
   title: "Home",
@@ -16,10 +17,12 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="en">
       <body>
-        <NextTopLoader showSpinner={false} />
-        <NavbarLayout>
-          {children}
-        </NavbarLayout>
+        <UserContextProvider>
+          <NextTopLoader showSpinner={false} />
+          <NavbarLayout>
+            {children}
+          </NavbarLayout>
+        </UserContextProvider>
       </body>
     </html>
   );
