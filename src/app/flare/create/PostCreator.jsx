@@ -11,12 +11,15 @@ import directUpload from "./directUpload";
 
 export default function SocialPost() {
   const [thought, setThought] = useState("")
-  const [images, setImages] = useState([])
-  const [previews, setPreviews] = useState([])
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSending(true);
+
     await fetch("/api/post", {
       method: "POST",
       body: JSON.stringify({ content: thought }),
@@ -87,8 +90,8 @@ export default function SocialPost() {
                 placeholder="share your thoughts"
                 className="flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
               />
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-                post
+              <Button type="submit" disabled={isSending} className="bg-blue-600 hover:bg-blue-700 text-white">
+                { isSending ? "posting" : "post" }
               </Button>
             </div>
 
