@@ -81,10 +81,20 @@ const UserProfilePage = ({ username }) => {
 
   const getProfile = useCallback(async () => {
     if (!username) {
-      waitFor(() => sessionStorage.getItem("user"), 1).then(() => {
-        const item = JSON.parse(sessionStorage.getItem("user"));
+      const item = JSON.parse(sessionStorage.getItem("user"));
+      
+      if (!item) {
+        waitFor(() => {
+          const resolved_user = JSON.parse(sessionStorage.getItem("user"));
+          if (resolved_user) {
+            setProfileInfo(resolved_user);
+            return true;
+          }
+        }, 1)
+      } else {
         setProfileInfo(item);
-      });
+      }
+      
     } else {
       try {
         const response = await fetch(`/api/profile?username=${username}`, {

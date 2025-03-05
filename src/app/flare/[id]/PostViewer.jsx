@@ -170,7 +170,6 @@ export default function PostView({ post }) {
                   <Image
                     src={image || "/logo.svg"}
                     alt={`Post image ${index + 1}`}
-                    unoptimized
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -197,7 +196,6 @@ export default function PostView({ post }) {
                   className="max-w-full max-h-full object-contain"
                   width={1200}
                   height={800}
-                  unoptimized
                   loading="eager"
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg"
