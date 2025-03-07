@@ -124,3 +124,30 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #4a5568 #2a2a2a; /* Tailwind's bg-gray-800 for track and thumb */
 }
+
+@keyframes like-heart {
+  0% {
+    opacity: 0;
+    transform: scale(0) translate(-50%, -50%);
+  }
+  15% {
+    opacity: 0.9;
+    transform: scale(1.2) translate(-50%, -50%);
+  }
+  30% {
+    transform: scale(0.95) translate(-50%, -50%);
+  }
+  45%,
+  80% {
+    opacity: 0.9;
+    transform: scale(1) translate(-50%, -50%);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) translate(-50%, -50%) translateY(-30px);
+  }
+}
+
+.animate-like-heart {
+  animation: like-heart 1s ease-in-out forwards;
+}
