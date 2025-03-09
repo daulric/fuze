@@ -31,7 +31,6 @@ export async function POST(request) {
             const { data: files, error } = await PostsStorage.list(postData.post_id);
 
             if (error) {
-                console.error("Error fetching files:", error);
                 return null;
             }
 
@@ -39,7 +38,6 @@ export async function POST(request) {
                 const { data: signedUrlData, error: signedUrlError } = await PostsStorage.createSignedUrl(`${postData.post_id}/${file.name}`, length);
 
                 if (signedUrlError) {
-                    console.error(`Error getting signed URL for ${file.name}:`, signedUrlError);
                     return null;
                 }
 

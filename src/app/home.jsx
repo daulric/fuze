@@ -127,7 +127,7 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
             </>
           ) : (
             <div className="absolute inset-0 bg-gray-700 flex items-center justify-center p-4">
-              <p className="text-gray-200 text-sm line-clamp-6 overflow-hidden">{content}</p>
+              <p className="text-gray-200 text-lg line-clamp-6 overflow-hidden">{content}</p>
             </div>
           )}
         </div>

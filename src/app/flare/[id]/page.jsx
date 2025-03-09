@@ -67,7 +67,7 @@ export default async function PostPage({ params }) {
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       <header className="sticky top-0 z-20 border-b border-gray-800 bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-gray-900/60">
         <div className="container flex h-14 max-w-3xl items-center px-4">
-          <Button variant="ghost" size="icon" asChild className="mr-4 text-gray-300 hover:text-gray-100">
+          <Button variant="ghost" size="icon" asChild className="mr-4 text-gray-300 hover:text-gray-600">
             <Link href="/">
               <ArrowLeft className="h-5 w-5" />
             </Link>

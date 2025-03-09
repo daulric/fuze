@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import waitFor from '@/lib/waitFor';
 import { useComputed, useSignal } from '@preact/signals-react';
+import { useSearchParams } from 'next/navigation';
 
 const CardMark = ({message}) => {
   return (
@@ -21,7 +22,9 @@ const CardMark = ({message}) => {
 }
 
 const UserProfilePage = ({ username }) => {
-  const [activeTab, setActiveTab] = useState('videos');
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tab || 'videos');
   const [profile, setProfileInfo] = useState(null);
   const videos = useSignal(null);
   const posts = useSignal(null);
@@ -29,7 +32,7 @@ const UserProfilePage = ({ username }) => {
   const videos_computed = useComputed(() => {
     if (!videos.value) return (<CardMark message={`...`}/>);
     if (videos.value.length === 0) return (<CardMark message={`no videos from ${profile.username }`}/>)
-    return videos.value.map((video) => (
+    return videos.value.sort((a, b) => new Date(b.upload_at).getTime() - new Date(a.upload_at).getTime()).map((video) => (
       <Link href={`/pulse?id=${video.video_id}`} key={video.video_id} className="block">
         <Card className="overflow-hidden bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
           <CardHeader className="p-0">
@@ -62,17 +65,21 @@ const UserProfilePage = ({ username }) => {
     if (!posts.value) return (<CardMark message={"..."} />);
     if (posts.value.length === 0) return (<CardMark message={`no posts from ${profile?.username}`} />)
 
-    return posts.value.map((post) => (
+    return posts.value.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((post) => (
       <Link href={`/flare?id=${post.post_id}`} key={post.post_id} className="block">
         <Card className="bg-gray-800 shadow-lg transition-shadow hover:shadow-xl hover:bg-gray-700 border border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center text-white">
               <FileText className="mr-2 text-green-400" />
-              {`${post.content.split(' ').slice(0, 10).join(' ')}...`}
+              {`${post.content.split(' ').reduce((acc, word) => (acc + word).length <= 20 ? acc + ' ' + word : acc, '').trim()}...`}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-400">Date: {new Date(post.created_at).toLocaleDateString()}</p>
+            <div className="flex justify-between text-sm text-gray-400">
+              <span className="flex items-center">
+                <Eye className="mr-1 h-4 w-4" /> {post.views}
+              </span>
+            </div>
           </CardContent>
         </Card>
       </Link>
@@ -106,7 +113,7 @@ const UserProfilePage = ({ username }) => {
           setProfileInfo(profile);
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        if (error) return;
       }
     }
 
@@ -127,7 +134,7 @@ const UserProfilePage = ({ username }) => {
         videos.value = data;
       }
     } catch (error) {
-      console.error('Error fetching videos:', error);
+      if (error) return;
     }
   }, [profile]);
 
@@ -146,7 +153,7 @@ const UserProfilePage = ({ username }) => {
         posts.value = data;
       }
     } catch (error) {
-      console.error('Error fetching videos:', error);
+      if (error) return;
     }
   }, [profile]);
   
@@ -159,13 +166,17 @@ const UserProfilePage = ({ username }) => {
   }, [getProfile]);
   
   useEffect(() => {
-    if (profile) {
-      Promise.all([
+    if (!profile) return;
+
+    const fetchData = async () => {
+      await Promise.all([
         getVideos(),
-        getPosts(),
+        getPosts()
       ]);
-    }
-    
+    };
+
+    fetchData();
+
     return () => {
       posts.value = null;
       videos.value = null;

@@ -14,8 +14,9 @@ import CommentSection from './CommentSection';
 import SupabaseServer from '@/supabase/server';
 import { useUser } from "@/lib/UserContext"
 import { useSignal, useComputed } from '@preact/signals-react';
+import { useRouter } from 'next/navigation';
 
-const YouTubeStylePlayer = ({ VideoData }) => {
+const VideoDisplayPlayer = ({ VideoData }) => {
   const [expanded, setExpanded] = useState(false);
   const [likes, setLikes] = useState(null);
   const [dislikes, setDislikes] = useState(null);
@@ -24,6 +25,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   const videoContainerRef = useRef(null);
   const user = useUser();
   const supabase = SupabaseServer();
+  const router = useRouter();
   
   const viewCount = useSignal( VideoData.views || 0);
   const recommendedVideos = useSignal(null);
@@ -340,7 +342,7 @@ const YouTubeStylePlayer = ({ VideoData }) => {
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <button onClick={() => globalThis.location.href = `/profile/${VideoData?.Account?.username}`} className="flex items-center space-x-3">
+            <button onClick={() => router.push(`/profile/${VideoData?.Account?.username}`)} className="flex items-center space-x-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={VideoData?.uploaderPic} alt={VideoData?.Account?.username} />
                 <AvatarFallback className='bg-gray-600'><User className="h-6 w-6" /></AvatarFallback>
@@ -459,4 +461,4 @@ const YouTubeStylePlayer = ({ VideoData }) => {
   );
 };
 
-export default YouTubeStylePlayer;
+export default VideoDisplayPlayer;

@@ -48,7 +48,6 @@ export async function POST(request) {
           }
         };
       } catch (err) {
-        console.error("Error processing videoData:", err);
         return {
           ...videoData,
           video: null,

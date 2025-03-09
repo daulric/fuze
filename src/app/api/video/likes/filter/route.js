@@ -42,7 +42,6 @@ export async function POST(request) {
             thumbnail: signed_thumbnail?.data?.signedUrl || "/logo.svg",
           };
         } catch (err) {
-          console.error("Error processing videoData:", err);
           return {
             ...videoData,
             video: null,

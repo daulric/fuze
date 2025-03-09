@@ -111,7 +111,6 @@ async function GetFullData(supa_client) {
             }
 
           } catch (error) {
-              console.error(`Error processing video ${videoData.video_id}:`, error);
               return {
                   ...videoData,
                   video: null,
@@ -124,7 +123,6 @@ async function GetFullData(supa_client) {
       // Filter out failed items if needed
       return handler_data.filter(Boolean);
     } catch (error) {
-        console.error('Error processing video data:', error);
         throw error; // Propagate error for proper handling in GET route
     }
 }
@@ -195,7 +193,6 @@ export async function GET(request) {
 
       return DatabaseQuery(supa_client, {is_private: false});
     } catch(error) {
-      console.error('API Error:', error);
       return NextResponse.json({
           success: false,
           message: error.message || "Internal server error",

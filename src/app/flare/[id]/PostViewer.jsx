@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, Heart, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useComputed, useSignal } from "@preact/signals-react"
 import { useUser } from "@/lib/UserContext"
+import { useRouter } from "next/navigation"
 
 export default function PostView({ post }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null)
@@ -20,6 +21,7 @@ export default function PostView({ post }) {
   const [swipeDirection, setSwipeDirection] = useState(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const user = useUser()
+  const router = useRouter();
 
   const likesCount = useSignal(null)
   const viewsCount = useSignal(post.views || 0)
@@ -167,7 +169,7 @@ export default function PostView({ post }) {
     <div className="bg-gray-900 flex items-center justify-center p-4">
       <Card className="w-full max-w-3xl bg-gray-800 text-gray-100 border-transparent flex flex-col">
         <CardHeader className="flex-shrink-0 flex flex-col sm:flex-row items-start gap-2 border-b border-gray-700 bg-gray-800 z-10 py-3 rounded">
-          <div className="flex items-center gap-4 flex-grow">
+          <div onClick={() => router.push(`/profile/${post.Account.username}?tab=blogs`)} className="flex items-center gap-4 flex-grow">
             <Avatar>
               <AvatarImage src={authorAvatar} alt={post?.Account?.username || "/logo.svg"} />
               <AvatarFallback className="bg-gray-600">{post?.Account?.username[0]}</AvatarFallback>

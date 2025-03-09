@@ -111,7 +111,7 @@ const CommentSection = ({ videoId }) => {
 
         process_comments(Comments);
       } catch (error) {
-        console.error("Failed to fetch comments:", error);
+        if (error) return;
       } finally {
         setIsLoading(false);
       }
@@ -176,7 +176,7 @@ const CommentSection = ({ videoId }) => {
   
       setNewComment("");
     } catch (error) {
-      console.error("Failed to post comment:", error);
+      if (error) return;
     }
   };
 

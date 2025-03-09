@@ -34,7 +34,6 @@ export async function POST(request) {
       const { data, error } = await VideoStorage.list(videoData.video_id);
     
       if (error) {
-        console.error("Error fetching files:", error);
         return null;
       }
 

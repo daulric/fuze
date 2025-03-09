@@ -59,7 +59,6 @@ async function GetFullData(supa_client) {
           return postData;
 
         } catch (error) {
-            console.error(`Error processing post ${postData.post_id}:`, error);
             return {
               ...postData,
               images: null,
@@ -71,7 +70,6 @@ async function GetFullData(supa_client) {
     // Filter out failed items if needed
     return handler_data.filter(Boolean);
   } catch (error) {
-    console.error('Error processing post data:', error);
     throw error; // Propagate error for proper handling in GET route
   }
 }
