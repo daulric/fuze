@@ -3,12 +3,10 @@ name: Bun Build
 on:
   push:
     branches:
-      - main
-      - ua-changes
+      - '**'
   pull_request:
     branches:
-      - main
-      - ua-changes
+      - '**'
 
 jobs:
   build-test:
