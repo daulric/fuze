@@ -1,0 +1,33 @@
+name: NodeJS Build
+
+on:
+  push:
+    branches:
+      - main
+      - ua-changes
+  pull_request:
+    branches:
+      - main
+      - ua-changes
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["18", "20", "22", "23"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
