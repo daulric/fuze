@@ -13,6 +13,8 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import directUpload from "./directUpload";
 import store from "@/tools/cookieStore";
+import { useUser } from '@/lib/UserContext';
+import { useRouter } from 'next/navigation';
 
 const cookieStore = store();
 
@@ -24,6 +26,8 @@ const VideoUploadPage = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef(null);
+  const user = useUser();
+  const router = useRouter();
   
   const [videoDetails, setVideoDetails] = useState({
     title: "",
@@ -206,6 +210,12 @@ const VideoUploadPage = () => {
       if (thumbnailPreviewUrl) URL.revokeObjectURL(thumbnailPreviewUrl);
     };
   }, [thumbnailPreviewUrl, videoPreviewUrl]);
+
+  useEffect(() => {
+    if (!user) {
+      router.refresh();
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-4">

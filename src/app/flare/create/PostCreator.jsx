@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { X, ImagePlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,13 +8,17 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import directUpload from "./directUpload";
+import { useUser } from "@/lib/UserContext"
+import { notFound, useRouter } from "next/navigation"
 
 export default function SocialPost() {
   const [thought, setThought] = useState("")
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isSending, setIsSending] = useState(false);
-  const fileInputRef = useRef(null)
+  const fileInputRef = useRef(null);
+  const user = useUser();
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,6 +80,12 @@ export default function SocialPost() {
     setImages((prev) => prev.filter((_, i) => i !== index))
     setPreviews((prev) => prev.filter((_, i) => i !== index))
   }
+
+  useEffect(() => {
+    if (!user) {
+      router.refresh();
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">

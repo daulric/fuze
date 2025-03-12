@@ -33,8 +33,8 @@ export function UserContextProvider({children}) {
         const user_token = cookieStore.get("user");
         if (!user_token) return;
   
-        const user_data = JSON.parse(sessionStorage.getItem("user"))
-        
+        const user_data = JSON.parse(sessionStorage.getItem("user"));
+
         if (user_data) {
           setUser(user_data);
         }
@@ -66,7 +66,19 @@ export function UserContextProvider({children}) {
         if (e) console.log("hmm lights cut out...");
       }
     }
-  
+
+    globalThis.addEventListener("client_side_logout_state", () => {
+      const user_token = cookieStore.get("user");
+      const user_data = sessionStorage.getItem("user");
+
+      if (user_token !== null || user_data !== null) {
+        cookieStore.remove("user");
+        sessionStorage.removeItem("user")
+      }
+
+      setUser(null);
+    }, { signal: controller.signal });
+
     getUser();
 
     return () => controller.abort();

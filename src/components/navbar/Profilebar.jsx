@@ -21,18 +21,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-function Logout() {
-  const user_token = cookieStore.get("user");
-  const user_data = sessionStorage.getItem("user");
-
-  if (user_token !== null || user_data !== null) {
-    cookieStore.remove("user");
-    sessionStorage.removeItem("user")
-  }
-
-  globalThis.location.reload();
-}
-
 const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) => {
   const user = useUser();
   const router = useRouter();
@@ -130,7 +118,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
             {user !== null && (
               <DropdownMenuItem
                 className="flex items-center text-red-500 bg-gray-700"
-                onClick={() => Logout(router)}
+                onClick={() => globalThis.dispatchEvent(new Event("client_side_logout_state"))}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>

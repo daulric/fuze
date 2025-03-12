@@ -189,10 +189,6 @@ const AuthPage = () => {
     }
   }, [isLogin, redirected_path, path_to_redirect, isLogining]);
 
-  useEffect(() => {
-    console.log(dobError)
-  }, [dobError])
-
   const user_exists = useMemo(() => {
     const user = cookies.get("user");
     if (user) return true;
