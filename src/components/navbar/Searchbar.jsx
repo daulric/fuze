@@ -4,10 +4,14 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 const SearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const pathName = usePathname();
+  const searchParams = useSearchParams();
+  const controller = new AbortController();
+
+  const [searchTerm, setSearchTerm] = useState(pathName === "/search" ? searchParams.get("query") : "");
   const [recommendations, setRecommendations] = useState([]);
   const [isActive, setIsActive] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -22,6 +26,14 @@ const SearchBar = () => {
     const search_storage = JSON.parse(localStorage.getItem("search_storage"));
     return search_storage?.length ? search_storage : [];
   }, []);
+
+  controller.signal.addEventListener("abort", () => {
+    setRecommendations([]);
+    setSearchTerm("");
+    selectedIndex(-1);
+    setIsExpanded(false);
+    setIsActive(false);
+  });
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -80,8 +92,6 @@ const SearchBar = () => {
   };
 
   useEffect(() => {
-    const controller = new AbortController();
-    
     const handleClickOutside = (event) => {
       if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
         setIsActive(false);
@@ -93,6 +103,16 @@ const SearchBar = () => {
     document.addEventListener('mousedown', handleClickOutside, { signal: controller.signal });
     return () => controller.abort();
   }, [isMobileSearchOpen]);
+
+  useEffect(() => {
+
+    if (pathName !== "/search") {
+      setSearchTerm('');
+    } else {
+      setSearchTerm(searchParams.get("query"))
+    }
+
+  }, [pathName])
 
   const toggleSearch = () => {
     setIsExpanded((prev) => !prev);
