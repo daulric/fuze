@@ -42,11 +42,13 @@ export async function POST(request) {
             thumbnail: signed_thumbnail?.data?.signedUrl || "/logo.svg",
           };
         } catch (err) {
-          return {
-            ...videoData,
-            video: null,
-            thumbnail: "/logo.svg",
-          };
+          if (err) {
+            return {
+              ...videoData,
+              video: null,
+              thumbnail: "/logo.svg",
+            };
+          }
         }
       }));
       

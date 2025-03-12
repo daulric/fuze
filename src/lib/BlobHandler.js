@@ -63,7 +63,7 @@ export async function compressVideo(file, options = {}) {
     );
 
   } catch (error) {
-    return null;
+    if (error) return null;
   }
 }
 

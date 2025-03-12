@@ -47,7 +47,7 @@ async function GetFullData(supa_client) {
           if (files) {
 
             const signed_urls = await Promise.all(
-              files.map(async (file) => getSignedUrl(`${postData.post_id}/${file.name}`, 300))
+              files.map((file) => getSignedUrl(`${postData.post_id}/${file.name}`, 300))
             );
           
             return {

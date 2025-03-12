@@ -15,10 +15,6 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  env: {
-    
-  },
-
   experimental: {
     serverActions: {
       bodySizeLimit: '4mb'

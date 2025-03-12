@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Play, ThumbsUp } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from "next/link";
 import { useComputed, useSignal } from '@preact/signals-react';
 

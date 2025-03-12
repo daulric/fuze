@@ -22,11 +22,7 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (isPlaying) {
-      video.pause();
-    } else {
-      video.play();
-    }
+    isPlaying ? video.pause() : video.play();
     setIsPlaying(!isPlaying);
   }, [isPlaying]);
 
@@ -112,6 +108,9 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   }, []);
 
   useEffect(() => {
+
+    const video_player = videoRef.current;
+
     const handleKeyPress = (e) => {
       switch (e.key.toLowerCase()) {
         case ' ':
@@ -149,11 +148,16 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
     document.addEventListener('keydown', (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) return;
       handleKeyPress(e);
-    }, {
-      signal: controller.signal
-    });
+    }, { signal: controller.signal });
+
+    video_player.addEventListener("pause", () => {
+      setIsPlaying(false);
+    }, { signal: controller.signal });
     
-    const video_player = videoRef.current;
+    video_player.addEventListener("play", () => {
+      setIsPlaying(true);
+    }, { signal: controller.signal })
+
 
     if (video_player.src) {
       if (isLoaded) return;
@@ -175,12 +179,8 @@ const VideoPlayer = ({ isCommenting, videoData}) => {
   
   function handleLoadedData(e) {
     
-    setDuration(e.target.duration)
-    
-    /*if (e.target.duration !== duration) {
-      setDuration(e.target.duration);
-      }*/
-    
+    setDuration(e.target.duration);
+
     if (isPlaying) {
       setIsPlaying(false)
     }

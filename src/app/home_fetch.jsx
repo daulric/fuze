@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import HomePage from "./home";
 import { useUser } from "@/lib/UserContext";
 import CheckAge from "@/lib/checkdob";
-import { useSignal, computed, useComputed } from "@preact/signals-react"
+import { useSignal, useComputed } from "@preact/signals-react"
 
 function timeAgo(dateStr) {
   const diff =  Date.now() - new Date(dateStr).getTime(); // Difference in milliseconds

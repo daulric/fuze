@@ -48,11 +48,13 @@ export async function POST(request) {
           }
         };
       } catch (err) {
-        return {
-          ...videoData,
-          video: null,
-          thumbnail: "/logo.svg",
-        };
+        if (err) {
+          return {
+            ...videoData,
+            video: null,
+            thumbnail: "/logo.svg",
+          };
+        }
       }
     }));
     

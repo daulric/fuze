@@ -152,7 +152,7 @@ const AuthPage = () => {
     return true;
   };
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = useCallback(() => {
     if (isLogining === true) return;
 
     if (!isLogin && !validateDateOfBirth(userInfoRef.dob.current.value)) return;
