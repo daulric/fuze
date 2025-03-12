@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator"
-import { useUser } from "@/lib/UserContext"
+import { useUser } from "@/lib/UserContext";
+import { HiddenSignal } from './NavbarSignal';
 
 const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
   <Link href={href} >
@@ -19,8 +20,7 @@ const SidebarItem = ({ icon: Icon, label, collapsed, href="#" }) => (
   </Link>
 );
 
-const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) => {
-  const [collapsed] = useState(defaultCollapsed);
+const Sidebar = ({ defaultCollapsed = false, isHidden, isMobile }) => {
   const user = useUser();
   const sidebarRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -32,7 +32,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
     
     const handleOutsideClick = (event) => {
       if (isMobile && !isHidden && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        setIsHidden(prev => !prev);
+        HiddenSignal.value = !HiddenSignal.value;
       }
     };
 
@@ -42,7 +42,7 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
     return () => {
       controller.abort();
     };
-  }, [isMobile, isHidden, setIsHidden]);
+  }, [isMobile, isHidden, HiddenSignal]);
 
   const onTouchStart = (e) => {
     setTouchEnd(null);
@@ -57,9 +57,9 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     if (isLeftSwipe) {
-      setIsHidden(true);
+      HiddenSignal.value = true;
     } else if (isRightSwipe) {
-      setIsHidden(false);
+      HiddenSignal.value = false;
     }
   };
 
@@ -67,32 +67,32 @@ const Sidebar = ({ defaultCollapsed = false, isHidden, setIsHidden, isMobile }) 
     <div
       ref={sidebarRef}
       className={`bg-gray-800 text-white h-[calc(100vh-4rem)] fixed top-16 left-0 transition-all duration-300
-        ${isMobile ? (isHidden ? '-translate-x-full' : 'translate-x-0 w-64') : (collapsed ? 'w-16' : 'w-64')}
+        ${isMobile ? (isHidden ? '-translate-x-full' : 'translate-x-0 w-64') : (defaultCollapsed ? 'w-16' : 'w-64')}
         ${isMobile ? 'z-40 shadow-lg' : 'relative'}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       <ScrollArea className="h-full">
-        <div className={`p-4 space-y-4 ${collapsed && !isMobile ? 'items-center' : ''}`}>
-          <SidebarItem icon={Home} label="Home" collapsed={collapsed && !isMobile} href='/' />
+        <div className={`p-4 space-y-4 ${defaultCollapsed && !isMobile ? 'items-center' : ''}`}>
+          <SidebarItem icon={Home} label="Home" collapsed={defaultCollapsed && !isMobile} href='/' />
 
           {user && (
-            <SidebarItem icon={Heart} label="Liked Videos" collapsed={collapsed && !isMobile} href="/feed/liked" />
+            <SidebarItem icon={Heart} label="Liked Videos" collapsed={defaultCollapsed && !isMobile} href="/feed/liked" />
           )}
           
-          <SidebarItem icon={History} label="Watch History" collapsed={collapsed && !isMobile} href="/feed/history" />
+          <SidebarItem icon={History} label="Watch History" collapsed={defaultCollapsed && !isMobile} href="/feed/history" />
   
-          {(!collapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
+          {(!defaultCollapsed || isMobile) && <Separator className="my-2 border-gray-700 bg-gray-700" />}
           {user && (
             <>
-              <SidebarItem icon={Upload} label="Upload" collapsed={collapsed && !isMobile} href="/upload" />
-              <SidebarItem icon={Pencil} label="Create Flare" collapsed={collapsed && !isMobile} href="/flare/create" />
-              <SidebarItem icon={LayoutDashboardIcon} label="Dashboard" collapsed={collapsed && !isMobile} href="/dashboard" />
+              <SidebarItem icon={Upload} label="Upload" collapsed={defaultCollapsed && !isMobile} href="/upload" />
+              <SidebarItem icon={Pencil} label="Create Flare" collapsed={defaultCollapsed && !isMobile} href="/flare/create" />
+              <SidebarItem icon={LayoutDashboardIcon} label="Dashboard" collapsed={defaultCollapsed && !isMobile} href="/dashboard" />
             </>
           )}
 
-          {(!collapsed || isMobile) && (
+          {(!defaultCollapsed || isMobile) && (
             <></>
           )}
         </div>

@@ -6,11 +6,10 @@ import Sidebar from "@/components/navbar/Sidebar"
 import { usePathname } from "next/navigation"
 import BottomMenu from "@/components/navbar/BottomMenu";
 import GetMobile from "@/lib/isMobileDevice";
+import { HiddenSignal, MobileSignal, PWASignal } from "./NavbarSignal";
+import { useComputed } from "@preact/signals-react"
 
 const ClientWrapper = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
-  const [isPWA, setIsPWA] = useState(false);
   const pathName = usePathname();
   const controller = new AbortController();
 
@@ -27,19 +26,15 @@ const ClientWrapper = ({ children }) => {
       const is_pwa = globalThis.navigator.standalone || globalThis.matchMedia('(display-mode: standalone)').matches;
       const pathExcluded = getPathName();
       const mobile = globalThis.innerWidth < 1080;
-      
-      setIsMobile(() => {
-        
-        if (is_pwa && GetMobile()) {
-          setIsPWA(true);
-        } else {
-          setIsPWA(false);
-        }
-        
-        setIsHidden(pathExcluded ? true : mobile);
-        return pathExcluded ? true : mobile;
-      })
 
+      if (is_pwa && GetMobile()) {
+        PWASignal.value = true;
+      } else {
+        PWASignal.value = false;
+      }
+
+      HiddenSignal.value = pathExcluded ? true : mobile;
+      MobileSignal.value = pathExcluded ? true : mobile;
     }
 
     checkMobile();
@@ -48,29 +43,42 @@ const ClientWrapper = ({ children }) => {
   }, [pathName])
 
   const toggleSidebar = (newState) => {
-    if (isMobile) {
+    if (MobileSignal.value) {
       if (typeof newState === "boolean") {
-        setIsHidden(newState)
+        HiddenSignal.value = newState;
       } else {
-        setIsHidden((prev) => !prev)
+        HiddenSignal.value = !HiddenSignal.value;
       }
     }
   }
 
+  const ProfilebarComputed = useComputed(() => (
+    <ProfileBar toggleSidebar={toggleSidebar} isSidebarHidden={HiddenSignal.value} isMobile={MobileSignal.value} isPWA={PWASignal.value} />
+  ));
+
+  const SidebarComputed = useComputed(() => (
+    (!MobileSignal.value || !PWASignal.value) && <Sidebar isHidden={HiddenSignal.value} isMobile={PWASignal.value ? PWASignal.value : MobileSignal.value} isPWA={ PWASignal.value } />
+  ));
+
+  const BottomMenuComputed = useComputed(() => (PWASignal.value && PWASignal.value) && <BottomMenu />)
+
+  const MainClassNameComputed = useComputed(() => `
+    flex-1 h-[calc(100vh-64px)] mt-16 
+    ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"} 
+    ${MobileSignal.value ? "mb-16" : ""}
+  `)
+
   return (
     <div className="relative h-screen overflow-hidden overscroll-none">
       <div className="flex h-screen">
-        <ProfileBar toggleSidebar={toggleSidebar} isSidebarHidden={isHidden} isMobile={isMobile} isPWA={isPWA} />
-        {(!isMobile || !isPWA) && <Sidebar isHidden={isHidden} setIsHidden={setIsHidden} isMobile={isPWA ? isPWA : isMobile} isPWA={isPWA} />}
+        { ProfilebarComputed }        
+        { SidebarComputed }
         <main
-          className={`flex-1 h-[calc(100vh-64px)] mt-16 
-            ${pathName === "/pulse" ? "overflow-none" : "overflow-auto"} 
-            ${isMobile ? "mb-16" : ""}`
-          }
+          className={ MainClassNameComputed }
         >
           {children}
         </main>
-        {(isPWA && isMobile) && <BottomMenu />}
+        { BottomMenuComputed }
       </div>
     </div>
   )
