@@ -5,14 +5,14 @@ import policies, { siteMetadata } from "./PolicyConfig";
 export default function PoliciesPage() {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Website Terms and Policies</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-50">Website Terms and Policies</h1>
       <p className="text-sm text-gray-200 mb-8">
         Last Updated: {siteMetadata.lastUpdated}
       </p>
 
       {policies.map((policy) => (
         <section key={policy.id} className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">{policy.title}</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-50">{policy.title}</h2>
           <ul className="space-y-3">
             {policy.subPolicies.map((subPolicy) => (
               <li key={subPolicy.id} className="text-gray-100">
@@ -31,7 +31,7 @@ export default function PoliciesPage() {
           with any part of these terms, you must not use this website.
         </p>
 
-        <h2 className="text-xl font-semibold mb-4">Contact</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-100">Contact</h2>
         <p className="text-gray-200">
           For any questions regarding these policies, please contact:{" "}
           <a

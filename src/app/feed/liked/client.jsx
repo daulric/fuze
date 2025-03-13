@@ -74,7 +74,7 @@ export default function LikedVideosPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-white">Liked Videos</h1>
-        <div variant="outline" size="sm" className="flex items-center bg-transparent">
+        <div variant="outline" size="sm" className="flex items-center bg-transparent text-gray-50">
           <ThumbsUp size={16} className="mr-2" />
           {likedVideo_Length} videos
         </div>

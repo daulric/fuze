@@ -37,7 +37,7 @@ export default function HistoryPage() {
   const histories = useSignal(null);
 
   const HistoryComponents = useComputed(() => {
-    if (!histories.value || histories.value.length === 0) return ( <div>u ent have a history yet</div> );  
+    if (!histories.value || histories.value.length === 0) return ( <div className='text-white'>u ent have a history yet</div> );  
 
     return histories.value.map((video) => (
       <HistoryVideoCard key={video.video_id} link={`/pulse?id=${video.video_id}`} {...video} /> 
@@ -94,7 +94,7 @@ export default function HistoryPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-white">Wah You Was Watching??</h1>
-        <Button onClick={clearHistory} variant="destructive" size="sm" className="flex items-center">
+        <Button onClick={clearHistory} variant="destructive" size="sm" className="text-white flex items-center">
           <Trash2 size={16} className="mr-2" />
           Clear All History
         </Button>
