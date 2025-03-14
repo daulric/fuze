@@ -62,6 +62,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
               className="object-cover opacity-20"
               priority={false}
               quality={50} // Lower quality for background is fine
+              loading="eager"
             />
           </div>
           
@@ -74,6 +75,7 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
             className={`absolute inset-0 w-full h-full object-contain z-10 transition-opacity duration-500 ${
               isHovered ? "opacity-20" : "opacity-100"
             }`}
+            loading="eager"
           />
           
           {/* Video element */}
@@ -118,6 +120,7 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
                 width={300}
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover z-10"
+                loading="eager"
               />
               {images.length > 1 && (
                 <div className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur z-20">
