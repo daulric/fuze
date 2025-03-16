@@ -63,6 +63,8 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
               priority={false}
               quality={50} // Lower quality for background is fine
               loading="eager"
+              placeholder="blur"
+              blurDataURL={thumbnail}
             />
           </div>
           
@@ -76,6 +78,9 @@ const VideoCard = ({ title, channel, views, uploadTime, thumbnail, link, video }
               isHovered ? "opacity-20" : "opacity-100"
             }`}
             loading="eager"
+            blurDataURL={thumbnail}
+            placeholder="blur"
+            priority
           />
           
           {/* Video element */}
@@ -121,6 +126,9 @@ const PostCard = ({ post_id, username, avatar, created_at, images, content }) =>
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover z-10"
                 loading="eager"
+                placeholder="blur"
+                blurDataURL={images[0]}
+                priority
               />
               {images.length > 1 && (
                 <div className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur z-20">

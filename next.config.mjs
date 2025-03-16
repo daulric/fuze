@@ -27,12 +27,13 @@ const nextConfig = {
 
   images: {
     unoptimized: process.env.VERCEL && true,
+    minimumCacheTTL: 2678400,
     
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.URL_CONFIG || "example.com",
-        pathname: "/storage/v1/**"
+        hostname: process.env.URL_CONFIG,
+        pathname: "/storage/v1/**",
       },
       {
         protocol: "https",
