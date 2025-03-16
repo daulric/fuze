@@ -32,7 +32,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.URL_CONFIG,
+        hostname: process.env.URL_CONFIG || "daulric.dev",
         pathname: "/storage/v1/**",
       },
       {
