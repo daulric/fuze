@@ -75,7 +75,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 For any questions or inquiries, feel free to reach out:
 
-- Email: ulricaird@yahoo.com
+- Email: ulric@daulric.dev
 - GitHub: [daulric](https://github.com/daulric)
 
 Feel free to customize any sections as needed, including adding more details about your platform's features, installation instructions, or any specific guidelines for contributions!
