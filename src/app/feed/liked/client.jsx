@@ -5,6 +5,7 @@ import { Play, ThumbsUp } from 'lucide-react';
 import { useEffect } from 'react';
 import Link from "next/link";
 import { useComputed, useSignal } from '@preact/signals-react';
+import DeepComparison from "@/lib/DeepComparison"
 
 const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
   return (
@@ -49,7 +50,10 @@ export default function LikedVideosPage() {
     async function getLikedVideos() {
 
       if (likedVideo_Length.value > 0) return;
-        
+
+      const user_liked_history = JSON.parse(localStorage.getItem("user_liked_history"));
+      if (user_liked_history) likedVideos.value = user_liked_history;
+
       const response = await fetch('/api/video/likes/filter', {
         method: 'POST',
         headers: {
@@ -59,11 +63,12 @@ export default function LikedVideosPage() {
           filter: '*, Video(*,  Account(username))',
         }),
       });
-      
+        
       const {success, data} = await response.json();
       
-      if (success) {
+      if (success && !DeepComparison(user_liked_history, data)) {
         likedVideos.value = data;
+        localStorage.setItem("user_liked_history", JSON.stringify(data));
       }
     }
     
