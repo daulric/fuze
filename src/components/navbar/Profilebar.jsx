@@ -26,8 +26,9 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
   const router = useRouter();
   
   return (
-    <Suspense>
-      <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
+    <div className="flex items-center justify-between space-x-4 bg-gray-800 p-4 w-full fixed top-0 z-50 h-16">
+
+      <Suspense>
         <div className="flex items-center space-x-4">
           {(isPWA ? false : isMobile) && (
             <Button
@@ -42,7 +43,7 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
               )}
             </Button>
           )}
-  
+
           <Button onClick={() => router.push("/")} className="bg-transparent flex items-center space-x-2">
             <Image
               src="/logo.svg"
@@ -55,12 +56,12 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
             <span className="text-white text-lg font-semibold">fuze</span>
           </Button>
         </div>
-  
+
         {/* Centered search bar */}
         <div className="flex-grow flex justify-center max-w-2xl">
           <SearchBar />
         </div>
-  
+
         {/* User dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -126,8 +127,9 @@ const AccountProfileBar = ({ toggleSidebar, isSidebarHidden, isMobile, isPWA }) 
             )}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-    </Suspense>
+      </Suspense>
+
+    </div>
   );
 };
 

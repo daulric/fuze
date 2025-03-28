@@ -88,11 +88,11 @@ const UserProfilePage = ({ username }) => {
 
   const getProfile = useCallback(async () => {
     if (!username) {
-      const item = JSON.parse(sessionStorage.getItem("user"));
+      const item = JSON.parse(localStorage.getItem("user"));
       
       if (!item) {
         waitFor(() => {
-          const resolved_user = JSON.parse(sessionStorage.getItem("user"));
+          const resolved_user = JSON.parse(localStorage.getItem("user"));
           if (resolved_user) {
             setProfileInfo(resolved_user);
             return true;
