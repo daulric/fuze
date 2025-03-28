@@ -20,9 +20,8 @@ The User may:
 ## 4. Restrictions  
 The User may not:  
 - Use, copy, distribute, or sublicense the Software without purchasing a valid license.  
-- Reverse-engineer, decompile, or attempt to extract the source code.  
 - Remove any copyright or proprietary notices.  
-- Transfer or resell the license without written permission from the Licensor.  
+- Transfer or resell the license without written permission from the Licensor.
 
 ## 5. Ownership  
 The Licensor retains all rights, title, and interest in the Software. This Agreement does not transfer ownership of any intellectual property.  
