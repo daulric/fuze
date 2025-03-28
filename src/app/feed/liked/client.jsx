@@ -2,10 +2,11 @@
 
 import Image from 'next/image';
 import { Play, ThumbsUp } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { useComputed, useSignal } from '@preact/signals-react';
 import DeepComparison from "@/lib/DeepComparison"
+import { notFound } from 'next/navigation';
 
 const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
   return (
@@ -38,6 +39,7 @@ const LikedVideoCard = ({ title, views,thumbnail, link, Account }) => {
 };
 
 export default function LikedVideosPage() {
+  const [loggedOut, setisLoggedOut] = useState(false);
 
   const likedVideos = useSignal([]);
   const likedVideo_Length = useComputed(() => likedVideos.value.length);
@@ -73,7 +75,16 @@ export default function LikedVideosPage() {
     }
     
     getLikedVideos();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    globalThis.addEventListener("client_side_logout_state", () => setisLoggedOut(true), { signal: controller.signal });
+    return () => controller.abort();
+  }, []);
+
+  if (loggedOut) notFound();
   
   return (
     <div className="container mx-auto px-4 py-8">

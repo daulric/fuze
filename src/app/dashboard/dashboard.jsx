@@ -11,13 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Upload } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useUser } from "@/lib/UserContext";
+import { notFound } from 'next/navigation';
+import waitFor from '@/lib/waitFor';
 
 export default function CreatorDashboard() {
   const [videos, setVideos] = useState(null);
   const [blogs, setBlogs] = useState(null);
-  const user = useUser();
-  const [userProfile, setUserProfile] = useState(user);
+  const [userProfile, setUserProfile] = useState(null);
+  const [isLoggedOut, setisLoggedOut] = useState(false);
 
   useEffect(() => {
     async function fetch_videos() {
@@ -36,6 +37,21 @@ export default function CreatorDashboard() {
 
     fetch_videos();
   }, [userProfile]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    waitFor(() => {
+      const temp_user = JSON.parse(localStorage.getItem("user"));
+      if (temp_user) {
+        setUserProfile(temp_user); 
+        return true;
+      }
+    }, 0);
+
+    globalThis.addEventListener("client_side_logout_state", () => setisLoggedOut(true), { signal: controller.signal });
+    return () => controller.abort();
+  }, [])
 
   const handleVideoEdit = async (_, updatedVideo) => {
 
@@ -258,6 +274,8 @@ export default function CreatorDashboard() {
       </Dialog>
     );
   };
+
+  if (isLoggedOut) notFound();
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
