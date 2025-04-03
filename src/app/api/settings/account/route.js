@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 import { encrypt } from "@/tools/encryption"
 
 export function GET() {
@@ -21,7 +21,6 @@ export async function POST(request) {
             throw "Missing Required Fields";
         }
 
-        const supa_client = SupabaseServer();
         const account_db = supa_client.from("Account");
 
         const { data: isValid, error: CheckError } = await account_db.select().eq("username", username);

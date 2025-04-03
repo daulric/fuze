@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 export function GET() {
     return new NextResponse("ok");
@@ -8,7 +8,6 @@ export function GET() {
 export async function POST(request) { 
     try {
         const video_upload_data = await request.formData();
-        const supa_client = SupabaseServer();
 
         const video_data = JSON.parse(video_upload_data.get("data"));
 

@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import SupabaseServer from '@/supabase/server';
+import supa_client from '@/supabase/server';
 import { cookies } from 'next/headers';
 
 export async function POST(request) {
@@ -10,8 +10,7 @@ export async function POST(request) {
       
       if (!AccountID) throw "Account ID is Required";
       if (!filter) throw "Filter is Required!";
-      
-      const supa_client = SupabaseServer();
+
       const FileStorage = supa_client.storage.from("Uploads");
       
       const data = await supa_client.from("VideoLikes")

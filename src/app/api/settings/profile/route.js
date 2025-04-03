@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 import crypto from "crypto"
 
 export function GET() {
@@ -10,7 +10,6 @@ export async function POST(request) {
 
   try {
     const updated_profile_data = await request.formData();
-    const supa_client = SupabaseServer();
 
     const { account_id, ...account_data} = JSON.parse(updated_profile_data.get("account_data"));
     const profile_picture = updated_profile_data.get("profile_picture");

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 export async function POST(request) {
   try {
@@ -10,8 +10,7 @@ export async function POST(request) {
     
     const { group, length = 30 } = await request.json();
     if (!group ||  group.length === 0) throw "Group Data is Needed";
-    
-    const supa_client = SupabaseServer();
+
     const VideoStorage = supa_client.storage.from("Uploads");
     
     const data = await supa_client.from("Video").select("*, Account(username)").then(({data, error}) => {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 import { cookies } from "next/headers";
 
 async function DatabaseQuery(supa_client, query) {
@@ -155,7 +155,6 @@ export async function GET(request) {
     const queries = Object.fromEntries(searchParams.entries());
 
     try {
-      const supa_client = SupabaseServer();
 
       if (Object.keys(queries).length !== 0) {
           if (queries.search) {
@@ -210,7 +209,6 @@ export async function PUT(request) {
 
     if (!video_id) throw "Video ID Not Provided";
 
-    const supa_client = SupabaseServer();
     const video_db = supa_client.from("Video");
 
     await video_db.update({

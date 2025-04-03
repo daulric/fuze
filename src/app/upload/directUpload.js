@@ -1,4 +1,4 @@
-import supabase_client from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 export default async function directUpload(video_id, video_file, video_thumbnail) {
     try {
@@ -6,7 +6,6 @@ export default async function directUpload(video_id, video_file, video_thumbnail
         if (!video_file) throw "No Video File Provided";
         if (!video_thumbnail) throw "No Thumbnail Provided"
 
-        const supa_client = supabase_client();
         const Uploads_Storage = supa_client.storage.from("Uploads");
 
         if (video_id) {

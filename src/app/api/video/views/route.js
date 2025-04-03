@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Supabase from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 export function GET() {
     return new NextResponse("ok");
@@ -11,7 +11,6 @@ export async function POST(request) {
 
     try {
 
-        const supa_client = Supabase();
         const video_db = supa_client.from("Video");
         const video_id = searchParams.get("id");
 

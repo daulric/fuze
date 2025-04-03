@@ -1,4 +1,4 @@
-import SupabaseServer from "@/supabase/server";
+import supabase from "@/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -10,7 +10,6 @@ export async function GET(request) {
 
         if (!video_id) throw "No Video ID Provided!";
 
-        const supabase = SupabaseServer();
         const VideoLikesDB = supabase.from("VideoLikes");
 
         const {data, error} = await VideoLikesDB.select("*")
@@ -66,7 +65,6 @@ export async function POST(request) {
         if (!account_id) throw "account needed";
         if (!video_id) throw "No Video ID Provided";
 
-        const supabase = SupabaseServer();
         const VideoLikesDB = supabase.from("VideoLikes");
 
         const {data: record_exisit, error: record_notfound} = await VideoLikesDB.select("*")

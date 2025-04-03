@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supabase from "@/supabase/server";
 
 export async function POST(request) {
     try {
@@ -7,7 +7,6 @@ export async function POST(request) {
         const { limit, length = 30 } = await request.json();
         if (!limit) throw "No Limit Provided";
 
-        const supabase = SupabaseServer();
         const PostsDB = supabase.from("Posts");
         const PostsStorage = supabase.storage.from("PostsImages");
 

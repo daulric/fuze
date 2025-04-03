@@ -1,11 +1,10 @@
-import supabase_client from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 export default async function directUpload(post_id, files) {
   try {
     
     if (!post_id) throw "No Post Id Provided For Direct Upload";
     
-    const supa_client = supabase_client();
     const Uploads_Storage = supa_client.storage.from("PostsImages");
     
     if (post_id) {

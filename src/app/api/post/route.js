@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 import { cookies } from "next/headers";
 
 async function GetFullData(supa_client) {
@@ -141,7 +141,6 @@ export async function GET(request) {
   const queries = Object.fromEntries(searchParams.entries());
 
   try {
-    const supa_client = SupabaseServer();
     
     if (Object.keys(queries).length !== 0) {
       
@@ -190,7 +189,6 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const supa_client = SupabaseServer();
     const requested_data = await request.json();
     
     const user = (await cookies()).get("user");

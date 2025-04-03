@@ -1,4 +1,4 @@
-import SupabaseServer from "@/supabase/server"
+import supabase from "@/supabase/server"
 import { NextResponse } from "next/server"
 
 export async function POST(request) {
@@ -6,8 +6,7 @@ export async function POST(request) {
   try {
     const { limit, length = 30, allow_age_18 = false } = await request.json();
     if (!limit) throw "Limit Not Provided!";
-    
-    const supabase = SupabaseServer();
+
     const VideoDB = supabase.from("Video");
     const VideoStorage = supabase.storage.from("Uploads");
     

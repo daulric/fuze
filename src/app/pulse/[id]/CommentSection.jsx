@@ -9,7 +9,7 @@ import { User, ChevronDown, ChevronUp } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useUser } from "@/lib/UserContext"
 
-import SupabaseClient from "@/supabase/server";
+import supabase from "@/supabase/server";
 
 const Comment = ({ user, comment, created_at }) => {
   const timeAgo = (date) => {
@@ -51,8 +51,6 @@ const CommentSection = ({ videoId }) => {
   const user_client = useUser();
   const [pre_comment_profiles, setPreCommentProfiles] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  const supabase = SupabaseClient();
 
   useEffect(() => {
     async function getProfiles() {

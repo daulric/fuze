@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import Supabase from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 async function GetUserProfiles() {
-    const supa_client = Supabase();
     const accounts_db = supa_client.from("Account");
     const ProfileStorage = supa_client.storage.from("Profiles");
 
@@ -56,8 +55,7 @@ export async function GET(request) {
         };
 
         if (!username && !account_id) { throw "No Valid Params" };
-       
-        const supa_client = Supabase();
+
         const account_db = supa_client.from("Account");
         const ProfileDB = supa_client.storage.from("Profiles");
 

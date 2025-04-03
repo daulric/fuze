@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Supabase from "@/supabase/server";
+import supa_client from "@/supabase/server";
 
 export function GET() {
     return new NextResponse("ok");
@@ -11,7 +11,6 @@ export async function POST(request) {
 
         if (!post_id) throw "no id";
 
-        const supa_client = Supabase();
         const PostsDB = supa_client.from("Posts");
 
         const { data: views_data, error: ViewError } = await PostsDB.select("views")

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supabase_client from "@/supabase/server";
 import { decrypt } from "@/tools/encryption"
 
 import { cookies } from "next/headers";
@@ -17,7 +17,6 @@ export async function POST(request) {
       throw "Missing Fields Required!";
     }
 
-    const supabase_client = SupabaseServer();
     const accounts_db = supabase_client.from("Account")
     const cookieStore = await cookies();
 
@@ -79,8 +78,7 @@ export async function PUT(request) {
             throw "Missing Fields Required!";
         }
 
-        const supa_client = SupabaseServer();
-        const accounts_db = supa_client.from("Account");
+        const accounts_db = supabase_client.from("Account");
         const cookieStore = await cookies();
 
         if (loginType !== "login") { throw "Invalid Login Type for Method!"; }

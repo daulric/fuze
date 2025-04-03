@@ -11,7 +11,7 @@ import VideoPlayer from "./VideoPlayer";
 import RecommendedVideos from './RecommendedSection';
 import { notFound } from 'next/navigation';
 import CommentSection from './CommentSection';
-import SupabaseServer from '@/supabase/server';
+import supabase from '@/supabase/server';
 import { useUser } from "@/lib/UserContext"
 import { useSignal, useComputed } from '@preact/signals-react';
 import { useRouter } from 'next/navigation';
@@ -24,7 +24,6 @@ const VideoDisplayPlayer = ({ VideoData }) => {
   const [userDisliked, setUserDisliked] = useState(null);
   const videoContainerRef = useRef(null);
   const user = useUser();
-  const supabase = SupabaseServer();
   const router = useRouter();
   
   const viewCount = useSignal( VideoData.views || 0);

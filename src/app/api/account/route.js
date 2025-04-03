@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import SupabaseServer from "@/supabase/server";
+import supa_client from "@/supabase/server";
 import { cookies } from "next/headers";
 
 export async function POST(request) {
@@ -11,7 +11,6 @@ export async function POST(request) {
     
     const { username, aboutme } = await request.json();
 
-    const supa_client = SupabaseServer();
     const AccountDB = supa_client.from("Account");
     
     const { data: existingData } = await AccountDB.select('*');

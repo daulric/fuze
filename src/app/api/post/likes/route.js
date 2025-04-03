@@ -1,4 +1,4 @@
-import SUPABASE_SERVER from "@/supabase/server"
+import supabase from "@/supabase/server"
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server"
 
@@ -9,7 +9,6 @@ export async function GET(request) {
 
         if (!post_id) throw "No Post ID Provided";
 
-        const supabase = SUPABASE_SERVER();
         const PostsLikesDB = supabase.from("PostsLikes");
 
         const {data, error} = await PostsLikesDB.select("*")
@@ -58,7 +57,6 @@ export async function POST(request) {
         if (!account_id) throw "account needed";
         if (!post_id) throw "no post id provided";
 
-        const supabase = SUPABASE_SERVER();
         const PostLikesDB = supabase.from("PostsLikes");
 
         const { data: record_exisit, error: record_notfound } = await PostLikesDB.select("*")
