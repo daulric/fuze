@@ -8,12 +8,19 @@
     "start": "next start",
     "lint": "next lint",
     "shadcn": "npx shadcn@latest",
-    "deploy": "next build && next start"
+    "deploy": "next build && next start",
+
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@hookform/resolvers": "^3.10.0",
+    "@opennextjs/cloudflare": "^1.2.1",
     "@preact/signals-react": "^3.0.1",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.3",
