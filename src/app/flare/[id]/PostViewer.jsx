@@ -253,7 +253,6 @@ export default function PostView({ post }) {
                   width={1200}
                   height={800}
                   priority={selectedImageIndex === 0}
-                  unoptimized
                   placeholder="blur"
                   blurDataURL={post.images[selectedImageIndex]}
                 />

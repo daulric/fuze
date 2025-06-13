@@ -26,7 +26,6 @@ const nextConfig = {
   },
 
   images: {
-    unoptimized: process.env.VERCEL && true,
     minimumCacheTTL: 2678400,
     
     remotePatterns: [
